@@ -4,3 +4,4 @@
 * [JIRA](http://jira.blinkbox.local/jira/secure/RapidBoard.jspa?rapidView=107)
 * [Chat](https://blinkbox.slack.com/messages/books-cust-services/)
 * [Teamcity](http://grisham.blinkbox.local:8111/project.html?projectId=Books_Platform_Agora_AccountCreditServiceV2)
+* [Techinical Design](http://jira.blinkbox.local/confluence/display/PT/account-credit-service-v2+Technical+Design)
