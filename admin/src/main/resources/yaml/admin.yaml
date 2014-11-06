@@ -1,0 +1,103 @@
+---
+swagger: "2.0"
+info:
+  title: Admin Account Credit Service
+  version: 1.0.0
+
+paths:
+  /admin/users/{user_id}/credit:
+    get:
+      summary: Lookup a users account credit
+      produces:
+        - application/vnd.blinkbox.books.v2+json
+      parameters:
+        - name: user_id
+          type: string
+          in: path
+          required: true
+      responses:
+        200:
+          description: Account credit
+          examples:
+            application/json: |
+              { amount: 1337,
+                credits: [
+                  { "credited_by": "438294238944848",
+                    "date_time": "2014-01-01T00:00:00Z",
+                    "amount": 2000,
+                    "reason_code": "Goodwill (shouty customer)"
+                    "reason_description": "The app misbehaved, so I gave the customer them some money"
+                  }
+                ]
+                debits: [
+                  { "date": "2014-03-01T00:00:00Z"
+                    "amount": 663
+                  }
+                ]
+              }
+    put:
+      summary: Credit a user's account
+      consumes:
+       - application/vnd.blinkbox.books.v2+json
+      parameters:
+        - name: user_id
+          required: true
+          type: string
+          in: path
+        - name: id
+          required: true
+          description: identifier used to make this PUT idempotent. If the service has already applied a credit change with this ID, this request does not add more credit, and returns 204.
+          type: string
+          in: formData
+        - name: amount_change
+          type: integer
+          in: formData
+          required: true
+        - name: credited_by
+          required: true
+          type: string
+          in: formData
+        - name: reason
+          required: true
+          type: string
+          in: formData
+          
+
+      responses:
+        204:
+          description: Account credit successfully update
+          examples:
+            application/json: |
+              { "amount_change": 2000,
+                "id": "4f87e333-32c7-4d40-a3cd-7da58345069e"
+              }
+              
+  /admin/users/{user_id}/debit:
+    put:
+      summary: Debit a user's account
+      consumes:
+       - application/vnd.blinkbox.books.v2+json
+      parameters:
+        - name: user_id
+          required: true
+          type: string
+          in: path
+        - name: id
+          required: true
+          description: identifier used to make this PUT idempotent. If the service has already applied a credit change with this ID, this request does not add more credit, and returns 204.
+          type: string
+          in: formData
+        - name: amount_change
+          type: integer
+          in: formData
+          required: true
+          
+
+      responses:
+        204:
+          description: Account credit successfully update
+          examples:
+            application/json: |
+              { "amount_change": 2000,
+                "id": "4f87e333-32c7-4d40-a3cd-7da58345069e"
+              }

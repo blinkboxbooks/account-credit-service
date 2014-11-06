@@ -1,0 +1,65 @@
+---
+swagger: "2.0"
+info:
+  title: Account Credit Service
+  description: TODO
+  version: 1.0.0
+basePath: /
+produces:
+  - application/json
+paths:
+  /credit:
+    get:
+      summary: Lookup current user's account credit
+      responses:
+        200:
+          description: Account credit
+          examples:
+            application/json: |
+              {
+                "amount": 100
+              }
+        404:
+          description: User not found
+
+definitions:
+  CreditResponse:
+    title: credit of a user
+    required:
+
+  ProviderStatusResponse:
+    title: progress status of a resource's storage
+    required:
+      - token
+      - label
+      - providers
+    additionalProperties: false
+    properties:
+      token:
+        title: a token which represents mapped resources in the cloud
+        type: string
+      label:
+        title: allows you to group assets, define some attributes of how they are stored
+        type: string
+      providers:
+        type: object
+        title: a map on of storage requests ->complete boolean
+        additionalProperties:
+          title: Details of the resource as stored in the various providers.
+          type: object
+          required:
+            - available
+          additionalProperties: false
+          properties:
+            available:
+              title: Can the resource be found at this location?
+              type: boolean
+            eta:
+              title: Number of seconds until upload is expected to complete, absent if complete or not started.
+              type: number
+              minimum: 0
+            percentComplete:
+              title: Upload complete percentage as fraction of 1, absent if complete or not started.
+              type: number
+              minimum: 0
+              maximum: 1
