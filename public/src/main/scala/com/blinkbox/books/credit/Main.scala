@@ -17,8 +17,8 @@ object Main extends App with Configuration with Loggers with StrictLogging {
   val system = ActorSystem("account-credit-service-v2-public")
   val service = system.actorOf(Props(classOf[PublicApiActor]))
 
-  val interface = config.getString("admin.listen.address")
-  val port = config.getInt("admin.listen.port")
+  val interface = config.getString("public.listen.address")
+  val port = config.getInt("public.listen.port")
 
   logger.info("App started")
   HttpServer(Http.Bind(service, interface = interface, port=port))(system, system.dispatcher, Timeout(10.seconds))
