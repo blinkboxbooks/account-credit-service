@@ -1,3 +1,0 @@
-# Changelog
-
-Nothing at all.
