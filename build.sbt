@@ -8,6 +8,6 @@ lazy val buildSettings = Seq(
 )
 
 lazy val root = (project in file("public")).
-  settings(rpmPrepSettings: _*).
   settings(buildSettings: _*).
+  settings(rpmPrepSettings: _*).
   settings(publish := {})
