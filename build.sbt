@@ -7,4 +7,4 @@ lazy val buildSettings = Seq(
   scalacOptions := Seq("-unchecked", "-deprecation", "-feature", "-encoding", "utf8", "-target:jvm-1.7")
 )
 
-lazy val root = (project in file("public"))
+lazy val root = (project in file("public")).settings(rpmPrepSettings: _*)
