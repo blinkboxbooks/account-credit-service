@@ -11,10 +11,10 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService {
 
   val route = (new AdminApi()).route
 
-  "The service" should "bar on foo" in {
+  "The service" should "bar-admin on foo" in {
     Get("/admin/credit/foo") ~> route ~> check {
       assert(status == StatusCodes.OK)
-      assert(responseAs[String] == "bar")
+      assert(responseAs[String] == "bar-admin")
     }
   }
 

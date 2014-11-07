@@ -6,7 +6,7 @@ import Directives._
 class AdminApi {
   val route = get {
     path("admin" / "credit" / "foo") {
-      complete("bar")
+      complete("bar-admin")
     }
   }
 }
