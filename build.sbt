@@ -2,10 +2,11 @@ import AssemblyKeys._
 
 name := "account-credit-service-v2"
 
+scalaVersion in ThisBuild := "2.11.4"
+
 lazy val buildSettings = Seq(
   organization := "com.blinkbox.books.platform",
   version := scala.io.Source.fromFile("VERSION").mkString.trim,
-  scalaVersion := "2.11.4",
   scalacOptions := Seq("-unchecked", "-deprecation", "-feature", "-encoding", "utf8", "-target:jvm-1.7")
 )
 
