@@ -13,10 +13,17 @@ lazy val buildSettings = Seq(
 lazy val artifactSettings = addArtifact(artifact in (Compile, assembly), assembly).settings
 
 lazy val root = (project in file(".")).
-  dependsOn(public).aggregate(public).
+  dependsOn(public, admin).aggregate(public, admin).
   settings(publish := {})
 
 lazy val public = (project in file("public")).
+  settings(aggregate in publish := false).
+  settings(buildSettings: _*).
+  settings(rpmPrepSettings: _*).
+  settings(artifactSettings: _*).
+  settings(publish := {})
+
+lazy val admin = (project in file("admin")).
   settings(aggregate in publish := false).
   settings(buildSettings: _*).
   settings(rpmPrepSettings: _*).
