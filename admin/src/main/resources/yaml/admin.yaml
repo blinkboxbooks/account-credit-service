@@ -133,6 +133,7 @@ definitions:
       issuerRoles:
         title: The issuing CSR/CSM's roles, at the time of issuance (only visible to CSM)
         type: array
+        uniqueItems: true
         items:
           type: string
           enum: [csr, csm]
