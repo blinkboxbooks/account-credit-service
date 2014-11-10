@@ -130,9 +130,12 @@ definitions:
       issuerName:
         title: The issuing CSR/CSM's name, at the time of issuance (only visible to CSM)
         type: string
-      issuerRole:
+      issuerRoles:
         title: The issuing CSR/CSM's roles, at the time of issuance (only visible to CSM)
-        type: string
+        type: array
+        items:
+          type: string
+
   Debit:
     title: Debit
     properties:
