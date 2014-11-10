@@ -2,7 +2,7 @@
 swagger: "2.0"
 info:
   title: Admin Account Credit Service
-  version: 1.0.0
+  version: 0.0.1
 paths:
   /admin/users/{user_id}/credit:
     get:
