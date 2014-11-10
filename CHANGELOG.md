@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0 ([#4](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/4) 2014-11-07 17:39:27)
+
+Add barebones public endpoint for testing
+
+* Adds `GET /my/credit/foo`
+* Changes `GET /admin/credit/foo` to return `bar-admin`
+
+new feature
+
 ## 0.3.0 ([#3](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/3) 2014-11-07 17:15:01)
 
 Add GET /admin/credit/foo endpoint
