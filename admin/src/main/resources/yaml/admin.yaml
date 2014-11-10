@@ -3,7 +3,6 @@ swagger: "2.0"
 info:
   title: Admin Account Credit Service
   version: 1.0.0
-
 paths:
   /admin/users/{user_id}/credit:
     get:
@@ -98,10 +97,20 @@ definitions:
     title: Credit history
     properties:
       credits:
+        $ref: CreditList
+      debits:
+        $ref: DebitList
+  CreditList:
+    title: List of credits
+    properties:
+      items:
         type: array
         items:
           $ref: Credit
-      debits:
+  DebitList:
+    title: List of debits
+    properties:
+      items:
         type: array
         items:
           $ref: Debit
