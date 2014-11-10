@@ -115,8 +115,7 @@ definitions:
         type: string
         format: date-time
       amount:
-        title: The credit's amount, in pence
-        type: integer
+        $ref: Amount
       reason:
         title: The reason given for the credit
         type: string
@@ -151,5 +150,16 @@ definitions:
         type: string
         format: date-time
       amount:
-        title: The debit's amount, in pence
-        type: integer
+        $ref: Amount
+
+  Amount:
+    title: Amount
+    properties:
+      currency:
+        title: Currency
+        type: string
+        enum: [GBP]
+      amount:
+        title: Amount
+        type: number
+        minimum: 0
