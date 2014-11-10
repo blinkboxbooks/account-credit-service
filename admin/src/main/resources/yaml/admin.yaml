@@ -135,6 +135,7 @@ definitions:
         type: array
         items:
           type: string
+          enum: [csr, csm]
 
   Debit:
     title: Debit
