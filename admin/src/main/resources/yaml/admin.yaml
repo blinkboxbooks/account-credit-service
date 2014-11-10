@@ -94,29 +94,22 @@ paths:
               
 definitions:
   CreditHistory:
-    title: Credit history
-    properties:
-      credits:
-        $ref: CreditList
-      debits:
-        $ref: DebitList
-  CreditList:
-    title: List of credits (ordered by `dateTime` descendingly)
+    title: Credit history (ordered by `dateTime` descendingly)
     properties:
       items:
         type: array
         items:
-          $ref: Credit
-  DebitList:
-    title: List of debits (ordered by `dateTime` descendingly)
-    properties:
-      items:
-        type: array
-        items:
-          $ref: Debit
+          oneOf:
+            - $ref: Credit
+            - $ref: Debit
+
   Credit:
     title: Credit
     properties:
+      type:
+        title: Type
+        type: string
+        enum: [credit]
       dateTime:
         title: When the credit was applied
         type: string
@@ -149,6 +142,10 @@ definitions:
   Debit:
     title: Debit
     properties:
+      type:
+        title: Type
+        type: string
+        enum: [debit]
       dateTime:
         title: When the debit was applied
         type: string
@@ -156,4 +153,3 @@ definitions:
       amount:
         title: The debit's amount, in pence
         type: integer
-        
