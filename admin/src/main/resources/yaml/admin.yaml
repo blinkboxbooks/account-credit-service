@@ -127,6 +127,14 @@ definitions:
       reason:
         title: The reason given for the credit
         type: string
+        enum:
+          - Goodwill (Book Issue)
+          - Goodwill (Technical Issue)
+          - Goodwill (Service Issue)
+          - Goodwill (Customer Retention)
+          - Credit Refund
+          - Staff Credit
+          - Credit Voucher Code
       issuerName:
         title: The issuing CSR/CSM's name, at the time of issuance (only visible to CSM)
         type: string
