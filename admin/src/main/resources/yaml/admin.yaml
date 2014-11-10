@@ -17,24 +17,15 @@ paths:
           required: true
       responses:
         200:
-          description: Account credit
-          examples:
-            application/json: |
-              { amount: 1337,
-                credits: [
-                  { "credited_by": "438294238944848",
-                    "date_time": "2014-01-01T00:00:00Z",
-                    "amount": 2000,
-                    "reason_code": "Goodwill (shouty customer)"
-                    "reason_description": "The app misbehaved, so I gave the customer them some money"
-                  }
-                ]
-                debits: [
-                  { "date": "2014-03-01T00:00:00Z"
-                    "amount": 663
-                  }
-                ]
-              }
+          description: user_id's Credit history
+          schema:
+            $ref: CreditHistory
+        401:
+          description: Not authenticated
+        403:
+          description: Insufficient privileges (needs CSR or CSM role)
+        404:
+          description: User not found
     put:
       summary: Credit a user's account
       consumes:
@@ -101,3 +92,44 @@ paths:
               { "amount_change": 2000,
                 "id": "4f87e333-32c7-4d40-a3cd-7da58345069e"
               }
+              
+definitions:
+  CreditHistory:
+    title: Credit history
+    properties:
+      credits:
+        type: array
+        items:
+          $ref: Credit
+      debits:
+        type: array
+        items:
+          $ref: Debit
+  Credit:
+    title: Credit
+    properties:
+      dateTime:
+        title: When the credit was applied
+        type: string
+      amountInPence:
+        title: The credit's amount, in pence
+        type: integer
+      reason:
+        title: The reason given for the credit
+        type: string
+      issuerName:
+        title: The issuing CSR/CSM's name, at the time of issuance (only visible to CSM)
+        type: string
+      issuerRole:
+        title: The issuing CSR/CSM's roles, at the time of issuance (only visible to CSM)
+        type: string
+  Debit:
+    title: Debit
+    properties:
+      dateTime:
+        title: When the debit was applied
+        type: string
+      amountInPence:
+        title: The debit's amount, in pence
+        type: integer
+        
