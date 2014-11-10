@@ -15,7 +15,7 @@ import scala.concurrent.duration._
 object Main extends App with Configuration with Loggers with StrictLogging {
   logger.info("App starting")
   val system = ActorSystem("account-credit-service-v2-public")
-  val service = system.actorOf(Props(classOf[PublicApiActor]))
+  val service = system.actorOf(Props(classOf[PublicApiActor], new PublicApi))
 
   val interface = config.getString("public.listen.address")
   val port = config.getInt("public.listen.port")
@@ -24,12 +24,12 @@ object Main extends App with Configuration with Loggers with StrictLogging {
   HttpServer(Http.Bind(service, interface = interface, port=port))(system, system.dispatcher, Timeout(10.seconds))
 }
 
-class PublicApiActor extends HttpServiceActor {
+class PublicApiActor(publicApi: PublicApi) extends HttpServiceActor {
 
   val healthService = new HealthCheckHttpService {
     override val basePath: Path = Path("/")
     override implicit def actorRefFactory: ActorRefFactory = PublicApiActor.this.actorRefFactory
   }
 
-  override def receive = runRoute(healthService.routes)
+  override def receive = runRoute(publicApi.route ~ healthService.routes)
 }
