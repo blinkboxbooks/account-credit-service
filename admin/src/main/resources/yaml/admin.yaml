@@ -120,6 +120,7 @@ definitions:
       dateTime:
         title: When the credit was applied
         type: string
+        format: date-time
       amount:
         title: The credit's amount, in pence
         type: integer
@@ -138,6 +139,7 @@ definitions:
       dateTime:
         title: When the debit was applied
         type: string
+        format: date-time
       amount:
         title: The debit's amount, in pence
         type: integer
