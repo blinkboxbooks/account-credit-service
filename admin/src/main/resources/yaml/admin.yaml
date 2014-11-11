@@ -163,7 +163,7 @@ definitions:
         title: Currency
         type: string
         enum: [GBP]
-      amount:
-        title: Amount
+      value:
+        title: Value
         type: number
         minimum: 0
