@@ -96,6 +96,10 @@ definitions:
   CreditHistory:
     title: Credit history (ordered by `dateTime` descendingly)
     properties:
+      balance:
+        title: The user's net credit balance (credits minus debits)
+        type: number
+        minimum: 0
       items:
         type: array
         items:
