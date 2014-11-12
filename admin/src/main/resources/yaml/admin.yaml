@@ -4,19 +4,19 @@ info:
   title: Admin Account Credit Service
   version: 0.0.1
 paths:
-  /admin/users/{user_id}/credit:
+  /admin/users/{userId}/credit:
     get:
       summary: Lookup a users account credit
       produces:
         - application/vnd.blinkbox.books.v2+json
       parameters:
-        - name: user_id
+        - name: userId
           type: string
           in: path
           required: true
       responses:
         200:
-          description: user_id's Credit history
+          description: userId's Credit history
           schema:
             $ref: CreditHistory
         401:
@@ -30,7 +30,7 @@ paths:
       consumes:
        - application/vnd.blinkbox.books.v2+json
       parameters:
-        - name: user_id
+        - name: userId
           required: true
           type: string
           in: path
@@ -62,13 +62,13 @@ paths:
                 "id": "4f87e333-32c7-4d40-a3cd-7da58345069e"
               }
               
-  /admin/users/{user_id}/debit:
+  /admin/users/{userId}/debit:
     put:
       summary: Debit a user's account
       consumes:
        - application/vnd.blinkbox.books.v2+json
       parameters:
-        - name: user_id
+        - name: userId
           required: true
           type: string
           in: path
