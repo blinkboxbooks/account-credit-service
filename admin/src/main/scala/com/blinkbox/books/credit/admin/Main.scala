@@ -15,7 +15,7 @@ import scala.concurrent.duration._
 object Main extends App with Configuration with Loggers with StrictLogging {
   logger.info("App starting")
   val system = ActorSystem("account-credit-service-v2-admin")
-  val service = system.actorOf(Props(classOf[AdminApiActor], new AdminApi))
+  val service = system.actorOf(Props(classOf[AdminApiActor], new AdminApi(new CreditHistoryRepository)))
 
   val interface = config.getString("admin.listen.address")
   val port = config.getInt("admin.listen.port")
