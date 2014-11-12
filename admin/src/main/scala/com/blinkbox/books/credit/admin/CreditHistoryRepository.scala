@@ -3,7 +3,15 @@ package com.blinkbox.books.credit.admin
 import org.joda.time.DateTime
 
 class CreditHistoryRepository {
-  def lookupCreditHistoryForUser(userId: Int): CreditHistory = {
+  def lookupCreditHistoryForUser(userId: Int): Option[CreditHistory] =
+    if (userId == 7)
+      Some(CreditHistoryRepository.dummy)
+    else
+      None
+}
+
+object CreditHistoryRepository {
+  val dummy = {
     val thePast = new DateTime().minusDays(5)
     val cheap = Money(BigDecimal.valueOf(1000))
 
@@ -18,5 +26,4 @@ class CreditHistoryRepository {
     }
     CreditHistory(cheap, eithers)
   }
-
 }
