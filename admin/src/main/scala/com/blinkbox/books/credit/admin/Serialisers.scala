@@ -12,21 +12,21 @@ object Serialisers {
 
   private implicit val moneyConverter: Money => JValue = money =>
     ("currency" -> money.currency) ~
-      ("value" -> money.amount)
+    ("value" -> money.amount)
 
   private implicit val reasonConverter: CreditReason => JValue = cr => JString(cr.reason)
 
   implicit val eitherDebitCreditConverter: Either[Debit, Credit] => JValue = {
     case Left(Debit(dt, amount)) =>
       ("type" -> "debit") ~
-        ("dateTime" -> dt) ~
-        ("amount" -> amount)
+      ("dateTime" -> dt) ~
+      ("amount" -> amount)
     case Right(Credit(dt, amount, reason, issuer)) =>
       ("type" -> "credit") ~
-        ("dateTime" -> dt) ~
-        ("amount" -> amount) ~
-        ("reason" -> reason) ~
-        ("issuerName" -> issuer.name)
+      ("dateTime" -> dt) ~
+      ("amount" -> amount) ~
+      ("reason" -> reason) ~
+      ("issuerName" -> issuer.name)
   }
 
   implicit val creditHistoryConverter: CreditHistory => JValue = ch =>
