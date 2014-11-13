@@ -61,7 +61,6 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
 class StubCsrAuthenticator extends ContextAuthenticator[User] {
   override def apply(v1: RequestContext): Future[Authentication[User]] = Future {
-    println(v1.request.headers)
     if (v1.request.headers.filter(_.name == "Authorization").head.value == "Bearer csr")
       Right(User(1, Some(1), "foo", Map("bb/rol" -> List("csr"))))
     else
