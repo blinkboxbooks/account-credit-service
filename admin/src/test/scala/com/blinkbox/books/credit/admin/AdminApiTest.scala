@@ -29,6 +29,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   "AdminApi" should "200 on credit history request for known user as CSR" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/credit") ~> csrAuth ~> route ~> check {
+      assert(DummyData.expectedForCsr == parse(responseAs[String]))
       assert(status == StatusCodes.OK)
     }
   }
@@ -36,7 +37,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   it should "200 on credit history request for known user as CSM" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/credit") ~> csmAuth ~> route ~> check {
-      assert(DummyData.expected == parse(responseAs[String]))
+      assert(DummyData.expectedForCsm == parse(responseAs[String]))
       assert(status == StatusCodes.OK)
     }
   }

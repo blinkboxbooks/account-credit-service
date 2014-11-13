@@ -1,8 +1,9 @@
 package com.blinkbox.books.credit.admin
 
+import com.blinkbox.books.json.ExplicitTypeHints
 import com.blinkbox.books.spray.v2
 import org.joda.time.DateTime
-import org.json4s.{Formats, ShortTypeHints}
+import org.json4s.ShortTypeHints
 import spray.routing._
 import Directives._
 import com.blinkbox.books.auth.{UserRole, User}
@@ -13,7 +14,12 @@ import com.blinkbox.books.auth.UserRole._
 import com.blinkbox.books.auth.Constraints._
 
 class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport {
-  override implicit def jsonFormats = v2.JsonFormats.blinkboxFormat(ShortTypeHints(List(classOf[Debit], classOf[Credit])))
+  override implicit def jsonFormats = {
+    val typeHints =
+      ShortTypeHints(List(classOf[Debit], classOf[Credit])) +
+      ExplicitTypeHints(Map(classOf[DebitWithoutIssuer] -> "Debit", classOf[CreditWithoutIssuer] -> "Credit"))
+    v2.JsonFormats.blinkboxFormat(typeHints)
+  }
 
   val route = get {
     pathPrefix("admin" / "users" / IntNumber) { userId =>

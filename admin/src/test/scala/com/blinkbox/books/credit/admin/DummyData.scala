@@ -5,7 +5,7 @@ import org.json4s.JsonAST.JObject
 object DummyData {
   import org.json4s.JsonDSL._
 
-  val expected: JObject =
+  val expectedForCsm: JObject =
     ("netBalance" ->
       ("amount" -> 1000) ~
       ("currency" -> "GBP")) ~
@@ -27,4 +27,23 @@ object DummyData {
       ("amount" ->
       ("amount" -> 1000) ~
       ("currency" -> "GBP"))))
+
+  var expectedForCsr: JObject =
+    ("netBalance" ->
+      ("amount" -> 1000) ~
+        ("currency" -> "GBP")) ~
+      ("history" -> List(
+        ("type" -> "Credit") ~
+          ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
+          ("amount" ->
+            (("amount" -> 1000) ~
+              ("currency" -> "GBP"))) ~
+          ("reason" ->
+            ("reason" -> "Why not?")),
+
+        ("type" -> "Debit") ~
+          ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
+          ("amount" ->
+            ("amount" -> 1000) ~
+              ("currency" -> "GBP"))))
 }
