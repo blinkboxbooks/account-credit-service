@@ -1,5 +1,6 @@
 package com.blinkbox.books.credit.admin
 
+import com.blinkbox.books.auth.UserRole
 import org.joda.time.DateTime
 
 class CreditHistoryRepository {
@@ -12,7 +13,7 @@ class CreditHistoryRepository {
 
 object CreditHistoryRepository {
   val dummy = {
-    val thePast = new DateTime().minusDays(5)
+    val thePast = new DateTime(2012,1,2,3,4,5)
     val cheap = Money(BigDecimal.valueOf(1000))
     val credits: List[Credit] = List(Credit(thePast, cheap, CreditReason("Why not?"), CreditIssuer("James Bond", Set(Role("csr")))))
     val debits: List[Debit] = List(Debit(thePast, cheap))

@@ -1,21 +1,16 @@
 package com.blinkbox.books.credit.admin
 
-import com.blinkbox.books.auth.Elevation.Elevation
-import com.blinkbox.books.auth.UserRole.UserRole
-import com.blinkbox.books.auth.{UserRole, User}
-import com.blinkbox.books.auth.UserRole.UserRole
-import com.blinkbox.books.spray.{BearerTokenAuthenticator, ElevatedContextAuthenticator}
+import com.blinkbox.books.auth.User
 import com.blinkbox.books.test.MockitoSyrup
 import org.scalatest.FlatSpec
 import org.mockito.Mockito._
-import org.mockito.Matchers._
 import spray.http.HttpHeaders.Authorization
-import spray.http.{OAuth2BearerToken, HttpHeaders, StatusCodes}
+import spray.http.{OAuth2BearerToken, StatusCodes}
 import spray.routing.AuthenticationFailedRejection.CredentialsRejected
 import spray.routing.authentication.{ContextAuthenticator, Authentication}
 import spray.routing.{Route, AuthenticationFailedRejection, RequestContext, HttpService}
 import spray.testkit.ScalatestRouteTest
-import spray.routing._
+import org.json4s.jackson.JsonMethods._
 
 import scala.concurrent.Future
 
@@ -34,6 +29,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   "AdminApi" should "200 on credit history request for known user as CSR" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/credit") ~> csrAuth ~> route ~> check {
+      assert(DummyData.expected == parse(responseAs[String]))
       assert(status == StatusCodes.OK)
     }
   }
