@@ -28,9 +28,8 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
 
 case class Money(amount: BigDecimal, currency: String = "GBP")
 case class CreditReason(reason: String)
-case class Role(role: String)
 trait CreditOrDebit
 case class Debit(dateTime: DateTime, amount: Money) extends CreditOrDebit
 case class Credit(dateTime: DateTime, amount: Money, reason: CreditReason, issuer: CreditIssuer) extends CreditOrDebit
-case class CreditIssuer(name: String, roles: Set[Role])
+case class CreditIssuer(name: String, roles: Set[UserRole])
 case class CreditHistory(netBalance: Money, history: List[CreditOrDebit])

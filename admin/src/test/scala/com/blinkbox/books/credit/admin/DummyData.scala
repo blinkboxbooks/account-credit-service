@@ -20,7 +20,7 @@ object DummyData {
       ("issuer" ->
         (("name" -> "James Bond") ~
         ("roles" -> List(
-          ("role" -> "csr"))))),
+          ("name" -> "csr"))))),
 
       ("type" -> "Debit") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
