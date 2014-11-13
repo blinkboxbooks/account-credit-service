@@ -1,7 +1,9 @@
 package com.blinkbox.books.credit.admin
 
 import com.blinkbox.books.auth.Elevation.Elevation
-import com.blinkbox.books.auth.User
+import com.blinkbox.books.auth.UserRole.UserRole
+import com.blinkbox.books.auth.{UserRole, User}
+import com.blinkbox.books.auth.UserRole.UserRole
 import com.blinkbox.books.spray.{BearerTokenAuthenticator, ElevatedContextAuthenticator}
 import com.blinkbox.books.test.MockitoSyrup
 import org.scalatest.FlatSpec
@@ -22,7 +24,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   def actorRefFactory = system
   val creditHistory = CreditHistoryRepository.dummy
   val creditHistoryRepository = mock[CreditHistoryRepository]
-  val authenticator = new StubCsrAuthenticator
+  val authenticator = new StubAuthenticator(UserRole.CustomerServicesRep)
 
   val route: Route = (new AdminApi(creditHistoryRepository, authenticator)).route
 
@@ -59,10 +61,10 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
 }
 
-class StubCsrAuthenticator extends ContextAuthenticator[User] {
+class StubAuthenticator(role: UserRole) extends ContextAuthenticator[User] {
   override def apply(v1: RequestContext): Future[Authentication[User]] = Future {
-    if (v1.request.headers.filter(_.name == "Authorization").head.value == "Bearer csr")
-      Right(User(1, Some(1), "foo", Map("bb/rol" -> List("csr"))))
+    if (v1.request.headers.filter(_.name == "Authorization").head.value == "Bearer " + role.toString)
+      Right(User(1, Some(1), "foo", Map("bb/rol" -> List(role.toString))))
     else
       Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, List()))
   }(scala.concurrent.ExecutionContext.Implicits.global)
