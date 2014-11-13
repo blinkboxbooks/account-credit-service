@@ -1,11 +1,11 @@
 package com.blinkbox.books.credit.admin
 
-import com.blinkbox.books.credit.admin.Serialisers.CreditHistorySerializer
 import com.blinkbox.books.spray.v2
 import org.joda.time.DateTime
+import org.json4s.{Formats, ShortTypeHints}
 import spray.routing._
 import Directives._
-import com.blinkbox.books.auth.{UserRole, Constraints, User}
+import com.blinkbox.books.auth.User
 import com.blinkbox.books.spray.AuthDirectives._
 import spray.routing.authentication.ContextAuthenticator
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -13,7 +13,7 @@ import com.blinkbox.books.auth.UserRole._
 import com.blinkbox.books.auth.Constraints._
 
 class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport {
-  override implicit def jsonFormats = v2.JsonFormats.blinkboxFormat() + CreditHistorySerializer
+  override implicit def jsonFormats = v2.JsonFormats.blinkboxFormat(ShortTypeHints(List(classOf[Debit], classOf[Credit])))
 
   val route = get {
     pathPrefix("admin" / "users" / IntNumber) { userId =>
@@ -29,8 +29,8 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
 case class Money(amount: BigDecimal, currency: String = "GBP")
 case class CreditReason(reason: String)
 case class Role(role: String)
-case class Debit(dateTime: DateTime, amount: Money)
-case class Credit(dateTime: DateTime, amount: Money, reason: CreditReason, issuer: CreditIssuer)
+trait CreditOrDebit
+case class Debit(dateTime: DateTime, amount: Money) extends CreditOrDebit
+case class Credit(dateTime: DateTime, amount: Money, reason: CreditReason, issuer: CreditIssuer) extends CreditOrDebit
 case class CreditIssuer(name: String, roles: Set[Role])
-case class CreditHistory(netBalance: Money, history: List[Either[Debit, Credit]])
-
+case class CreditHistory(netBalance: Money, history: List[CreditOrDebit])
