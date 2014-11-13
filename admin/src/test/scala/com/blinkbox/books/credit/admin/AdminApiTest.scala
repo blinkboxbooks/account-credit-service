@@ -2,6 +2,7 @@ package com.blinkbox.books.credit.admin
 
 import com.blinkbox.books.auth.User
 import com.blinkbox.books.test.MockitoSyrup
+import org.json4s._
 import org.scalatest.FlatSpec
 import org.mockito.Mockito._
 import spray.http.HttpHeaders.Authorization
@@ -11,7 +12,6 @@ import spray.routing.authentication.{ContextAuthenticator, Authentication}
 import spray.routing.{Route, AuthenticationFailedRejection, RequestContext, HttpService}
 import spray.testkit.ScalatestRouteTest
 import org.json4s.jackson.JsonMethods._
-
 import scala.concurrent.Future
 
 class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService with MockitoSyrup {
@@ -29,7 +29,6 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   "AdminApi" should "200 on credit history request for known user as CSR" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/credit") ~> csrAuth ~> route ~> check {
-      assert(DummyData.expected == parse(responseAs[String]))
       assert(status == StatusCodes.OK)
     }
   }
@@ -37,7 +36,35 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   it should "200 on credit history request for known user as CSM" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/credit") ~> csmAuth ~> route ~> check {
+      assert(DummyData.expected == parse(responseAs[String]))
       assert(status == StatusCodes.OK)
+    }
+  }
+
+  it should "not show issuer information to CSRs" in {
+    when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    Get("/admin/users/123/credit") ~> csrAuth ~> route ~> check {
+      val json = parse(responseAs[String])
+      println(responseAs[String])
+      val issuerInfo: List[List[JField]] = for {
+        JObject(child) <- json
+        JField("issuer", JObject(issuer)) <- child
+      } yield issuer
+
+      assert(issuerInfo.flatten.isEmpty)
+    }
+  }
+
+  it should "show issuer information to CSMs" in {
+    when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    Get("/admin/users/123/credit") ~> csmAuth ~> route ~> check {
+      val json = parse(responseAs[String])
+      val issuerInfo: List[List[JField]] = for {
+        JObject(child) <- json
+        JField("issuer", JObject(issuer)) <- child
+      } yield issuer
+
+      assert(!issuerInfo.flatten.isEmpty)
     }
   }
 
