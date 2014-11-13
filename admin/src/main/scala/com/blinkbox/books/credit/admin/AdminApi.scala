@@ -9,6 +9,8 @@ import com.blinkbox.books.auth.{UserRole, Constraints, User}
 import com.blinkbox.books.spray.AuthDirectives._
 import spray.routing.authentication.ContextAuthenticator
 import scala.concurrent.ExecutionContext.Implicits.global
+import com.blinkbox.books.auth.UserRole._
+import com.blinkbox.books.auth.Constraints._
 
 class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport {
   override implicit def jsonFormats = v2.JsonFormats.blinkboxFormat() + CreditHistorySerializer
@@ -16,7 +18,7 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
   val route = get {
     pathPrefix("admin" / "users" / IntNumber) { userId =>
       path("credit") {
-        authenticateAndAuthorize(authenticator, Constraints.hasRole(UserRole.CustomerServicesRep)) { _ =>
+        authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { _ =>
           complete(creditHistoryRepository.lookupCreditHistoryForUser(userId))
         }
       }

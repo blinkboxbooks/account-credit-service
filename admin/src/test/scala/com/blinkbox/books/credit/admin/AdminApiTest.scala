@@ -29,10 +29,18 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   val route: Route = (new AdminApi(creditHistoryRepository, authenticator)).route
 
   val csrAuth: Authorization = Authorization(OAuth2BearerToken("csr"))
+  val csmAuth: Authorization = Authorization(OAuth2BearerToken("csm"))
 
-  "AdminApi" should "200 on credit history request for known user" in {
+  "AdminApi" should "200 on credit history request for known user as CSR" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/credit") ~> csrAuth ~> route ~> check {
+      assert(status == StatusCodes.OK)
+    }
+  }
+
+  it should "200 on credit history request for known user as CSM" in {
+    when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    Get("/admin/users/123/credit") ~> csmAuth ~> route ~> check {
       assert(status == StatusCodes.OK)
     }
   }
