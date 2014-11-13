@@ -24,7 +24,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   def actorRefFactory = system
   val creditHistory = CreditHistoryRepository.dummy
   val creditHistoryRepository = mock[CreditHistoryRepository]
-  val authenticator = new StubAuthenticator(UserRole.CustomerServicesRep)
+  val authenticator = new StubAuthenticator
 
   val route: Route = (new AdminApi(creditHistoryRepository, authenticator)).route
 
@@ -61,10 +61,13 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
 }
 
-class StubAuthenticator(role: UserRole) extends ContextAuthenticator[User] {
+class StubAuthenticator extends ContextAuthenticator[User] {
   override def apply(v1: RequestContext): Future[Authentication[User]] = Future {
-    if (v1.request.headers.filter(_.name == "Authorization").head.value == "Bearer " + role.toString)
-      Right(User(1, Some(1), "foo", Map("bb/rol" -> List(role.toString))))
+    val authHeader = v1.request.headers.filter(_.name == "Authorization").head.value
+    val roleInRequest = authHeader.substring("Bearer ".length)
+    val allowedRoles = Set("csr", "csm")
+    if (allowedRoles contains roleInRequest)
+      Right(User(1, Some(1), "foo", Map("bb/rol" -> List(roleInRequest))))
     else
       Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, List()))
   }(scala.concurrent.ExecutionContext.Implicits.global)
