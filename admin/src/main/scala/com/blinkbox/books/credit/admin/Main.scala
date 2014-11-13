@@ -11,7 +11,6 @@ import spray.can.Http
 import spray.http.Uri.Path
 import spray.routing.HttpServiceActor
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.typesafe.config.Config
 
 import scala.concurrent.duration._
 
