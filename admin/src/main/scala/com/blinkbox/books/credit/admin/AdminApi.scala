@@ -12,6 +12,7 @@ import spray.routing.authentication.ContextAuthenticator
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.blinkbox.books.auth.UserRole._
 import com.blinkbox.books.auth.Constraints._
+import com.blinkbox.books.credit.admin.RenderingFunctions._
 
 class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport {
   override implicit def jsonFormats = {
@@ -27,11 +28,11 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
         authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { user =>
           if (user.isInRole(UserRole.CustomerServicesManager))
             complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map {
-              case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(Urgh.keepIssuer))
+              case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(keepIssuer))
             })
           else if (user.isInRole(UserRole.CustomerServicesRep))
             complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map {
-              case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(Urgh.removeIssuer))
+              case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(removeIssuer))
             })
           else
             throw new RuntimeException
@@ -41,20 +42,3 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
   }
 }
 
-// Crap below
-trait RenderingCreditOrDebit
-case class CreditForRendering(dateTime: DateTime, amount: Money, reason: CreditReason, issuer: Option[CreditIssuer]) extends RenderingCreditOrDebit
-case class DebitForRendering(dateTime: DateTime, amount: Money) extends RenderingCreditOrDebit
-case class CreditHistoryForRendering(netBalance: Money, history: List[RenderingCreditOrDebit])
-
-object Urgh {
-  def removeIssuer(cd: CreditOrDebit): RenderingCreditOrDebit = cd match {
-    case Credit(dt, a, r, _) => CreditForRendering(dt, a, r, None)
-    case Debit(dt, a) => DebitForRendering(dt, a)
-  }
-
-  def keepIssuer(cd: CreditOrDebit): RenderingCreditOrDebit = cd match {
-    case Credit(dt, a, r, issuer) => CreditForRendering(dt, a, r, Some(issuer))
-    case Debit(dt, a) => DebitForRendering(dt, a)
-  }
-}
