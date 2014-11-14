@@ -10,6 +10,7 @@ import spray.http.{OAuth2BearerToken, StatusCodes}
 import spray.routing.AuthenticationFailedRejection.CredentialsRejected
 import spray.routing.authentication.{ContextAuthenticator, Authentication}
 import spray.routing.{Route, AuthenticationFailedRejection, RequestContext, HttpService}
+import com.blinkbox.books.spray.v2.`application/vnd.blinkbox.books.v2+json`
 import spray.testkit.ScalatestRouteTest
 import org.json4s.jackson.JsonMethods._
 import scala.concurrent.Future
@@ -79,6 +80,14 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
       } yield issuer
 
       assert(!issuerInfo.flatten.isEmpty)
+    }
+  }
+
+  it should "return v2 media type on credit history request" in {
+    when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    Get("/admin/users/123/credit") ~> csrAuth ~> route ~> check {
+      assert(status == StatusCodes.OK)
+      assert(mediaType == `application/vnd.blinkbox.books.v2+json`)
     }
   }
 
