@@ -16,8 +16,8 @@ import com.blinkbox.books.auth.Constraints._
 class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport {
   override implicit def jsonFormats = {
     val typeHints =
-      ShortTypeHints(List(classOf[Debit], classOf[Credit])) +
-      ExplicitTypeHints(Map(classOf[DebitWithoutIssuer] -> "Debit", classOf[CreditWithoutIssuer] -> "Credit"))
+      ShortTypeHints(List()) +
+      ExplicitTypeHints(Map(classOf[DebitForRendering] -> "Debit", classOf[CreditForRendering] -> "Credit"))
     v2.JsonFormats.blinkboxFormat(typeHints)
   }
 
@@ -26,9 +26,13 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
       path("credit") {
         authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { user =>
           if (user.isInRole(UserRole.CustomerServicesManager))
-            complete(creditHistoryRepository.lookupCreditHistoryForUser(userId))
+            complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map {
+              case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(Urgh.keepIssuer))
+            })
           else if (user.isInRole(UserRole.CustomerServicesRep))
-            complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map(Urgh.t))
+            complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map {
+              case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(Urgh.removeIssuer))
+            })
           else
             throw new RuntimeException
         }
@@ -47,18 +51,19 @@ case class CreditHistory(netBalance: Money, history: List[CreditOrDebit])
 
 
 // Crap below
-trait CreditOrDebitWithoutIssuer
-case class DebitWithoutIssuer(dateTime: DateTime, amount: Money) extends CreditOrDebitWithoutIssuer
-case class CreditWithoutIssuer(dateTime: DateTime, amount: Money, reason: CreditReason) extends CreditOrDebitWithoutIssuer
-case class CreditHistoryWithoutIssuer(netBalance: Money, history: List[CreditOrDebitWithoutIssuer])
+trait RenderingCreditOrDebit
+case class CreditForRendering(dateTime: DateTime, amount: Money, reason: CreditReason, issuer: Option[CreditIssuer]) extends RenderingCreditOrDebit
+case class DebitForRendering(dateTime: DateTime, amount: Money) extends RenderingCreditOrDebit
+case class CreditHistoryForRendering(netBalance: Money, history: List[RenderingCreditOrDebit])
 
 object Urgh {
-  def t(ch: CreditHistory): CreditHistoryWithoutIssuer = ch match {
-    case CreditHistory(m: Money, h: List[CreditOrDebit]) => CreditHistoryWithoutIssuer(m, h.map(c))
+  def removeIssuer(cd: CreditOrDebit): RenderingCreditOrDebit = cd match {
+    case Credit(dt, a, r, _) => CreditForRendering(dt, a, r, None)
+    case Debit(dt, a) => DebitForRendering(dt, a)
   }
 
-  def c(cd: CreditOrDebit): CreditOrDebitWithoutIssuer = cd match {
-    case Credit(dt, a, r, _) => CreditWithoutIssuer(dt, a, r)
-    case Debit(dt, a) => DebitWithoutIssuer(dt, a)
+  def keepIssuer(cd: CreditOrDebit): RenderingCreditOrDebit = cd match {
+    case Credit(dt, a, r, issuer) => CreditForRendering(dt, a, r, Some(issuer))
+    case Debit(dt, a) => DebitForRendering(dt, a)
   }
 }
