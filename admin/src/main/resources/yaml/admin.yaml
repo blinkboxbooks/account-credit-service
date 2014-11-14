@@ -2,45 +2,42 @@
 swagger: "2.0"
 info:
   title: Admin Account Credit Service
-  version: 1.0.0
-
+  version: 0.0.1
 paths:
-  /admin/users/{user_id}/credit:
+  /admin/users/{userId}/credit:
     get:
       summary: Lookup a users account credit
       produces:
         - application/vnd.blinkbox.books.v2+json
       parameters:
-        - name: user_id
+        - name: Authorization
+          in: header
+          description: The bearer token from the Auth server describing the user.
+          type: string
+          required: true
+          format: "/^Bearer .+/"
+          x-elevation: none
+        - name: userId
           type: string
           in: path
           required: true
       responses:
         200:
-          description: Account credit
-          examples:
-            application/json: |
-              { amount: 1337,
-                credits: [
-                  { "credited_by": "438294238944848",
-                    "date_time": "2014-01-01T00:00:00Z",
-                    "amount": 2000,
-                    "reason_code": "Goodwill (shouty customer)"
-                    "reason_description": "The app misbehaved, so I gave the customer them some money"
-                  }
-                ]
-                debits: [
-                  { "date": "2014-03-01T00:00:00Z"
-                    "amount": 663
-                  }
-                ]
-              }
+          description: userId's Credit history
+          schema:
+            $ref: CreditHistory
+        401:
+          description: Not authenticated
+        403:
+          description: Insufficient privileges (needs CSR or CSM role)
+        404:
+          description: User not found
     put:
       summary: Credit a user's account
       consumes:
        - application/vnd.blinkbox.books.v2+json
       parameters:
-        - name: user_id
+        - name: userId
           required: true
           type: string
           in: path
@@ -72,13 +69,13 @@ paths:
                 "id": "4f87e333-32c7-4d40-a3cd-7da58345069e"
               }
               
-  /admin/users/{user_id}/debit:
+  /admin/users/{userId}/debit:
     put:
       summary: Debit a user's account
       consumes:
        - application/vnd.blinkbox.books.v2+json
       parameters:
-        - name: user_id
+        - name: userId
           required: true
           type: string
           in: path
@@ -101,3 +98,71 @@ paths:
               { "amount_change": 2000,
                 "id": "4f87e333-32c7-4d40-a3cd-7da58345069e"
               }
+              
+definitions:
+  CreditHistory:
+    title: Credit history (ordered by `dateTime` descendingly)
+    properties:
+      balance:
+        title: The user's net credit balance (credits minus debits)
+        type: number
+        minimum: 0
+      items:
+        type: array
+        items:
+          oneOf:
+            - $ref: Credit
+            - $ref: Debit
+
+  Credit:
+    title: Credit
+    properties:
+      type:
+        title: Type
+        type: string
+        enum: [credit]
+      dateTime:
+        title: When the credit was applied
+        type: string
+        format: date-time
+      amount:
+        $ref: Amount
+      reason:
+        title: The reason given for the credit
+        type: string
+      issuerName:
+        title: The issuing CSR/CSM's name, at the time of issuance (only visible to CSM)
+        type: string
+      issuerRoles:
+        title: The issuing CSR/CSM's roles, at the time of issuance (only visible to CSM)
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+          enum: [csr, csm]
+
+  Debit:
+    title: Debit
+    properties:
+      type:
+        title: Type
+        type: string
+        enum: [debit]
+      dateTime:
+        title: When the debit was applied
+        type: string
+        format: date-time
+      amount:
+        $ref: Amount
+
+  Amount:
+    title: Amount
+    properties:
+      currency:
+        title: Currency
+        type: string
+        enum: [GBP]
+      value:
+        title: Value
+        type: number
+        minimum: 0
