@@ -22,7 +22,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   val creditHistoryRepository = mock[CreditHistoryRepository]
   val authenticator = new StubAuthenticator
 
-  val route: Route = (new AdminApi(creditHistoryRepository, authenticator)).route
+  val route = (new AdminApi(creditHistoryRepository, authenticator)).route
 
   val csrAuth: Authorization = Authorization(OAuth2BearerToken("csr"))
   val csmAuth: Authorization = Authorization(OAuth2BearerToken("csm"))
