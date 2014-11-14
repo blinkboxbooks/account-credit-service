@@ -14,7 +14,7 @@ class CreditHistoryRepository {
 object CreditHistoryRepository {
   val dummy = {
     val thePast = new DateTime(2012,1,2,3,4,5)
-    val cheap = Money(BigDecimal.valueOf(1000))
+    val cheap = Money(BigDecimal.valueOf(1000.53))
     val credits: List[Credit] = List(Credit(thePast, cheap, CreditReason("Why not?"), CreditIssuer("James Bond", Set(UserRole.CustomerServicesRep))))
     val debits: List[Debit] = List(Debit(thePast, cheap))
     implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isBefore _)
