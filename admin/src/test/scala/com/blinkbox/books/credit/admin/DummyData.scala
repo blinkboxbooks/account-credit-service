@@ -10,7 +10,7 @@ object DummyData {
       ("amount" -> 1000) ~
       ("currency" -> "GBP")) ~
     ("history" -> List(
-      ("type" -> "Credit") ~
+      ("type" -> "credit") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
         (("amount" -> 1000) ~
@@ -22,7 +22,7 @@ object DummyData {
         ("roles" -> List(
           ("name" -> "csr"))))),
 
-      ("type" -> "Debit") ~
+      ("type" -> "debit") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
       ("amount" -> 1000) ~
@@ -33,7 +33,7 @@ object DummyData {
       ("amount" -> 1000) ~
         ("currency" -> "GBP")) ~
       ("history" -> List(
-        ("type" -> "Credit") ~
+        ("type" -> "credit") ~
           ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
           ("amount" ->
             (("amount" -> 1000) ~
@@ -41,7 +41,7 @@ object DummyData {
           ("reason" ->
             ("reason" -> "Why not?")),
 
-        ("type" -> "Debit") ~
+        ("type" -> "debit") ~
           ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
           ("amount" ->
             ("amount" -> 1000) ~

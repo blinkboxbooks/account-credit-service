@@ -17,7 +17,7 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
   override implicit def jsonFormats = {
     val typeHints =
       ShortTypeHints(List()) +
-      ExplicitTypeHints(Map(classOf[DebitForRendering] -> "Debit", classOf[CreditForRendering] -> "Credit"))
+      ExplicitTypeHints(Map(classOf[DebitForRendering] -> "debit", classOf[CreditForRendering] -> "credit"))
     v2.JsonFormats.blinkboxFormat(typeHints)
   }
 
