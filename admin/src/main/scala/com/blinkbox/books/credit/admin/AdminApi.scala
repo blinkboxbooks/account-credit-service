@@ -26,14 +26,10 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
     pathPrefix("admin" / "users" / IntNumber) { userId =>
       path("credit") {
         authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { user =>
-          if (user.isInRole(UserRole.CustomerServicesManager))
-            complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map {
-              case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(keepIssuer))
-            })
-          else
-            complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map {
-              case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(removeIssuer))
-            })
+          val issuerBehaviour = if (user.isInRole(UserRole.CustomerServicesManager)) keepIssuer _ else removeIssuer _
+          complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map {
+            case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(issuerBehaviour))
+          })
         }
       }
     }
