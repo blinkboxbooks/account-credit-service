@@ -30,12 +30,10 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
             complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map {
               case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(keepIssuer))
             })
-          else if (user.isInRole(UserRole.CustomerServicesRep))
+          else
             complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map {
               case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(removeIssuer))
             })
-          else
-            throw new RuntimeException
         }
       }
     }
