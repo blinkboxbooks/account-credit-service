@@ -2,26 +2,36 @@ package com.blinkbox.books.credit.admin
 
 import akka.actor.{ActorRefFactory, ActorSystem, Props}
 import akka.util.Timeout
-import com.blinkbox.books.config.Configuration
+import com.blinkbox.books.auth.{Elevation, ZuulElevationChecker, ZuulTokenDecoder, ZuulTokenDeserializer}
+import com.blinkbox.books.config.{AuthClientConfig, Configuration}
 import com.blinkbox.books.logging.Loggers
-import com.blinkbox.books.spray.{HealthCheckHttpService, HttpServer}
+import com.blinkbox.books.spray.{BearerTokenAuthenticator, HealthCheckHttpService, HttpServer}
 import com.typesafe.scalalogging.slf4j.StrictLogging
 import spray.can.Http
 import spray.http.Uri.Path
 import spray.routing.HttpServiceActor
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.duration._
 
 object Main extends App with Configuration with Loggers with StrictLogging {
   logger.info("App starting")
   val system = ActorSystem("account-credit-service-v2-admin")
-  val service = system.actorOf(Props(classOf[AdminApiActor], new AdminApi))
+  val appConfig = AppConfig(config)
+  val authenticator = {
+    val keysFolder = appConfig.auth.keysDir.getAbsolutePath
+    val sessionUri = appConfig.auth.sessionUrl.toString
+    new BearerTokenAuthenticator(
+      new ZuulTokenDeserializer(
+        new ZuulTokenDecoder(keysFolder)),
+        new ZuulElevationChecker(sessionUri)(system),
+        Elevation.Unelevated)
+  }
 
-  val interface = config.getString("admin.listen.address")
-  val port = config.getInt("admin.listen.port")
+  val service = system.actorOf(Props(classOf[AdminApiActor], new AdminApi(new CreditHistoryRepository, authenticator)))
 
   logger.info("App started")
-  HttpServer(Http.Bind(service, interface = interface, port=port))(system, system.dispatcher, Timeout(10.seconds))
+  HttpServer(Http.Bind(service, interface = appConfig.interface, port=appConfig.port))(system, system.dispatcher, Timeout(10.seconds))
 }
 
 class AdminApiActor(adminApi: AdminApi) extends HttpServiceActor {

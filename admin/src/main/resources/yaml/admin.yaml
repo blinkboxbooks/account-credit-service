@@ -130,11 +130,16 @@ definitions:
       reason:
         title: The reason given for the credit
         type: string
-      issuerName:
-        title: The issuing CSR/CSM's name, at the time of issuance (only visible to CSM)
+      issuer:
+        title: The issuer's details, at the time of issuance (only visible to CSM)
+        $ref: Issuer
+
+  Issuer:
+    description: A person who issues credit to a customer (a CSR or a CSM)
+    properties:
+      name:
         type: string
-      issuerRoles:
-        title: The issuing CSR/CSM's roles, at the time of issuance (only visible to CSM)
+      roles:
         type: array
         uniqueItems: true
         items:
