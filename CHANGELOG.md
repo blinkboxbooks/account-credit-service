@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.5.0 ([#7](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/7) 2014-11-12 15:04:29)
+
+CRED-5: implement credit history (no DB)
+
+New feature
+
+What it does:
+* Adds a new endpoint: `GET /admin/users/{user_id}/credit` that returns credit history
+* Returns dummy data for now. Hook up to DB in later PR.
+* Have to be a CSM/CSR to call it
+* Returns all info if requester is a CSM
+* Returns all info (except issuer info) if request is a CSR
+
 ## 0.4.1 ([#5](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/5) 2014-11-10 11:58:01)
 
 CRED-5: credit history swagger API
