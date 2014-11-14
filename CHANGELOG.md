@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1 ([#5](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/5) 2014-11-10 11:58:01)
+
+CRED-5: credit history swagger API
+
+patch
+
 ## 0.4.0 ([#4](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/4) 2014-11-07 17:39:27)
 
 Add barebones public endpoint for testing
