@@ -87,7 +87,6 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     val invalidAuth: RequestTransformer = Authorization(OAuth2BearerToken("invalid"))
     Get("/admin/users/123/credit") ~> invalidAuth ~> route ~> check {
-      println(rejections)
       assert(rejection == AuthenticationFailedRejection(CredentialsRejected, List()))
     }
   }
