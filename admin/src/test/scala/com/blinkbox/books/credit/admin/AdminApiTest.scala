@@ -25,6 +25,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   val csrAuth: Authorization = Authorization(OAuth2BearerToken("csr"))
   val csmAuth: Authorization = Authorization(OAuth2BearerToken("csm"))
+  var csmAndCsrAuth: Authorization = Authorization(OAuth2BearerToken("csr,csm"))
 
   "AdminApi" should "200 on credit history request for known user as CSR" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
@@ -68,6 +69,19 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     }
   }
 
+  it should "show issuer information to users with CSR /and/ CSM roles" in {
+    when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    Get("/admin/users/123/credit") ~> csmAndCsrAuth ~> route ~> check {
+      val json = parse(responseAs[String])
+      val issuerInfo: List[List[JField]] = for {
+        JObject(child) <- json
+        JField("issuer", JObject(issuer)) <- child
+      } yield issuer
+
+      assert(!issuerInfo.flatten.isEmpty)
+    }
+  }
+
   it should "404 on credit history request for unknown user" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(666)).thenReturn(None)
     Get("/admin/users/666/credit") ~> csrAuth ~> route ~> check {
@@ -95,10 +109,10 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 class StubAuthenticator extends ContextAuthenticator[User] {
   override def apply(v1: RequestContext): Future[Authentication[User]] = Future {
     val authHeader = v1.request.headers.filter(_.name == "Authorization").head.value
-    val roleInRequest = authHeader.substring("Bearer ".length)
+    val rolesInRequest: Set[String] = authHeader.substring("Bearer ".length).split(',').toSet
     val allowedRoles = Set("csr", "csm")
-    if (allowedRoles contains roleInRequest)
-      Right(User(1, Some(1), "foo", Map("bb/rol" -> List(roleInRequest))))
+    if (allowedRoles.intersect(rolesInRequest).nonEmpty)
+      Right(User(1, Some(1), "foo", Map("bb/rol" -> rolesInRequest.toList)))
     else
       Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, List()))
   }(scala.concurrent.ExecutionContext.Implicits.global)
