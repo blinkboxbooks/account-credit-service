@@ -9,7 +9,7 @@ object DummyData {
     ("netBalance" ->
       ("amount" -> 1000) ~
       ("currency" -> "GBP")) ~
-    ("history" -> List(
+    ("items" -> List(
       ("type" -> "credit") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
@@ -32,7 +32,7 @@ object DummyData {
     ("netBalance" ->
       ("amount" -> 1000) ~
         ("currency" -> "GBP")) ~
-      ("history" -> List(
+      ("items" -> List(
         ("type" -> "credit") ~
           ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
           ("amount" ->
