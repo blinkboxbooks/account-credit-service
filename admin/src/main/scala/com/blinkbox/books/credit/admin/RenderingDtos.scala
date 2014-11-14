@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 trait RenderingCreditOrDebit
 case class CreditForRendering(dateTime: DateTime, amount: Money, reason: CreditReason, issuer: Option[CreditIssuer]) extends RenderingCreditOrDebit
 case class DebitForRendering(dateTime: DateTime, amount: Money) extends RenderingCreditOrDebit
-case class CreditHistoryForRendering(netBalance: Money, items: List[RenderingCreditOrDebit])
+case class CreditHistoryForRendering(balance: Money, items: List[RenderingCreditOrDebit])
 
 object RenderingFunctions {
   def removeIssuer(cd: CreditOrDebit): RenderingCreditOrDebit = cd match {

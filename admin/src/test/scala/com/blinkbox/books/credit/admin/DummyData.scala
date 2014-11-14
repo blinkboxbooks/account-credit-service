@@ -6,7 +6,7 @@ object DummyData {
   import org.json4s.JsonDSL._
 
   val expectedForCsm: JObject =
-    ("netBalance" ->
+    ("balance" ->
       ("amount" -> 1000) ~
       ("currency" -> "GBP")) ~
     ("items" -> List(
@@ -29,7 +29,7 @@ object DummyData {
       ("currency" -> "GBP"))))
 
   var expectedForCsr: JObject =
-    ("netBalance" ->
+    ("balance" ->
       ("amount" -> 1000) ~
         ("currency" -> "GBP")) ~
       ("items" -> List(
