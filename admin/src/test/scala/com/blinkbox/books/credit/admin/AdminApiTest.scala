@@ -113,7 +113,8 @@ class StubAuthenticator extends ContextAuthenticator[User] {
     val authHeader = v1.request.headers.filter(_.name == "Authorization").head.value
     val rolesInRequest: Set[String] = authHeader.substring("Bearer ".length).split(',').toSet
     val allowedRoles = Set("csr", "csm")
-    if (allowedRoles.intersect(rolesInRequest).nonEmpty)
+    val validAuthentication = allowedRoles.intersect(rolesInRequest).nonEmpty
+    if (validAuthentication)
       Right(User(1, Some(1), "foo", Map("bb/rol" -> rolesInRequest.toList)))
     else
       Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, List()))
