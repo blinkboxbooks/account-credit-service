@@ -2,7 +2,7 @@ package com.blinkbox.books.credit.admin
 
 import org.joda.time.DateTime
 
-trait RenderingCreditOrDebit
+sealed trait RenderingCreditOrDebit
 case class CreditIssuerForRendering(name: String, roles: Set[String])
 case class CreditForRendering(dateTime: DateTime, amount: Money, reason: String, issuer: Option[CreditIssuerForRendering]) extends RenderingCreditOrDebit
 case class DebitForRendering(dateTime: DateTime, amount: Money) extends RenderingCreditOrDebit
