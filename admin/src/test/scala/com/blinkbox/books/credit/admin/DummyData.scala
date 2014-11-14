@@ -15,8 +15,7 @@ object DummyData {
       ("amount" ->
         ("amount" -> 1000) ~
         ("currency" -> "GBP")) ~
-      ("reason" ->
-        ("reason" -> "Why not?")) ~
+      ("reason" -> "Why not?") ~
       ("issuer" ->
         (("name" -> "James Bond") ~
         ("roles" -> List(
@@ -38,8 +37,7 @@ object DummyData {
       ("amount" ->
         ("amount" -> 1000) ~
         ("currency" -> "GBP")) ~
-      ("reason" ->
-        ("reason" -> "Why not?")),
+      ("reason" -> "Why not?"),
 
       ("type" -> "debit") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
