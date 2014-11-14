@@ -48,12 +48,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/credit") ~> csrAuth ~> route ~> check {
       val json = parse(responseAs[String])
-      val issuerInfo: List[List[JField]] = for {
-        JObject(child) <- json
-        JField("issuer", JObject(issuer)) <- child
-      } yield issuer
-
-      assert(issuerInfo.flatten.isEmpty)
+      assert(!containsIssuerInformation(json))
     }
   }
 
@@ -61,12 +56,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/credit") ~> csmAuth ~> route ~> check {
       val json = parse(responseAs[String])
-      val issuerInfo: List[List[JField]] = for {
-        JObject(child) <- json
-        JField("issuer", JObject(issuer)) <- child
-      } yield issuer
-
-      assert(!issuerInfo.flatten.isEmpty)
+      assert(containsIssuerInformation(json))
     }
   }
 
@@ -74,12 +64,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/credit") ~> csmAndCsrAuth ~> route ~> check {
       val json = parse(responseAs[String])
-      val issuerInfo: List[List[JField]] = for {
-        JObject(child) <- json
-        JField("issuer", JObject(issuer)) <- child
-      } yield issuer
-
-      assert(!issuerInfo.flatten.isEmpty)
+      assert(containsIssuerInformation(json))
     }
   }
 
@@ -111,6 +96,15 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     Get("/nope") ~> route ~> check {
       assert(handled == false)
     }
+  }
+
+  def containsIssuerInformation(j: JValue): Boolean = {
+    val issuerInfo: List[List[JField]] = for {
+      JObject(child) <- j
+      JField("issuer", JObject(issuer)) <- child
+    } yield issuer
+
+    !issuerInfo.flatten.isEmpty
   }
 
 }
