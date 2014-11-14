@@ -10,6 +10,13 @@ paths:
       produces:
         - application/vnd.blinkbox.books.v2+json
       parameters:
+        - name: Authorization
+          in: header
+          description: The bearer token from the Auth server describing the user.
+          type: string
+          required: true
+          format: "/^Bearer .+/"
+          x-elevation: none
         - name: userId
           type: string
           in: path
