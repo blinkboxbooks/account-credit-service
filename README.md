@@ -17,6 +17,3 @@ This diagram shows the key components and actors of the service
 The account-credit-service is using mysql relation database. It has been designed following [BBB Database Design Guidelines](http://jira.blinkbox.local/confluence/display/PT/MySQL+Database+Design+Guidelines).  
 For crediting and debiting an account, After successful credit\_balance table update, a new row has to be entered in net\_balance table to maintain the net balance.    
 the schemas for this service can be found in [schemas](https://git.mobcastdev.com/Agora/account-credit-service-v2/tree/master/schemas).
-
-### Entity Relationship Diagram
-![alt tag](http://jira.blinkbox.local/confluence/download/attachments/21439462/accountCreditV2EntityRelationshipDiagram.png?api=v2)
