@@ -33,7 +33,7 @@ paths:
         404:
           description: User not found
     post:
-      summary: Credit an user's account
+      summary: Credit a user's account
       description: add credit to user's account
       parameters:
         - name: Authorization
@@ -176,7 +176,7 @@ definitions:
             description: identifier used to make this Post idempotent. If the service has already applied a credit change with this ID, this request does not add more credit, and returns 204.
           amount:
             $ref: Amount
-            description: can not be negative
+            description: can not be 0 or negative
           reason:
             title: The reason given for the credit
             type: string
@@ -188,12 +188,11 @@ definitions:
   AddCreditResponse:
       title: AddCreditResponse
       properties:
-        id:
-          title: Id
+        requestId:
+          title: RequestId
           type: string
         amount:
             $ref: Amount
-            description: can not be negative
         type:
             title: Type
             type: string
