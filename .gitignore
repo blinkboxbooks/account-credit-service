@@ -4,4 +4,3 @@ target
 
 *.iml
 
-admin/src/main/resources/yaml/admin.yaml
