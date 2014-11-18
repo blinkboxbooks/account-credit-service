@@ -183,7 +183,7 @@ definitions:
           type:
             title: Type
             type: string
-            enum: [credit,debit]
+            enum: [Credit,Debit]
           
   AddCreditResponse:
       title: AddCreditResponse
@@ -196,4 +196,4 @@ definitions:
         type:
             title: Type
             type: string
-            enum: [credit,debit]
+            enum: [Credit,Debit]
