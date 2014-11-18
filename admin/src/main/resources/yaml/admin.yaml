@@ -52,13 +52,13 @@ paths:
           in: body
           description: add credit details
           schema:
-            $ref: AddCreditDebitRequest
+            $ref: AddCreditRequest
             
       responses:
         204:
           description: Account credit successfully update
           schema:
-            $ref: AddCreditDebitResponse
+            $ref: AddCreditResponse
         401:
           description: Not authenticated
         404:
@@ -167,8 +167,8 @@ definitions:
         type: number
         minimum: 0
         
-  AddCreditDebitRequest:
-     title: AddCreditDebit
+  AddCreditRequest:
+     title: AddCreditRequest
      properties:
           requestId:
             title: RequestId
@@ -176,6 +176,7 @@ definitions:
             description: identifier used to make this Post idempotent. If the service has already applied a credit change with this ID, this request does not add more credit, and returns 204.
           amount:
             $ref: Amount
+            description: can not be negative
           reason:
             title: The reason given for the credit
             type: string
@@ -184,14 +185,15 @@ definitions:
             type: string
             enum: [credit,debit]
           
-  AddCreditDebitResponse:
-      title: AddCreditDebitResponse
+  AddCreditResponse:
+      title: AddCreditResponse
       properties:
         id:
           title: Id
           type: string
         amount:
             $ref: Amount
+            description: can not be negative
         type:
             title: Type
             type: string
