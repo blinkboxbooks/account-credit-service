@@ -4,7 +4,7 @@ info:
   title: Admin Account Credit Service
   version: 0.0.1
 paths:
-  /admin/users/{userId}/credit:
+  /admin/users/{userId}/accountcredit:
     get:
       summary: Lookup a users account credit
       produces:
@@ -32,6 +32,7 @@ paths:
           description: Insufficient privileges (needs CSR or CSM role)
         404:
           description: User not found
+  /admin/users/{userId}/credit:
     put:
       summary: Credit a user's account
       consumes:

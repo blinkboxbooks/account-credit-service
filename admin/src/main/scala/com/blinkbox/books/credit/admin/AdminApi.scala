@@ -24,7 +24,7 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
 
   val route = get {
     pathPrefix("admin" / "users" / IntNumber) { userId =>
-      path("credit") {
+      path("accountcredit") {
         authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { user =>
           val issuerBehaviour = if (user.isInRole(UserRole.CustomerServicesManager)) keepIssuer _ else removeIssuer _
           complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map {
