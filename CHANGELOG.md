@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0 ([#11](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/11) 2014-11-19 13:41:27)
+
+CRED-5: Change credit history URL
+
+... to `GET /admins/users/{id}/credit/credithistory`
+
+breaking change
+
 ## 0.5.0 ([#7](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/7) 2014-11-12 15:04:29)
 
 CRED-5: implement credit history (no DB)
