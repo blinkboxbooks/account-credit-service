@@ -4,7 +4,7 @@ info:
   title: Admin Account Credit Service
   version: 0.0.1
 paths:
-  /admin/users/{userId}/credit/credithistory:
+  /admin/users/{userId}/accountcredit:
     get:
       summary: Lookup a users account credit
       produces:

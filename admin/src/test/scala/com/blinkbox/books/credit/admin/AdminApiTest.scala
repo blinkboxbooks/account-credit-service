@@ -30,7 +30,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   "AdminApi" should "200 on credit history request for known user as CSR" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
-    Get("/admin/users/123/credit/credithistory") ~> csrAuth ~> route ~> check {
+    Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
       assert(DummyData.expectedForCsr == parse(responseAs[String]))
       assert(status == StatusCodes.OK)
     }
@@ -38,7 +38,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   it should "200 on credit history request for known user as CSM" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
-    Get("/admin/users/123/credit/credithistory") ~> csmAuth ~> route ~> check {
+    Get("/admin/users/123/accountcredit") ~> csmAuth ~> route ~> check {
       assert(DummyData.expectedForCsm == parse(responseAs[String]))
       assert(status == StatusCodes.OK)
     }
@@ -46,7 +46,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   it should "not show issuer information to CSRs" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
-    Get("/admin/users/123/credit/credithistory") ~> csrAuth ~> route ~> check {
+    Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
       val json = parse(responseAs[String])
       assert(!containsIssuerInformation(json))
     }
@@ -54,7 +54,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   it should "show issuer information to CSMs" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
-    Get("/admin/users/123/credit/credithistory") ~> csmAuth ~> route ~> check {
+    Get("/admin/users/123/accountcredit") ~> csmAuth ~> route ~> check {
       val json = parse(responseAs[String])
       assert(containsIssuerInformation(json))
     }
@@ -62,7 +62,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   it should "show issuer information to users with CSR /and/ CSM roles" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
-    Get("/admin/users/123/credit/credithistory") ~> csmAndCsrAuth ~> route ~> check {
+    Get("/admin/users/123/accountcredit") ~> csmAndCsrAuth ~> route ~> check {
       val json = parse(responseAs[String])
       assert(containsIssuerInformation(json))
     }
@@ -70,7 +70,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   it should "return v2 media type on credit history request" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
-    Get("/admin/users/123/credit/credithistory") ~> csrAuth ~> route ~> check {
+    Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
       assert(status == StatusCodes.OK)
       assert(mediaType == `application/vnd.blinkbox.books.v2+json`)
     }
@@ -78,7 +78,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   it should "404 on credit history request for unknown user" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(666)).thenReturn(None)
-    Get("/admin/users/666/credit/credithistory") ~> csrAuth ~> route ~> check {
+    Get("/admin/users/666/accountcredit") ~> csrAuth ~> route ~> check {
       assert(status == StatusCodes.NotFound)
     }
   }
@@ -86,7 +86,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   it should "401 on credit history request when passed incorrect credentials" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     val invalidAuth: RequestTransformer = Authorization(OAuth2BearerToken("invalid"))
-    Get("/admin/users/123/credit/credithistory") ~> invalidAuth ~> route ~> check {
+    Get("/admin/users/123/accountcredit") ~> invalidAuth ~> route ~> check {
       assert(rejection == AuthenticationFailedRejection(CredentialsRejected, List()))
     }
   }
