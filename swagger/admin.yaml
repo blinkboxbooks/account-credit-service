@@ -173,7 +173,7 @@ definitions:
           requestId:
             title: RequestId
             type: string
-            description: identifier used to make this Post idempotent. If the service has already applied a credit change with this ID, this request does not add more credit, and returns 204.
+            description: identifier used to make this Post idempotent. If the service has already applied a credit change with this ID, this request does not add more credit, and returns 201.
           value:
             title: Value
             type: number
@@ -183,10 +183,6 @@ definitions:
             title: The reason given for the credit
             type: string
             enum: [GoodwillBookIssue,GoodwillTechnicalIssue,GoodwillServiceIssue,GoodwillCustomerRetention,CreditRefund,StaffCredit,CreditVoucherCode,Hudl2Promotion]
-          type:
-            title: Type
-            type: string
-            enum: [Credit,Debit]
           
   AddCreditResponse:
       title: AddCreditResponse
@@ -196,7 +192,3 @@ definitions:
           type: string
         amount:
             $ref: Amount
-        type:
-            title: Type
-            type: string
-            enum: [Credit,Debit]
