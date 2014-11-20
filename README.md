@@ -5,3 +5,10 @@
 * [Chat](https://blinkbox.slack.com/messages/books-cust-services/)
 * [Teamcity](http://grisham.blinkbox.local:8111/project.html?projectId=Books_Platform_Agora_AccountCreditServiceV2)
 * [Technical Design](http://jira.blinkbox.local/confluence/display/PT/account-credit-service-v2+Technical+Design)
+
+## How to run
+### ... the Admin service
+`sbt "run-main com.blinkbox.books.credit.admin.Main"`
+
+### ... the Public service
+`sbt "run-main com.blinkbox.books.credit.Main"`
