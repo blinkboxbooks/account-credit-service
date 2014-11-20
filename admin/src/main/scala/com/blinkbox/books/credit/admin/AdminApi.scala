@@ -14,13 +14,14 @@ import com.blinkbox.books.auth.UserRole._
 import com.blinkbox.books.auth.Constraints._
 import com.blinkbox.books.credit.admin.RenderingFunctions._
 
-class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport {
+class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: ContextAuthenticator[User]) extends  v2.JsonSupport {
   override implicit def jsonFormats = {
     val typeHints =
       ShortTypeHints(List()) +
       ExplicitTypeHints(Map(classOf[DebitForRendering] -> "debit", classOf[CreditForRendering] -> "credit"))
     v2.JsonFormats.blinkboxFormat(typeHints)
   }
+  
 
   val route = get {
     pathPrefix("admin" / "users" / IntNumber) { userId =>
@@ -34,5 +35,18 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
       }
     }
   }
+  
+   private lazy val createVoucherCampaign =get {
+    pathPrefix("admin" / "users" / IntNumber) { userId =>
+      path("accountcredit") {
+        authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { u =>
+          entity(as[AddCreditRequest]) { req =>
+            complete(createCampaign(req, u))
+          }
+        }
+      }
+    }
+  }
+  
 }
 
