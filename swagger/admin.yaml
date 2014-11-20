@@ -179,13 +179,10 @@ definitions:
             type: number
             minimum: 0
             exclusiveMinimum: true
-          currency:
-            title: Currency
-            type: string
-            enum: [GBP]
           reason:
             title: The reason given for the credit
             type: string
+            enum: [GoodwillBookIssue,GoodwillTechnicalIssue,GoodwillServiceIssue,GoodwillCustomerRetention,CreditRefund,StaffCredit,CreditVoucherCode,Hudl2Promotion]
           type:
             title: Type
             type: string
