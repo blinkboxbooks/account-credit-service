@@ -33,14 +33,6 @@ CREATE TABLE credit_balance (
  CONSTRAINT code_to_type_fk FOREIGN KEY (transaction_type_id) REFERENCES transaction_type (transaction_type_id)
  ) ENGINE = InnoDB, DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ;
 
-CREATE TABLE net_balance (
- net_balance_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
- value FLOAT(7,2) NOT NULL,
- currency varchar(5) NOT NULL,
- created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
- updated_at  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
- PRIMARY KEY (net_balance_id) 
- ) ENGINE = InnoDB, DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ;
 
 INSERT INTO transaction_type (`transaction_type_id`, `description`) VALUES ('0', 'credit');
 INSERT INTO transaction_type (`transaction_type_id`, `description`) VALUES ('1', 'debit');
