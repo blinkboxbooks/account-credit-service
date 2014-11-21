@@ -14,9 +14,11 @@ import com.blinkbox.books.auth.UserRole._
 import com.blinkbox.books.auth.Constraints._
 import com.blinkbox.books.credit.admin.RenderingFunctions._
 
-class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: ContextAuthenticator[User]) extends  v2.JsonSupport { 
+trait AdminApi extends  v2.JsonSupport { 
   implicit val adminService: AdminService
   import adminService._
+  val creditHistoryRepository: CreditHistoryRepository
+  val  authenticator: ContextAuthenticator[User]
   override implicit def jsonFormats = {
     val typeHints =
       ShortTypeHints(List()) +

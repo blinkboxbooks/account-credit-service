@@ -31,23 +31,26 @@ object Main extends App with Configuration with Loggers with StrictLogging {
         new ZuulElevationChecker(sessionUri)(system),
         Elevation.Unelevated)
   }
-  
-    
-  val service = system.actorOf(Props(classOf[AdminApiActor], new AdminApi(new CreditHistoryRepository, authenticator),appConfig.dbconf))
+
+  val service = system.actorOf(Props(classOf[AdminApiActor], authenticator, appConfig.dbconf))
 
   logger.info("App started")
   HttpServer(Http.Bind(service, interface = appConfig.interface, port=appConfig.port))(system, system.dispatcher, Timeout(10.seconds))
 }
 
-class AdminApiActor(adminApi: AdminApi, dbconf: DatabaseConfig) extends HttpServiceActor {
+class AdminApiActor(auth: BearerTokenAuthenticator, dbconf: DatabaseConfig) extends HttpServiceActor with AdminApi {
 
   import com.blinkbox.books.credit.admin.AdminService
-  override implicit val adminApi.adminService : AdminService = new AdminCake(dbconf)
+  override implicit val adminService : AdminService = new AdminCake(dbconf)
+  
+  override val authenticator = auth
+  
+  override val creditHistoryRepository = new CreditHistoryRepository 
   
   val healthService = new HealthCheckHttpService {
     override val basePath: Path = Path("/")
     override implicit def actorRefFactory: ActorRefFactory = AdminApiActor.this.actorRefFactory
   }
 
-  override def receive = runRoute(adminApi.route ~ healthService.routes)
+  override def receive = runRoute(route ~ healthService.routes)
 }
