@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0 ([#13](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/13) 2014-11-21 14:40:29)
+
+Cred 28 api design fixed
+
+#### New feature
+* design updated
+
 ## 0.6.0 ([#11](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/11) 2014-11-19 13:41:27)
 
 CRED-5: Change credit history URL
