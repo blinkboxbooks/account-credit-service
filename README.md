@@ -6,14 +6,13 @@
 * [Teamcity](http://grisham.blinkbox.local:8111/project.html?projectId=Books_Platform_Agora_AccountCreditServiceV2)
 
 # Background
-This document provides a high level overview of the technical design for account-credit-service-v2 functionalities. In a nutshell, the account-credit-service-v2 will allow Customer Service Managers and Representatives (CSM & CSR) to reward credits to customers and to retrieve awarded credit history so they can advice them on that matter. CSM and CSR have different privileges on the services where , for example, CSM can grant suspend/delete account role to a CSR.  
+This document provides a high level overview of the technical design for account-credit-service-v2 functionalities. In a nutshell, the account-credit-service-v2 will allow Customer Service Managers and Representatives (CSM & CSR) to reward credits to customers and to retrieve awarded credit history so they can advice them on that matter. 
 CSM is a bbb representative and CSR is an External agency (FIS for now).
 
 # Technical Overview
 This diagram shows the key components and actors of the service
-![alt tag](http://jira.blinkbox.local/confluence/download/attachments/21439462/accountCreditServiceV2.png?api=v2)
+![alt tag](accountCreditServiceV2.png?api=v2)
 
 # Database modelling
 The account-credit-service is using mysql relation database. It has been designed following [BBB Database Design Guidelines](http://jira.blinkbox.local/confluence/display/PT/MySQL+Database+Design+Guidelines).  
-For crediting and debiting an account, After successful credit\_balance table update, a new row has to be entered in net\_balance table to maintain the net balance.    
 the schemas for this service can be found in [schemas](https://git.mobcastdev.com/Agora/account-credit-service-v2/tree/master/schemas).

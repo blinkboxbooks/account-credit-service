@@ -33,7 +33,7 @@ paths:
         404:
           description: User not found
     post:
-      summary: Credit an user's account
+      summary: Credit a user's account
       description: add credit to user's account
       parameters:
         - name: Authorization
@@ -55,7 +55,7 @@ paths:
             $ref: AddCreditRequest
             
       responses:
-        204:
+        201:
           description: Account credit successfully update
           schema:
             $ref: AddCreditResponse
@@ -177,14 +177,19 @@ definitions:
           value:
             title: Value
             type: number
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
+          currency:
+            title: Currency
+            type: string
+            enum: [GBP]
           reason:
             title: The reason given for the credit
             type: string
           type:
             title: Type
             type: string
-            enum: [credit,debit]
+            enum: [Credit,Debit]
           
   AddCreditResponse:
       title: AddCreditResponse
@@ -197,4 +202,4 @@ definitions:
         type:
             title: Type
             type: string
-            enum: [credit,debit]
+            enum: [Credit,Debit]
