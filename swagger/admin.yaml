@@ -33,7 +33,7 @@ paths:
         404:
           description: User not found
     
-  /admin/users/{userId}/credit:
+  /admin/users/{userId}/accountcredit/credits:
     post:
       summary: Credit a user's account
       description: add credit to user's account
