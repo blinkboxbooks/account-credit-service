@@ -32,43 +32,39 @@ paths:
           description: Insufficient privileges (needs CSR or CSM role)
         404:
           description: User not found
-  /admin/users/{userId}/credit:
-    put:
+    
+  /admin/users/{userId}/accountcredit/credits:
+    post:
       summary: Credit a user's account
-      consumes:
-       - application/vnd.blinkbox.books.v2+json
+      description: add credit to user's account
       parameters:
-        - name: userId
+        - name: Authorization
+          in: header
+          description: The bearer token from the Auth server describing the user.
+          type: string
           required: true
+          format: "/^Bearer .+/"
+          x-elevation: none
+        - name: userId
           type: string
           in: path
-        - name: id
           required: true
-          description: identifier used to make this PUT idempotent. If the service has already applied a credit change with this ID, this request does not add more credit, and returns 204.
-          type: string
-          in: formData
-        - name: amount_change
-          type: integer
-          in: formData
+        - name: body
           required: true
-        - name: credited_by
-          required: true
-          type: string
-          in: formData
-        - name: reason
-          required: true
-          type: string
-          in: formData
-          
-
+          in: body
+          description: add credit details
+          schema:
+            $ref: AddCreditRequest
+            
       responses:
-        204:
+        201:
           description: Account credit successfully update
-          examples:
-            application/json: |
-              { "amount_change": 2000,
-                "id": "4f87e333-32c7-4d40-a3cd-7da58345069e"
-              }
+          schema:
+            $ref: AddCreditResponse
+        401:
+          description: Not authenticated
+        404:
+          description: User not found
               
   /admin/users/{userId}/debit:
     put:
@@ -172,3 +168,29 @@ definitions:
         title: Value
         type: number
         minimum: 0
+        
+  AddCreditRequest:
+     title: AddCreditRequest
+     properties:
+          requestId:
+            title: RequestId
+            type: string
+            description: identifier used to make this Post idempotent. If the service has already applied a credit change with this ID, this request does not add more credit, and returns 201.
+          value:
+            title: Value
+            type: number
+            minimum: 0
+            exclusiveMinimum: true
+          reason:
+            title: The reason given for the credit
+            type: string
+            enum: [GoodwillBookIssue,GoodwillTechnicalIssue,GoodwillServiceIssue,GoodwillCustomerRetention,CreditRefund,StaffCredit,CreditVoucherCode,Hudl2Promotion]
+          
+  AddCreditResponse:
+      title: AddCreditResponse
+      properties:
+        requestId:
+          title: RequestId
+          type: string
+        amount:
+            $ref: Amount
