@@ -24,7 +24,7 @@ CREATE TABLE credit_balance (
  transaction_types_id TINYINT UNSIGNED NOT NULL,
  reasons_id TINYINT UNSIGNED,
  created_at datetime  NOT NULL,
- updated_at  datetime NOT NULL ,
+ updated_at  datetime ,
  customer_id INT(11) NOT NULL,
  admin_user_id INT(11) ,
  PRIMARY KEY (credit_balance_id),
