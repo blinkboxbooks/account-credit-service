@@ -12,3 +12,6 @@ object Reason extends Enumeration {
   val GoodwillBookIssue, GoodwillTechnicalIssue, GoodwillServiceIssue, GoodwillCustomerRetention, CreditRefund, StaffCredit, CreditVoucherCode, Hudl2Promotion = Value
 }
 
+case class AddCreditResponse(
+  requestId: String,
+  amount: Money)
