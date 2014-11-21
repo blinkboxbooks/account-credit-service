@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.0 ([#9](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/9) 2014-11-21 15:10:59)
+
+CRED-27 added db design
+
+#### New feature
+added db schemas design for the service.
+
 ## 0.7.0 ([#13](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/13) 2014-11-21 14:40:29)
 
 Cred 28 api design fixed
