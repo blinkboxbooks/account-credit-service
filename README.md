@@ -16,3 +16,10 @@ This diagram shows the key components and actors of the service
 # Database modelling
 The account-credit-service is using mysql relation database. It has been designed following [BBB Database Design Guidelines](http://jira.blinkbox.local/confluence/display/PT/MySQL+Database+Design+Guidelines).  
 the schemas for this service can be found in [schemas](https://git.mobcastdev.com/Agora/account-credit-service-v2/tree/master/schemas).
+
+## How to run
+### ... the Admin service
+`sbt "run-main com.blinkbox.books.credit.admin.Main"`
+
+### ... the Public service
+`sbt "run-main com.blinkbox.books.credit.Main"`
