@@ -54,7 +54,7 @@ paths:
           in: body
           description: add credit details
           schema:
-            $ref: Credit
+            $ref: AddCreditRequest
             
       responses:
         201:
@@ -88,9 +88,9 @@ paths:
         - name: body
           required: true
           in: body
-          description: add debit details
+          description: debit details
           schema:
-            $ref: AddDebitRequest
+            $ref: Debit
 
       responses:
         204:
