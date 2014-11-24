@@ -159,7 +159,7 @@ definitions:
       type:
         title: Type
         type: string
-        enum: [debit]
+        enum: [Debit]
         readOnly: true
       dateTime:
         title: When the debit was applied
