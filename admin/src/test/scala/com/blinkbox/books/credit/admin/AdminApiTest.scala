@@ -9,7 +9,7 @@ import spray.http.HttpHeaders.Authorization
 import spray.http.{OAuth2BearerToken, StatusCodes}
 import spray.routing.AuthenticationFailedRejection.{CredentialsMissing, CredentialsRejected}
 import spray.routing.authentication.{ContextAuthenticator, Authentication}
-import spray.routing.{Route, AuthenticationFailedRejection, RequestContext, HttpService}
+import spray.routing._
 import com.blinkbox.books.spray.v2.`application/vnd.blinkbox.books.v2+json`
 import spray.testkit.ScalatestRouteTest
 import org.json4s.jackson.JsonMethods._
@@ -115,6 +115,13 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     }
   }
 
+  it should "403 on add debit endpoint, with unauthorised credentials" in {
+    val unauthorisedAuth: Authorization = Authorization(OAuth2BearerToken("unauthorised"))
+    Post("/admin/users/123/accountcredit/debits") ~> unauthorisedAuth ~> route ~> check {
+      assert(rejection == AuthorizationFailedRejection)
+    }
+  }
+
   def containsIssuerInformation(j: JValue): Boolean = {
     val issuerInfo: List[List[JField]] = for {
       JObject(child) <- j
@@ -131,7 +138,7 @@ class StubAuthenticator extends ContextAuthenticator[User] {
     v1.request.headers.filter(_.name == "Authorization") match {
       case List(authHeader) => {
         val rolesInRequest: Set[String] = authHeader.value.substring("Bearer ".length).split(',').toSet
-        val allowedRoles = Set("csr", "csm")
+        val allowedRoles = Set("csr", "csm", "unauthorised")
         val validAuthentication = allowedRoles.intersect(rolesInRequest).nonEmpty
         if (validAuthentication)
           Right(User(1, Some(1), "foo", Map("bb/rol" -> rolesInRequest.toList)))
