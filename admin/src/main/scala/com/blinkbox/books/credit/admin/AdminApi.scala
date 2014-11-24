@@ -40,7 +40,10 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
           post {
             authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
               entity(as[CreditRequest]) { creditRequest =>
-                complete(StatusCodes.NoContent)
+                if (creditRequest.amount.currency == "GBP")
+                  complete(StatusCodes.NoContent)
+                else
+                  complete(StatusCodes.BadRequest)
               }
             }
           }

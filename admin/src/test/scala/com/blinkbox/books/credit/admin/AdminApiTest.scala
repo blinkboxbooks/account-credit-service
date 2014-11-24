@@ -29,6 +29,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   override implicit def jsonFormats = api.jsonFormats
 
   val creditRequest = CreditRequest(Money(BigDecimal.valueOf(90.01), "GBP"), "good")
+  val nonGbpCreditRequest = CreditRequest(Money(BigDecimal.valueOf(90.01), "USD"), "good")
 
   val csrAuth: Authorization = Authorization(OAuth2BearerToken("csr"))
   val csmAuth: Authorization = Authorization(OAuth2BearerToken("csm"))
@@ -112,6 +113,12 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   it should "204 on add debit endpoint, as CSM" in {
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csmAuth ~> route ~> check {
       assert(status == StatusCodes.NoContent)
+    }
+  }
+
+  it should "400 on add debit endpoint, if trying to debit non-GBP" in {
+    Post("/admin/users/123/accountcredit/debits", nonGbpCreditRequest) ~> csrAuth ~> route ~> check {
+      assert(status == StatusCodes.BadRequest)
     }
   }
 
