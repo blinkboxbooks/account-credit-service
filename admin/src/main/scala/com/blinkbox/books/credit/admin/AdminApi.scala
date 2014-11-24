@@ -28,8 +28,8 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
       pathPrefix("accountcredit") {
         pathEnd {
           get {
-            authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { user =>
-              val issuerBehaviour = if (user.isInRole(UserRole.CustomerServicesManager)) keepIssuer _ else removeIssuer _
+            authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
+              val issuerBehaviour = if (adminUser.isInRole(UserRole.CustomerServicesManager)) keepIssuer _ else removeIssuer _
               complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map {
                 case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(issuerBehaviour))
               })
@@ -38,7 +38,7 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
         } ~
         path("debits") {
           post {
-            authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { user =>
+            authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
               complete(StatusCodes.NoContent)
             }
           }
