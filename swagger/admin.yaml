@@ -191,13 +191,14 @@ definitions:
             title: The reason given for the credit
             type: string
             enum: [GoodwillBookIssue,GoodwillTechnicalIssue,GoodwillServiceIssue,GoodwillCustomerRetention,CreditRefund,StaffCredit,CreditVoucherCode,Hudl2Promotion]
+
   AddDebitRequest:
      title: AddDebitRequest
      properties:
           requestId:
             title: RequestId
             type: string
-            description: identifier used to make this Post idempotent. If the service has already applied a debit change with this ID, this request does not add more debit, and returns 201.
+            description: identifier used to make this Post idempotent. If the service has already applied a debit change with this ID, this request does not add more debit, and returns 204.
           value:
             title: Value
             type: number
