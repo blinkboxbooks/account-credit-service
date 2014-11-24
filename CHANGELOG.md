@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.1 ([#14](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/14) 2014-11-24 12:09:05)
+
+Enable -Xfatal-warnings -Xcheckinit -Xlint
+
+patch
+
 ## 0.8.0 ([#9](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/9) 2014-11-21 15:10:59)
 
 CRED-27 added db design
