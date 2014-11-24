@@ -103,6 +103,12 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     }
   }
 
+  it should "201 on add debit endpoint, as CSM" in {
+    Post("/admin/users/123/accountcredit/debits") ~> csmAuth ~> route ~> check {
+      assert(status == StatusCodes.Created)
+    }
+  }
+
   it should "401 on add debit endpoint, with no auth" in {
     Post("/admin/users/123/accountcredit/debits") ~> route ~> check {
       assert(rejection == AuthenticationFailedRejection(CredentialsMissing, List()))
