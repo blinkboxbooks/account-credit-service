@@ -66,35 +66,39 @@ paths:
         404:
           description: User not found
               
-  /admin/users/{userId}/debit:
-    put:
+  /admin/users/{userId}/accountcredit/debits:
+    post:
       summary: Debit a user's account
       consumes:
        - application/vnd.blinkbox.books.v2+json
       parameters:
+        - name: Authorization
+          in: header
+          description: The bearer token from the Auth server describing the user.
+          type: string
+          required: true
+          format: "/^Bearer .+/"
+          x-elevation: none
         - name: userId
           required: true
           type: string
           in: path
-        - name: id
+        - name: body
           required: true
-          description: identifier used to make this PUT idempotent. If the service has already applied a credit change with this ID, this request does not add more credit, and returns 204.
-          type: string
-          in: formData
-        - name: amount_change
-          type: integer
-          in: formData
-          required: true
-          
+          in: body
+          description: add debit details
+          schema:
+            $ref: AddDebitRequest
 
       responses:
-        204:
-          description: Account credit successfully update
-          examples:
-            application/json: |
-              { "amount_change": 2000,
-                "id": "4f87e333-32c7-4d40-a3cd-7da58345069e"
-              }
+        201:
+          description: Account debit successfully update
+          schema:
+            $ref: AddDebitResponse
+        401:
+          description: Not authenticated
+        404:
+          description: User not found
               
 definitions:
   CreditHistory:
@@ -185,9 +189,30 @@ definitions:
             title: The reason given for the credit
             type: string
             enum: [GoodwillBookIssue,GoodwillTechnicalIssue,GoodwillServiceIssue,GoodwillCustomerRetention,CreditRefund,StaffCredit,CreditVoucherCode,Hudl2Promotion]
+  AddDebitRequest:
+     title: AddDebitRequest
+     properties:
+          requestId:
+            title: RequestId
+            type: string
+            description: identifier used to make this Post idempotent. If the service has already applied a debit change with this ID, this request does not add more debit, and returns 201.
+          value:
+            title: Value
+            type: number
+            minimum: 0
+            exclusiveMinimum: true
           
   AddCreditResponse:
       title: AddCreditResponse
+      properties:
+        requestId:
+          title: RequestId
+          type: string
+        amount:
+            $ref: Amount
+
+  AddDebitResponse:
+      title: AddDebitResponse
       properties:
         requestId:
           title: RequestId
