@@ -97,6 +97,12 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     }
   }
 
+  it should "201 on add debit endpoint, as CSR" in {
+    Post("/admin/users/123/accountcredit/debits") ~> csrAuth ~> route ~> check {
+      assert(status == StatusCodes.Created)
+    }
+  }
+
   def containsIssuerInformation(j: JValue): Boolean = {
     val issuerInfo: List[List[JField]] = for {
       JObject(child) <- j
