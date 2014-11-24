@@ -7,7 +7,7 @@ import org.scalatest.FlatSpec
 import org.mockito.Mockito._
 import spray.http.HttpHeaders.Authorization
 import spray.http.{OAuth2BearerToken, StatusCodes}
-import spray.routing.AuthenticationFailedRejection.CredentialsRejected
+import spray.routing.AuthenticationFailedRejection.{CredentialsMissing, CredentialsRejected}
 import spray.routing.authentication.{ContextAuthenticator, Authentication}
 import spray.routing.{Route, AuthenticationFailedRejection, RequestContext, HttpService}
 import com.blinkbox.books.spray.v2.`application/vnd.blinkbox.books.v2+json`
@@ -103,6 +103,12 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     }
   }
 
+  it should "401 on add debit endpoint, with no auth" in {
+    Post("/admin/users/123/accountcredit/debits") ~> route ~> check {
+      assert(rejection == AuthenticationFailedRejection(CredentialsMissing, List()))
+    }
+  }
+
   def containsIssuerInformation(j: JValue): Boolean = {
     val issuerInfo: List[List[JField]] = for {
       JObject(child) <- j
@@ -116,13 +122,18 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
 class StubAuthenticator extends ContextAuthenticator[User] {
   override def apply(v1: RequestContext): Future[Authentication[User]] = Future {
-    val authHeader = v1.request.headers.filter(_.name == "Authorization").head.value
-    val rolesInRequest: Set[String] = authHeader.substring("Bearer ".length).split(',').toSet
-    val allowedRoles = Set("csr", "csm")
-    val validAuthentication = allowedRoles.intersect(rolesInRequest).nonEmpty
-    if (validAuthentication)
-      Right(User(1, Some(1), "foo", Map("bb/rol" -> rolesInRequest.toList)))
-    else
-      Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, List()))
+    v1.request.headers.filter(_.name == "Authorization") match {
+      case List(authHeader) => {
+        val rolesInRequest: Set[String] = authHeader.value.substring("Bearer ".length).split(',').toSet
+        val allowedRoles = Set("csr", "csm")
+        val validAuthentication = allowedRoles.intersect(rolesInRequest).nonEmpty
+        if (validAuthentication)
+          Right(User(1, Some(1), "foo", Map("bb/rol" -> rolesInRequest.toList)))
+        else
+          Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, List()))
+      }
+      case List() => Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsMissing, List()))
+    }
+
   }(scala.concurrent.ExecutionContext.Implicits.global)
 }
