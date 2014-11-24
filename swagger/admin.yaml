@@ -54,12 +54,10 @@ paths:
           in: body
           description: add credit details
           schema:
-            $ref: AddCreditRequest
+            $ref: Credit
       responses:
-        201:
+        204:
           description: Account credit successfully update
-          schema:
-            $ref: AddCreditResponse
         401:
           description: Not authenticated
         403:
@@ -118,25 +116,34 @@ definitions:
   Credit:
     title: Credit
     properties:
+      requestId:
+        title: RequestId
+        type: string
+        description: An identifier used to make this POST idempotent. If the service has already applied a credit change with this ID, this request does not add more credit, and returns 204. Clients are encouraged to use a globally unique identifier.
       type:
         title: Type
         type: string
-        enum: [credit]
+        enum: [Credit]
+        readOnly: true
       dateTime:
         title: When the credit was applied
         type: string
         format: date-time
+        readOnly: true
       amount:
-        $ref: Amount
+        $ref: PositiveAmount
       reason:
         title: The reason given for the credit
         type: string
+        readOnly: true
+        enum: [GoodwillBookIssue,GoodwillTechnicalIssue,GoodwillServiceIssue,GoodwillCustomerRetention,CreditRefund,StaffCredit,CreditVoucherCode,Hudl2Promotion]
       issuer:
         title: The issuer's details, at the time of issuance (only visible to CSM)
         $ref: Issuer
 
   Issuer:
     description: A person who issues credit to a customer (a CSR or a CSM)
+    readOnly: true
     properties:
       name:
         type: string
@@ -191,29 +198,3 @@ definitions:
         type: number
         minimum: 0
         exclusiveMinimum: true
-
-  AddCreditRequest:
-     title: AddCreditRequest
-     properties:
-          requestId:
-            title: RequestId
-            type: string
-            description: identifier used to make this Post idempotent. If the service has already applied a credit change with this ID, this request does not add more credit, and returns 201.
-          value:
-            title: Value
-            type: number
-            minimum: 0
-            exclusiveMinimum: true
-          reason:
-            title: The reason given for the credit
-            type: string
-            enum: [GoodwillBookIssue,GoodwillTechnicalIssue,GoodwillServiceIssue,GoodwillCustomerRetention,CreditRefund,StaffCredit,CreditVoucherCode,Hudl2Promotion]
-
-  AddCreditResponse:
-      title: AddCreditResponse
-      properties:
-        requestId:
-          title: RequestId
-          type: string
-        amount:
-            $ref: Amount
