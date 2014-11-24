@@ -39,7 +39,9 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
         path("debits") {
           post {
             authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
-              complete(StatusCodes.NoContent)
+              entity(as[CreditRequest]) { creditRequest =>
+                complete(StatusCodes.NoContent)
+              }
             }
           }
         }
@@ -47,3 +49,4 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
     }
 }
 
+case class CreditRequest(amount: Money, requestId: String)

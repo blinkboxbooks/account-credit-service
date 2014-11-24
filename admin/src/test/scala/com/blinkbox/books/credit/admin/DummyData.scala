@@ -1,19 +1,19 @@
 package com.blinkbox.books.credit.admin
 
-import org.json4s.JsonAST.JObject
+import org.json4s.JsonAST.{JDecimal, JObject}
 
 object DummyData {
   import org.json4s.JsonDSL._
 
   val expectedForCsm: JObject =
     ("balance" ->
-      ("amount" -> 1000.53) ~
+      ("amount" -> JDecimal(1000.53)) ~
       ("currency" -> "GBP")) ~
     ("items" -> List(
       ("type" -> "credit") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
-        ("amount" -> 1000.53) ~
+        ("amount" -> JDecimal(1000.53)) ~
         ("currency" -> "GBP")) ~
       ("reason" -> "Why not?") ~
       ("issuer" ->
@@ -23,24 +23,24 @@ object DummyData {
       ("type" -> "debit") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
-        ("amount" -> 1000.53) ~
+        ("amount" -> JDecimal(1000.53)) ~
         ("currency" -> "GBP"))))
 
   var expectedForCsr: JObject =
     ("balance" ->
-      ("amount" -> 1000.53) ~
+      ("amount" -> JDecimal(1000.53)) ~
       ("currency" -> "GBP")) ~
     ("items" -> List(
       ("type" -> "credit") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
-        ("amount" -> 1000.53) ~
+        ("amount" -> JDecimal(1000.53)) ~
         ("currency" -> "GBP")) ~
       ("reason" -> "Why not?"),
 
       ("type" -> "debit") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
-        ("amount" -> 1000.53) ~
+        ("amount" -> JDecimal(1000.53)) ~
         ("currency" -> "GBP"))))
 }
