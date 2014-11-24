@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.0 ([#15](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/15) 2014-11-24 12:08:25)
+
+CRED-36: Outline of add debit endpoint
+
+Acceptance criteria at http://jira.blinkbox.local/jira/browse/CRED-19
+
+new feature
+
 ## 0.8.1 ([#14](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/14) 2014-11-24 12:09:05)
 
 Enable -Xfatal-warnings -Xcheckinit -Xlint
