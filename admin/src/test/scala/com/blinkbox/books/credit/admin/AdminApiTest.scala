@@ -27,6 +27,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   val csrAuth: Authorization = Authorization(OAuth2BearerToken("csr"))
   val csmAuth: Authorization = Authorization(OAuth2BearerToken("csm"))
   var csmAndCsrAuth: Authorization = Authorization(OAuth2BearerToken("csr,csm"))
+  val invalidAuth: RequestTransformer = Authorization(OAuth2BearerToken("invalid"))
 
   "AdminApi" should "200 on credit history request for known user as CSR" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
@@ -85,7 +86,6 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   it should "401 on credit history request when passed incorrect credentials" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
-    val invalidAuth: RequestTransformer = Authorization(OAuth2BearerToken("invalid"))
     Get("/admin/users/123/accountcredit") ~> invalidAuth ~> route ~> check {
       assert(rejection == AuthenticationFailedRejection(CredentialsRejected, List()))
     }
@@ -106,6 +106,12 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   it should "401 on add debit endpoint, with no auth" in {
     Post("/admin/users/123/accountcredit/debits") ~> route ~> check {
       assert(rejection == AuthenticationFailedRejection(CredentialsMissing, List()))
+    }
+  }
+
+  it should "401 on add debit endpoint, with invalid credentials" in {
+    Post("/admin/users/123/accountcredit/debits") ~> invalidAuth ~> route ~> check {
+      assert(rejection == AuthenticationFailedRejection(CredentialsRejected, List()))
     }
   }
 
