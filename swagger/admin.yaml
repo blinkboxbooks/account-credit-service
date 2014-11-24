@@ -54,7 +54,7 @@ paths:
           in: body
           description: add credit details
           schema:
-            $ref: AddCreditRequest
+            $ref: Credit
             
       responses:
         201:
@@ -152,16 +152,22 @@ definitions:
   Debit:
     title: Debit
     properties:
+      requestId:
+        title: RequestId
+        type: string
+        description: identifier used to make this Post idempotent. If the service has already applied a debit change with this ID, this request does not add more debit, and returns 204.
       type:
         title: Type
         type: string
         enum: [debit]
+        readOnly: true
       dateTime:
         title: When the debit was applied
         type: string
         format: date-time
+        readOnly: true
       amount:
-        $ref: Amount
+        $ref: PositiveAmount
 
   Amount:
     title: Amount
@@ -174,6 +180,20 @@ definitions:
         title: Value
         type: number
         minimum: 0
+
+  PositiveAmount:
+    title: Amount
+    properties:
+      currency:
+        title: Currency
+        type: string
+        enum: [GBP]
+      value:
+        title: Value
+        type: number
+        minimum: 0
+        exclusiveMinimum: true
+
 
   AddCreditRequest:
      title: AddCreditRequest
@@ -192,19 +212,6 @@ definitions:
             type: string
             enum: [GoodwillBookIssue,GoodwillTechnicalIssue,GoodwillServiceIssue,GoodwillCustomerRetention,CreditRefund,StaffCredit,CreditVoucherCode,Hudl2Promotion]
 
-  AddDebitRequest:
-     title: AddDebitRequest
-     properties:
-          requestId:
-            title: RequestId
-            type: string
-            description: identifier used to make this Post idempotent. If the service has already applied a debit change with this ID, this request does not add more debit, and returns 204.
-          value:
-            title: Value
-            type: number
-            minimum: 0
-            exclusiveMinimum: true
-          
   AddCreditResponse:
       title: AddCreditResponse
       properties:
