@@ -55,7 +55,6 @@ paths:
           description: add credit details
           schema:
             $ref: AddCreditRequest
-            
       responses:
         201:
           description: Account credit successfully update
@@ -91,7 +90,6 @@ paths:
           description: debit details
           schema:
             $ref: Debit
-
       responses:
         204:
           description: Account debit successfully update
