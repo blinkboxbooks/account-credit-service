@@ -194,7 +194,6 @@ definitions:
         minimum: 0
         exclusiveMinimum: true
 
-
   AddCreditRequest:
      title: AddCreditRequest
      properties:
