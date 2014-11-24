@@ -106,6 +106,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   it should "204 on add debit endpoint, as CSR" in {
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csrAuth ~> route ~> check {
+      verify(creditHistoryRepository).debitIfNotAlreadyDebited(123, Money(BigDecimal.valueOf(90.01), "GBP"), "good")
       assert(status == StatusCodes.NoContent)
     }
   }
