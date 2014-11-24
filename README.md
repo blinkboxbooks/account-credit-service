@@ -1,16 +1,14 @@
 # account-credit-service-v2
 
-* [Spec](http://jira.blinkbox.local/confluence/pages/viewpage.action?pageId=21436336)
-* [JIRA](http://jira.blinkbox.local/jira/secure/RapidBoard.jspa?rapidView=107)
-* [Chat](https://blinkbox.slack.com/messages/books-cust-services/)
-* [Teamcity](http://grisham.blinkbox.local:8111/project.html?projectId=Books_Platform_Agora_AccountCreditServiceV2)
+[Spec](http://jira.blinkbox.local/confluence/pages/viewpage.action?pageId=21436336) ||
+[JIRA](http://jira.blinkbox.local/jira/secure/RapidBoard.jspa?rapidView=107) ||
+[Chat](https://blinkbox.slack.com/messages/books-cust-services/) ||
+[Teamcity](http://grisham.blinkbox.local:8111/project.html?projectId=Books_Platform_Agora_AccountCreditServiceV2) ||
+[Technical Overview](https://git.mobcastdev.com/Agora/account-credit-service-v2/tree/master/accountCreditServiceV2-2.png)
 
 # Background
 The account-credit-service-v2 will allow Customer Service Managers and Representatives (CSM & CSR) to reward credits to customers and to retrieve awarded credit history so they can advice them on that matter. 
 CSM is a bbb representative and CSR is an External agency (FIS for now).
-
-# Technical Overview
-![Technical Overview](https://git.mobcastdev.com/Agora/account-credit-service-v2/tree/master/accountCreditServiceV2-2.png)
 
 # Database modelling
 The account-credit-service is using mysql relation database. It has been designed following [BBB Database Design Guidelines](http://jira.blinkbox.local/confluence/display/PT/MySQL+Database+Design+Guidelines).  
