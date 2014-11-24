@@ -63,6 +63,8 @@ paths:
             $ref: AddCreditResponse
         401:
           description: Not authenticated
+        403:
+          description: User not authorised (needs CSR/CSM role)
         404:
           description: User not found
               
@@ -95,6 +97,8 @@ paths:
           description: Account debit successfully update
         401:
           description: Not authenticated
+        403:
+          description: User not authorised (needs CSR/CSM role)
         404:
           description: User not found
               
