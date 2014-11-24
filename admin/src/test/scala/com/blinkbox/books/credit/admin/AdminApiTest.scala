@@ -123,6 +123,13 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     }
   }
 
+  it should "400 on add debit endpoint, if trying to debit a zero amount" in {
+    val zeroCreditRequest = CreditRequest(Money(BigDecimal.valueOf(0), "GBP"), "good")
+    Post("/admin/users/123/accountcredit/debits", zeroCreditRequest) ~> csrAuth ~> route ~> check {
+      assert(status == StatusCodes.BadRequest)
+    }
+  }
+
   it should "401 on add debit endpoint, with no auth" in {
     Post("/admin/users/123/accountcredit/debits") ~> route ~> check {
       assert(rejection == AuthenticationFailedRejection(CredentialsMissing, List()))

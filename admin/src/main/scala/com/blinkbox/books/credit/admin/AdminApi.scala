@@ -40,7 +40,9 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
           post {
             authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
               entity(as[CreditRequest]) { creditRequest =>
-                if (creditRequest.amount.currency == "GBP") {
+                if (creditRequest.amount.amount == BigDecimal.valueOf(0)) {
+                  complete(StatusCodes.BadRequest)
+                } else if (creditRequest.amount.currency == "GBP") {
                   creditHistoryRepository.debitIfNotAlreadyDebited(userId, creditRequest.amount, creditRequest.requestId)
                   complete(StatusCodes.NoContent)
                 } else
