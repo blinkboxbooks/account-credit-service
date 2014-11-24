@@ -91,10 +91,8 @@ paths:
             $ref: AddDebitRequest
 
       responses:
-        201:
+        204:
           description: Account debit successfully update
-          schema:
-            $ref: AddDebitResponse
         401:
           description: Not authenticated
         404:
@@ -172,7 +170,7 @@ definitions:
         title: Value
         type: number
         minimum: 0
-        
+
   AddCreditRequest:
      title: AddCreditRequest
      properties:
@@ -204,15 +202,6 @@ definitions:
           
   AddCreditResponse:
       title: AddCreditResponse
-      properties:
-        requestId:
-          title: RequestId
-          type: string
-        amount:
-            $ref: Amount
-
-  AddDebitResponse:
-      title: AddDebitResponse
       properties:
         requestId:
           title: RequestId
