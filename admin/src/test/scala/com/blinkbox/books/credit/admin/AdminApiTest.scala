@@ -97,15 +97,15 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     }
   }
 
-  it should "201 on add debit endpoint, as CSR" in {
+  it should "204 on add debit endpoint, as CSR" in {
     Post("/admin/users/123/accountcredit/debits") ~> csrAuth ~> route ~> check {
-      assert(status == StatusCodes.Created)
+      assert(status == StatusCodes.NoContent)
     }
   }
 
-  it should "201 on add debit endpoint, as CSM" in {
+  it should "204 on add debit endpoint, as CSM" in {
     Post("/admin/users/123/accountcredit/debits") ~> csmAuth ~> route ~> check {
-      assert(status == StatusCodes.Created)
+      assert(status == StatusCodes.NoContent)
     }
   }
 

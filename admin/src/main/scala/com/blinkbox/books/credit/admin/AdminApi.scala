@@ -39,7 +39,7 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
         path("debits") {
           post {
             authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { user =>
-              complete(StatusCodes.Created, "foo")
+              complete(StatusCodes.NoContent)
             }
           }
         }
