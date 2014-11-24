@@ -7,7 +7,7 @@ scalaVersion in ThisBuild := "2.11.4"
 lazy val buildSettings = Seq(
   organization := "com.blinkbox.books.platform",
   version := scala.io.Source.fromFile("VERSION").mkString.trim,
-  scalacOptions := Seq("-unchecked", "-deprecation", "-feature", "-encoding", "utf8", "-target:jvm-1.7")
+  scalacOptions := Seq("-unchecked", "-deprecation", "-feature", "-encoding", "utf8", "-target:jvm-1.7", "-Xfatal-warnings", "-Xcheckinit", "-Xlint")
 )
 
 lazy val artifactSettings = addArtifact(artifact in (Compile, assembly), assembly).settings
