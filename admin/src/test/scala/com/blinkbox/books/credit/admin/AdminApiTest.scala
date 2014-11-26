@@ -88,13 +88,13 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     val invalidAuth: RequestTransformer = Authorization(OAuth2BearerToken("invalid"))
     Get("/admin/users/123/accountcredit") ~> invalidAuth ~> route ~> check {
-      assert(rejection == AuthenticationFailedRejection(CredentialsRejected, List()))
+      assert(status == StatusCodes.Unauthorized)
     }
   }
 
   it should "404 on unexpected path" in {
     Get("/nope") ~> route ~> check {
-      assert(handled == false)
+      assert(status == StatusCodes.NotFound)
     }
   }
 

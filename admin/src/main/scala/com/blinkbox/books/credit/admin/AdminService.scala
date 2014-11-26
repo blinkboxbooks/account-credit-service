@@ -8,14 +8,14 @@ import scala.concurrent.Future
 import com.blinkbox.books.time.SystemClock
 
 trait AdminService {
-  def addCredit(req: AddCreditRequest, customerId: Int)(implicit adminUser: User): Credit
+  def addCredit(req: AddCreditRequest, customerId: Int)(implicit adminUser: User): CreditBalance
 }
 
 class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminService {
 
   val nowTime = SystemClock.now()
 
-  override def addCredit(req: AddCreditRequest, customerId: Int)(implicit adminUser: User): Credit = {
+  override def addCredit(req: AddCreditRequest, customerId: Int)(implicit adminUser: User): CreditBalance = {
     val foundCreditBalance = findCreditBalanceByRequestId(req.requestId)
     foundCreditBalance.getOrElse(addCreditToDb(req, adminUser, customerId))
   }

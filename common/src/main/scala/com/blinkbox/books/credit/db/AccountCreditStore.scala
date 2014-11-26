@@ -2,7 +2,7 @@ package com.blinkbox.books.credit.db
 
 import com.blinkbox.books.config.DatabaseConfig
 import com.blinkbox.books.slick.{ DatabaseComponent, DatabaseSupport, MySQLDatabaseSupport, TablesContainer }
-import com.typesafe.scalalogging.slf4j.StrictLogging
+import com.typesafe.scalalogging.StrictLogging
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.slick.driver.MySQLDriver
