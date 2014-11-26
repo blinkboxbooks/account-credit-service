@@ -6,7 +6,7 @@ import com.blinkbox.books.auth.{Elevation, ZuulElevationChecker, ZuulTokenDecode
 import com.blinkbox.books.config.{AuthClientConfig, Configuration}
 import com.blinkbox.books.logging.Loggers
 import com.blinkbox.books.spray.{BearerTokenAuthenticator, HealthCheckHttpService, HttpServer}
-import com.typesafe.scalalogging.slf4j.StrictLogging
+import com.typesafe.scalalogging.StrictLogging
 import spray.can.Http
 import spray.http.Uri.Path
 import spray.routing.HttpServiceActor

@@ -2,9 +2,9 @@ package com.blinkbox.books.credit.admin
 
 import com.blinkbox.books.json.ExplicitTypeHints
 import com.blinkbox.books.spray.v2
+import com.typesafe.scalalogging.StrictLogging
 import org.joda.time.DateTime
 import org.json4s.ShortTypeHints
-import org.slf4j.LoggerFactory
 import spray.routing._
 import Directives._
 import com.blinkbox.books.auth.{UserRole, User}
@@ -17,7 +17,7 @@ import com.blinkbox.books.credit.admin.RenderingFunctions._
 import com.blinkbox.books.spray.MonitoringDirectives.monitor
 import com.blinkbox.books.spray.v2.Implicits.throwableMarshaller
 
-class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport {
+class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport with StrictLogging {
   override implicit def jsonFormats = {
     val typeHints =
       ShortTypeHints(List()) +
@@ -25,9 +25,7 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
     v2.JsonFormats.blinkboxFormat(typeHints)
   }
 
-  val log = LoggerFactory.getLogger(classOf[AdminApi])
-
-  val route = monitor(log, throwableMarshaller) {
+  val route = monitor(logger, throwableMarshaller) {
     get {
       pathPrefix("admin" / "users" / IntNumber) { userId =>
         path("accountcredit") {
