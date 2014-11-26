@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.1 ([#18](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/18) 2014-11-26 12:47:32)
+
+Add logging of requests, using monitor directive
+
+patch
+
 ## 0.9.0 ([#15](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/15) 2014-11-24 12:08:25)
 
 CRED-36: Outline of add debit endpoint
