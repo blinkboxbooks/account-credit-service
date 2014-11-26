@@ -41,5 +41,5 @@ class AdminApiActor(adminApi: AdminApi) extends HttpServiceActor {
     override implicit def actorRefFactory: ActorRefFactory = AdminApiActor.this.actorRefFactory
   }
 
-  override def receive = runRoute(adminApi.route ~ healthService.routes)
+  override def receive = runRoute(healthService.routes ~ adminApi.route)
 }
