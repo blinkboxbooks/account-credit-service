@@ -12,16 +12,14 @@ module KnowsAboutBbbUsers
   @@last_public_user
 
   def use_api_user
-
+    @@api_user
   end
 
   def use_csm_user
-    p 'using csm user'
     @@last_admin_user = @@csm_user
   end
 
   def use_csr_user
-    p 'using csr user'
     @@last_admin_user = @@csr_user
   end
 

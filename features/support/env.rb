@@ -1,6 +1,4 @@
 require 'rubygems'
-require 'wrong'
-require 'childprocess'
 require 'httparty'
 require 'blinkbox/user'
 require 'securerandom'
