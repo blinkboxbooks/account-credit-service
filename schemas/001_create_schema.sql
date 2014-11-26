@@ -28,7 +28,7 @@ CREATE TABLE credit_balance (
  customer_id INT(11) NOT NULL,
  admin_user_id INT(11) ,
  PRIMARY KEY (credit_balance_id),
- FOREIGN KEY `fk_credit_balance_transaction_types` (`transaction_type_id `) references `transaction_types` (`transaction_type_id `),
+ FOREIGN KEY `fk_credit_balance_transaction_types` (`transaction_type_id`) references `transaction_types` (`transaction_type_id`),
  FOREIGN KEY `fk_credit_balance_reasons` (`reason_id`) references `reasons` (`reason_id`)
  ) ENGINE = InnoDB, DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ;
 
