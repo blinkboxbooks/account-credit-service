@@ -1,0 +1,13 @@
+dev_int:
+  services:
+    credit: https://api.dev.bbbtest2.com/
+  users:
+    csr_user:
+      username: tm-books-test-csr@blinkbox.com
+      password: za5xoR9eQuuF0jii
+    csm_user:
+      username: tm-books-itops@blinkbox.com
+      password: d41P8YETV7OjU^cufcu0
+    api_user:
+      username: api_user@blinkbox.com
+      password: api-user-password
