@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.10.0 ([#17](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/17) 2014-11-26 14:57:29)
+
+Suggested "add credit" API changes
+
+... from the review of the "add debit" API changes in
+https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/15
+
+new feature
+
 ## 0.9.1 ([#18](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/18) 2014-11-26 12:47:32)
 
 Add logging of requests, using monitor directive
