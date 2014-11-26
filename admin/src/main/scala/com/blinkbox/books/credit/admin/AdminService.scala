@@ -5,20 +5,19 @@ import com.blinkbox.books.credit.db._
 import com.blinkbox.books.time.Clock
 import com.blinkbox.books.time.TimeSupport
 import scala.concurrent.Future
+import com.blinkbox.books.time.SystemClock
 
 trait AdminService {
-  def addCredit(req: AddCreditRequest, customerId: Int)(implicit adminUser: User): CreditBalance
+  def addCredit(req: AddCreditRequest, customerId: Int)(implicit adminUser: User): Credit
 }
 
-class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminService with TimeSupport {
+class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminService {
 
-  override def addCredit(req: AddCreditRequest, adminUser: User, customerId: Int): CreditBalance = {
+  val nowTime = SystemClock.now()
 
+  override def addCredit(req: AddCreditRequest, customerId: Int)(implicit adminUser: User): Credit = {
     val foundCreditBalance = findCreditBalanceByRequestId(req.requestId)
-    foundCreditBalance match {
-      case Some(_) => foundCreditBalance.get
-      case None    => addCreditToDb(req, adminUser, customerId)
-    }
+    foundCreditBalance.getOrElse(addCreditToDb(req, adminUser, customerId))
   }
 
   private def findCreditBalanceByRequestId(requestId: String): Option[CreditBalance] = {
@@ -30,9 +29,9 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
       id = None,
       requestId = req.requestId,
       value = req.value,
-      transactionType = new TransactionType (TransactionType.Credit),
+      transactionType = TransactionType.Credit,
       reason = Some(com.blinkbox.books.credit.db.Reason.withName(req.reason.toString())),
-      createdAt = clock.now(),
+      createdAt = nowTime,
       updatedAt = None,
       customerId = customerId,
       adminUserId = Some(adminUser.id))

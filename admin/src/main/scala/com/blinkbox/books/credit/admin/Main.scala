@@ -33,7 +33,7 @@ object Main extends App with Configuration with Loggers with StrictLogging {
 
   val dbComponent = new DefaultDatabaseComponent(appConfig.databaseConfig)
 
-  val accountCreditStore = new DbAccountCreditStore[MySQLDatabaseSupport](dbComponent.db, dbComponent.tables, dbComponent.exceptionFilter)
+  val accountCreditStore = new DbAccountCreditStore[MySQLDatabaseSupport](dbComponent.db, dbComponent.tables, dbComponent.exceptionFilter, ec)
 
   val adminService = new DefaultAdminService(accountCreditStore)
 
