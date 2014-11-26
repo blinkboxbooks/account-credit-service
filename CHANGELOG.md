@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.1 ([#20](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/20) 2014-11-26 15:00:02)
+
+Fix health check service: it was 404ing
+
+Will add cucumber test, when the cucumber test skeleton is up
+
+patch
+
 ## 0.10.0 ([#17](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/17) 2014-11-26 14:57:29)
 
 Suggested "add credit" API changes
