@@ -45,11 +45,15 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
               entity(as[CreditRequest]) { creditRequest =>
                 if (creditRequest.amount.amount == BigDecimal.valueOf(0) || creditRequest.amount.amount < BigDecimal.valueOf(0)) {
                   complete(StatusCodes.BadRequest, v2.Error("InvalidAmount", None))
-                } else if (creditRequest.amount.currency == "GBP") {
+                } else if (creditRequest.amount.currency != "GBP") {
+                  complete(StatusCodes.BadRequest, v2.Error("UnsupportedCurrency", None))
+                } else if (creditRequest.amount.amount > creditHistoryRepository.lookupCreditBalanceForUser(123).amount) {
+                  complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))
+                } else {
                   creditHistoryRepository.debitIfNotAlreadyDebited(userId, creditRequest.amount, creditRequest.requestId)
                   complete(StatusCodes.NoContent)
-                } else
-                  complete(StatusCodes.BadRequest, v2.Error("UnsupportedCurrency", None))
+                }
+
               }
             }
           }

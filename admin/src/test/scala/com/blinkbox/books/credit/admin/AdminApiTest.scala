@@ -5,7 +5,7 @@ import com.blinkbox.books.spray.v2
 import com.blinkbox.books.test.MockitoSyrup
 import org.json4s.JsonAST.JObject
 import org.json4s._
-import org.scalatest.FlatSpec
+import org.scalatest.{BeforeAndAfter, FlatSpec}
 import org.mockito.Mockito._
 import spray.http.HttpHeaders.Authorization
 import spray.http.{OAuth2BearerToken, StatusCodes}
@@ -17,7 +17,7 @@ import spray.testkit.ScalatestRouteTest
 import org.json4s.jackson.JsonMethods._
 import scala.concurrent.Future
 
-class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService with MockitoSyrup with v2.JsonSupport {
+class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService with MockitoSyrup with v2.JsonSupport with BeforeAndAfter {
 
   def actorRefFactory = system
   val creditHistory = CreditHistoryRepository.dummy
@@ -36,6 +36,12 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   val csmAuth: Authorization = Authorization(OAuth2BearerToken("csm"))
   var csmAndCsrAuth: Authorization = Authorization(OAuth2BearerToken("csr,csm"))
   val invalidAuth: RequestTransformer = Authorization(OAuth2BearerToken("invalid"))
+
+  val oneMillionPounds = Money(BigDecimal.valueOf(1000000))
+
+  before {
+    reset(creditHistoryRepository)
+  }
 
   "AdminApi" should "200 on credit history request for known user as CSR" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
@@ -106,6 +112,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   it should "204 on add debit endpoint, as CSR" in {
+    when(creditHistoryRepository.lookupCreditBalanceForUser(123)).thenReturn(oneMillionPounds)
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csrAuth ~> route ~> check {
       verify(creditHistoryRepository).debitIfNotAlreadyDebited(123, Money(BigDecimal.valueOf(90.01), "GBP"), "good")
       assert(status == StatusCodes.NoContent)
@@ -113,8 +120,20 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   it should "204 on add debit endpoint, as CSM" in {
+    when(creditHistoryRepository.lookupCreditBalanceForUser(123)).thenReturn(oneMillionPounds)
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csmAuth ~> route ~> check {
       assert(status == StatusCodes.NoContent)
+    }
+  }
+
+  it should "400 on add debit endpoint, if trying to debit more credit than they have" in {
+    import org.mockito.Matchers._
+
+    when(creditHistoryRepository.lookupCreditBalanceForUser(123)).thenReturn(Money(BigDecimal.valueOf(1)))
+    Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csrAuth ~> route ~> check {
+      verify(creditHistoryRepository, never()).debitIfNotAlreadyDebited(any[Int], any[Money], any[String])
+      assert(status == StatusCodes.BadRequest)
+      assert(responseAs[JObject] == errorMessage("InsufficientFunds"))
     }
   }
 
