@@ -53,7 +53,6 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
                   creditHistoryRepository.debit(userId, creditRequest.amount, creditRequest.requestId)
                   complete(StatusCodes.NoContent)
                 }
-
               }
             }
           }
