@@ -16,6 +16,7 @@ import com.blinkbox.books.spray.v2.`application/vnd.blinkbox.books.v2+json`
 import spray.testkit.ScalatestRouteTest
 import org.json4s.jackson.JsonMethods._
 import scala.concurrent.Future
+import org.mockito.Matchers._
 
 class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService with MockitoSyrup with v2.JsonSupport with BeforeAndAfter {
 
@@ -127,8 +128,6 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   it should "400 on add debit endpoint, if trying to debit more credit than they have" in {
-    import org.mockito.Matchers._
-
     when(creditHistoryRepository.lookupCreditBalanceForUser(123)).thenReturn(Money(BigDecimal.valueOf(1)))
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csrAuth ~> route ~> check {
       verify(creditHistoryRepository, never()).debit(any[Int], any[Money], any[String])
@@ -156,8 +155,6 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
    *
    */
   it should "204 on add debit endpoint, if requestId has previously succeeded, even if the debit is more than currently available" in {
-    import org.mockito.Matchers._
-
     when(creditHistoryRepository.lookupCreditBalanceForUser(123)).thenReturn(Money(BigDecimal.valueOf(1)))
     when(creditHistoryRepository.hasRequestAlreadyBeenProcessed("good")).thenReturn(true)
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csrAuth ~> route ~> check {
