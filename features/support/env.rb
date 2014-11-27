@@ -7,8 +7,12 @@ require 'securerandom'
 env = ENV['SERVER'] || 'dev_int'
 $env_properties = YAML.load_file('config/environments.yml')[env]
 
-def test_host
+def credit_host
   $env_properties['services']['credit']
+end
+
+def health_check_host
+  $env_properties['services']['health']
 end
 
 def api_username

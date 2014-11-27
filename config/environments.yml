@@ -1,6 +1,7 @@
 dev_int:
   services:
     credit: https://api.dev.bbbtest2.com/
+    health: http://harris.blinkbox.local:7011/
   users:
     csr_user:
       username: tm-books-test-csr@blinkbox.com
