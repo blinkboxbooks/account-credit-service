@@ -28,13 +28,15 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
 
   val route = monitor(logger, throwableMarshaller) {
     pathPrefix("admin" / "users" / IntNumber) { userId =>
-      path("accountcredit") {
-        get {
-          authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
-            val issuerBehaviour = if (adminUser.isInRole(UserRole.CustomerServicesManager)) keepIssuer _ else removeIssuer _
-            complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map {
-              case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(issuerBehaviour))
-            })
+      pathPrefix("accountcredit") {
+        pathEnd {
+          get {
+            authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
+              val issuerBehaviour = if (adminUser.isInRole(UserRole.CustomerServicesManager)) keepIssuer _ else removeIssuer _
+              complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map {
+                case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(issuerBehaviour))
+              })
+            }
           }
         } ~
         path("debits") {
