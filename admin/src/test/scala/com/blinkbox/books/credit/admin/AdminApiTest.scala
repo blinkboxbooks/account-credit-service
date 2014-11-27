@@ -9,12 +9,10 @@ import org.scalatest.{BeforeAndAfter, FlatSpec}
 import org.mockito.Mockito._
 import spray.http.HttpHeaders.Authorization
 import spray.http.{OAuth2BearerToken, StatusCodes}
-import spray.routing.AuthenticationFailedRejection.{CredentialsMissing, CredentialsRejected}
 import spray.routing.authentication.{ContextAuthenticator, Authentication}
 import spray.routing._
 import com.blinkbox.books.spray.v2.`application/vnd.blinkbox.books.v2+json`
 import spray.testkit.ScalatestRouteTest
-import org.json4s.jackson.JsonMethods._
 import scala.concurrent.Future
 import org.mockito.Matchers._
 

@@ -3,7 +3,6 @@ package com.blinkbox.books.credit.admin
 import com.blinkbox.books.json.ExplicitTypeHints
 import com.blinkbox.books.spray.v2
 import com.typesafe.scalalogging.StrictLogging
-import org.joda.time.DateTime
 import org.json4s.ShortTypeHints
 import spray.http.StatusCodes
 import spray.routing._
