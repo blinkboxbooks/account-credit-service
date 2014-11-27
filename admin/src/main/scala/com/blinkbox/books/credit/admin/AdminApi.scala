@@ -49,7 +49,7 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
                   creditHistoryRepository.debitIfNotAlreadyDebited(userId, creditRequest.amount, creditRequest.requestId)
                   complete(StatusCodes.NoContent)
                 } else
-                  complete(StatusCodes.BadRequest)
+                  complete(StatusCodes.BadRequest, v2.Error("UnsupportedCurrency", None))
               }
             }
           }

@@ -121,6 +121,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   it should "400 on add debit endpoint, if trying to debit non-GBP" in {
     Post("/admin/users/123/accountcredit/debits", nonGbpCreditRequest) ~> csrAuth ~> route ~> check {
       assert(status == StatusCodes.BadRequest)
+      assert(responseAs[JObject] == errorMessage("UnsupportedCurrency"))
     }
   }
 
