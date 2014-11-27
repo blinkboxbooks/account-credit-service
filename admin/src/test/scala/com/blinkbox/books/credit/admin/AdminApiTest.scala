@@ -3,6 +3,7 @@ package com.blinkbox.books.credit.admin
 import com.blinkbox.books.auth.User
 import com.blinkbox.books.spray.v2
 import com.blinkbox.books.test.MockitoSyrup
+import org.json4s.JsonAST.JObject
 import org.json4s._
 import org.scalatest.FlatSpec
 import org.mockito.Mockito._
@@ -134,6 +135,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     val negativeCreditRequest = CreditRequest(Money(BigDecimal.valueOf(-1), "GBP"), "good")
     Post("/admin/users/123/accountcredit/debits", negativeCreditRequest) ~> csrAuth ~> route ~> check {
       assert(status == StatusCodes.BadRequest)
+      assert(responseAs[JObject] == errorMessage("InvalidAmount"))
     }
   }
 
@@ -169,6 +171,11 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     } yield issuer
 
     !issuerInfo.flatten.isEmpty
+  }
+
+  def errorMessage(code: String): JObject = {
+    import org.json4s.JsonDSL._
+    ("code" -> code)
   }
 
 }
