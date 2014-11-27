@@ -1,15 +1,17 @@
 require 'json'
 
 module KnowsAboutAccountCreditRequests
-  @@host = test_host
+  def get_health_check
+    @response = HTTParty.get("#{health_check_host}health/ping")
+  end
 
   def get_admin_account_credit(admin_auth_token, user_id)
-    @response = HTTParty.get("/#{@@host}admin/users/#{user_id}/accountcredit",
+    @response = HTTParty.get("#{credit_host}admin/users/#{user_id}/accountcredit",
                             :options => { :headers => get_headers(admin_auth_token)})
   end
 
   def post_admin_account_debit(admin_auth_token, amount_debit, user_id, transaction_id)
-      @response = HTTParty.post("#{@@host}admin/users/#{user_id}/accountcredit/debits",
+      @response = HTTParty.post("#{credit_host}admin/users/#{user_id}/accountcredit/debits",
       :query => {
                   :requestId => transaction_id,
                   :amount => {
@@ -19,7 +21,7 @@ module KnowsAboutAccountCreditRequests
   end
 
   def post_admin_account_credit(admin_auth_token, amount, reason, user_id, transaction_id)
-    @response = HTTParty.post("#{@@host}admin/users/#{user_id}/accountcredit/credits",
+    @response = HTTParty.post("#{credit_host}admin/users/#{user_id}/accountcredit/credits",
     :query => {
                 :requestId => transaction_id,
                 :amount => {
