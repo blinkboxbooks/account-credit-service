@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.10.1 ([#20](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/20) 2014-11-26 15:00:02)
+
+Fix health check service: it was 404ing
+
+Will add cucumber test, when the cucumber test skeleton is up
+
+patch
+
+## 0.10.0 ([#17](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/17) 2014-11-26 14:57:29)
+
+Suggested "add credit" API changes
+
+... from the review of the "add debit" API changes in
+https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/15
+
+new feature
+
+## 0.9.1 ([#18](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/18) 2014-11-26 12:47:32)
+
+Add logging of requests, using monitor directive
+
+patch
+
+## 0.9.0 ([#15](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/15) 2014-11-24 12:08:25)
+
+CRED-36: Outline of add debit endpoint
+
+Acceptance criteria at http://jira.blinkbox.local/jira/browse/CRED-19
+
+new feature
+
+## 0.8.1 ([#14](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/14) 2014-11-24 12:09:05)
+
+Enable -Xfatal-warnings -Xcheckinit -Xlint
+
+patch
+
 ## 0.8.0 ([#9](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/9) 2014-11-21 15:10:59)
 
 CRED-27 added db design

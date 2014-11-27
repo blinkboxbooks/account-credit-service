@@ -94,13 +94,13 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   it should "401 on credit history request when passed incorrect credentials" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/accountcredit") ~> invalidAuth ~> route ~> check {
-      assert(rejection == AuthenticationFailedRejection(CredentialsRejected, List()))
+      assert(status == StatusCodes.Unauthorized)
     }
   }
 
   it should "404 on unexpected path" in {
     Get("/nope") ~> route ~> check {
-      assert(handled == false)
+      assert(status == StatusCodes.NotFound)
     }
   }
 
@@ -139,26 +139,26 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   it should "401 on add debit endpoint, with no auth" in {
     Post("/admin/users/123/accountcredit/debits") ~> route ~> check {
-      assert(rejection == AuthenticationFailedRejection(CredentialsMissing, List()))
+      assert(status == StatusCodes.Unauthorized)
     }
   }
 
   it should "401 on add debit endpoint, with invalid credentials" in {
     Post("/admin/users/123/accountcredit/debits") ~> invalidAuth ~> route ~> check {
-      assert(rejection == AuthenticationFailedRejection(CredentialsRejected, List()))
+      assert(status == StatusCodes.Unauthorized)
     }
   }
 
   it should "403 on add debit endpoint, with unauthorised credentials" in {
     val unauthorisedAuth: Authorization = Authorization(OAuth2BearerToken("unauthorised"))
     Post("/admin/users/123/accountcredit/debits") ~> unauthorisedAuth ~> route ~> check {
-      assert(rejection == AuthorizationFailedRejection)
+      assert(status == StatusCodes.Forbidden)
     }
   }
 
   it should "400 on add debit endpoint, if missing body" in {
     Post("/admin/users/123/accountcredit/debits") ~> csrAuth ~> route ~> check {
-      assert(rejection == RequestEntityExpectedRejection)
+      assert(status == StatusCodes.BadRequest)
     }
   }
 

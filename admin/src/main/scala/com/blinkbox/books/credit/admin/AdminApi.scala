@@ -2,6 +2,7 @@ package com.blinkbox.books.credit.admin
 
 import com.blinkbox.books.json.ExplicitTypeHints
 import com.blinkbox.books.spray.v2
+import com.typesafe.scalalogging.StrictLogging
 import org.joda.time.DateTime
 import org.json4s.ShortTypeHints
 import spray.http.StatusCodes
@@ -14,8 +15,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import com.blinkbox.books.auth.UserRole._
 import com.blinkbox.books.auth.Constraints._
 import com.blinkbox.books.credit.admin.RenderingFunctions._
+import com.blinkbox.books.spray.MonitoringDirectives.monitor
+import com.blinkbox.books.spray.v2.Implicits.throwableMarshaller
 
-class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport {
+class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport with StrictLogging {
   override implicit def jsonFormats = {
     val typeHints =
       ShortTypeHints(List()) +
@@ -23,7 +26,7 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
     v2.JsonFormats.blinkboxFormat(typeHints)
   }
 
-  val route =
+  val route = monitor(logger, throwableMarshaller) {
     pathPrefix("admin" / "users" / IntNumber) { userId =>
       pathPrefix("accountcredit") {
         pathEnd {
@@ -53,6 +56,7 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
         }
       }
     }
+  }
 }
 
 case class CreditRequest(amount: Money, requestId: String)
