@@ -114,7 +114,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   it should "204 on add debit endpoint, as CSR" in {
     when(creditHistoryRepository.lookupCreditBalanceForUser(123)).thenReturn(oneMillionPounds)
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csrAuth ~> route ~> check {
-      verify(creditHistoryRepository).debitIfNotAlreadyDebited(123, Money(BigDecimal.valueOf(90.01), "GBP"), "good")
+      verify(creditHistoryRepository).debit(123, Money(BigDecimal.valueOf(90.01), "GBP"), "good")
       assert(status == StatusCodes.NoContent)
     }
   }
@@ -131,9 +131,38 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
     when(creditHistoryRepository.lookupCreditBalanceForUser(123)).thenReturn(Money(BigDecimal.valueOf(1)))
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csrAuth ~> route ~> check {
-      verify(creditHistoryRepository, never()).debitIfNotAlreadyDebited(any[Int], any[Money], any[String])
+      verify(creditHistoryRepository, never()).debit(any[Int], any[Money], any[String])
       assert(status == StatusCodes.BadRequest)
       assert(responseAs[JObject] == errorMessage("InsufficientFunds"))
+    }
+  }
+
+  /*
+   * Suppose the following requests occur:
+   *
+   * Row name | Request                  | Response code | Net balance after request
+   * -------- | ------------------------ | ------------- | -------------------------
+   * A        | credit(£10, requestId=1) | 204           | £10
+   * B        | debit(£10, requestId=2)  | 204           | £0
+   * C        | debit(£1, requestId=3)   | 400           | £0    // 400 due to insufficient funds
+   * D        | debit(£10, requestId=2)  | 204           | £0
+   *
+   * D returns 204, which on first inspection seems odd, since the debit is for more than the user's balance.
+   * This is expected, however, due to the idempotence of the debit endpoint.
+   *
+   * The rationale is that we return 204:
+   *    * when a debit request we haven't seen before is successfully applied (e.g. B)
+   *    * whenever we notice that particular debit (uniquely identified by the requestId) has already been applied
+   *
+   */
+  it should "204 on add debit endpoint, if requestId has previously succeeded, even if the debit is more than currently available" in {
+    import org.mockito.Matchers._
+
+    when(creditHistoryRepository.lookupCreditBalanceForUser(123)).thenReturn(Money(BigDecimal.valueOf(1)))
+    when(creditHistoryRepository.hasRequestAlreadyBeenProcessed("good")).thenReturn(true)
+    Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csrAuth ~> route ~> check {
+      verify(creditHistoryRepository, never()).debit(any[Int], any[Money], any[String])
+      assert(status == StatusCodes.NoContent)
     }
   }
 

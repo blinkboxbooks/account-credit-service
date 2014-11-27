@@ -47,10 +47,12 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
                   complete(StatusCodes.BadRequest, v2.Error("InvalidAmount", None))
                 } else if (creditRequest.amount.currency != "GBP") {
                   complete(StatusCodes.BadRequest, v2.Error("UnsupportedCurrency", None))
+                } else if (creditHistoryRepository.hasRequestAlreadyBeenProcessed(creditRequest.requestId)) {
+                  complete(StatusCodes.NoContent)
                 } else if (creditRequest.amount.amount > creditHistoryRepository.lookupCreditBalanceForUser(123).amount) {
                   complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))
                 } else {
-                  creditHistoryRepository.debitIfNotAlreadyDebited(userId, creditRequest.amount, creditRequest.requestId)
+                  creditHistoryRepository.debit(userId, creditRequest.amount, creditRequest.requestId)
                   complete(StatusCodes.NoContent)
                 }
 

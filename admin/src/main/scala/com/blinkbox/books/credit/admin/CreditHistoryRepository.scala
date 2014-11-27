@@ -6,13 +6,15 @@ import org.joda.time.DateTime
 class CreditHistoryRepository {
   def lookupCreditBalanceForUser(i: Int): Money = Money(BigDecimal.valueOf(1000000))
 
-  def debitIfNotAlreadyDebited(i: Int, money: Money, s: String) = {}
+  def debit(i: Int, money: Money, s: String) = {}
 
   def lookupCreditHistoryForUser(userId: Int): Option[CreditHistory] =
     if (userId == 7)
       Some(CreditHistoryRepository.dummy)
     else
       None
+
+  def hasRequestAlreadyBeenProcessed(requestId: String): Boolean = requestId == "used"
 }
 
 object CreditHistoryRepository {
