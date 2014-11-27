@@ -2,6 +2,8 @@ module KnowsAboutBbbUsers
   attr_accessor :last_admin_user, :last_public_user
 
   def use_api_user
+    # @user = data_for_a(:user, which: "has the #{role} role")
+    # @user['username'], password: @user['password'])
     @last_admin_user = authenticate_user(api_username, api_password)
   end
 

@@ -10,4 +10,6 @@ group :test do
   gem 'json'
   gem 'blinkbox-user'
   gem 'jsonpath'
+  gem 'cucumber-blinkbox'
+  gem 'cucumber-rest'
 end
