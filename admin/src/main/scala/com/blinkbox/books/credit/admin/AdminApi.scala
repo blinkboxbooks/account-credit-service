@@ -43,7 +43,7 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
           post {
             authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
               entity(as[CreditRequest]) { creditRequest =>
-                if (creditRequest.amount.amount == BigDecimal.valueOf(0) || creditRequest.amount.amount < BigDecimal.valueOf(0)) {
+                if (creditRequest.amount.amount <= BigDecimal.valueOf(0)) {
                   complete(StatusCodes.BadRequest, v2.Error("InvalidAmount", None))
                 } else if (creditRequest.amount.currency != "GBP") {
                   complete(StatusCodes.BadRequest, v2.Error("UnsupportedCurrency", None))
