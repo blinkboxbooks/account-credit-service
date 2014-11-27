@@ -2,17 +2,13 @@ module KnowsAboutBbbUsers
   attr_accessor :last_admin_user, :last_public_user
 
   def use_api_user
-    # @user = data_for_a(:user, which: "has the #{role} role")
-    # @user['username'], password: @user['password'])
-    @last_admin_user = authenticate_user(api_username, api_password)
+    user = data_for_a(:user, which: "is an api user")
+    @last_admin_user = authenticate_user(user['username'], user['password'])
   end
 
-  def use_csm_user
-    @last_admin_user = authenticate_user(csm_username, csm_password)
-  end
-
-  def use_csr_user
-    @last_admin_user = authenticate_user(csr_username, csr_password)
+  def use_admin_user(role)
+    user = data_for_a(:user, which: "has the #{role} role")
+    @last_admin_user = authenticate_user(user['username'], user['password'])
   end
 
   def new_public_user
