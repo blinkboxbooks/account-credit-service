@@ -170,6 +170,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     val zeroCreditRequest = CreditRequest(Money(BigDecimal.valueOf(0), "GBP"), "good")
     Post("/admin/users/123/accountcredit/debits", zeroCreditRequest) ~> csrAuth ~> route ~> check {
       assert(status == StatusCodes.BadRequest)
+      assert(responseAs[JObject] == errorMessage("InvalidAmount"))
     }
   }
 
