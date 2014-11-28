@@ -20,3 +20,11 @@ the schemas for this service can be found in [schemas](https://git.mobcastdev.co
 
 ### ... the Public service
 `sbt "run-main com.blinkbox.books.credit.Main"`
+
+# Acceptance Tests
+To run all acceptance tests against dev-int execute the following cmd in the project directory:
+```
+Rake test
+```
+
+If you encounter errors about "OpenSSL::X509::StoreError" then follow the instructions on [this page](http://jira.blinkbox.local/confluence/display/PT/StartSSL+Certificates)

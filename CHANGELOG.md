@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.10.4 ([#24](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/24) 2014-11-28 11:31:38)
+
+Add local/dev to cucumber environments
+
+patch
+
+@daniell
+
+## 0.10.3 ([#23](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/23) 2014-11-28 11:17:33)
+
+acceptance test for health check endpoint
+
+Patch: acceptance test for health check endpoint
+
+## 0.10.2 ([#19](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/19) 2014-11-28 10:35:48)
+
+Cucumber skeleton
+
+Test Improvement: Cucumber skeleton for acceptance tests.
+
 ## 0.10.1 ([#20](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/20) 2014-11-26 15:00:02)
 
 Fix health check service: it was 404ing
