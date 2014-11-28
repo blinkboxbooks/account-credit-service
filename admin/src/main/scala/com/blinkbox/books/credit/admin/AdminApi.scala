@@ -48,12 +48,10 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
                   complete(StatusCodes.BadRequest, v2.Error("UnsupportedCurrency", None))
                 } else if (creditHistoryRepository.hasRequestAlreadyBeenProcessed(creditRequest.requestId)) {
                   complete(StatusCodes.NoContent)
+                } else if (creditHistoryRepository.debit(userId, creditRequest.amount, creditRequest.requestId)) {
+                  complete(StatusCodes.NoContent)
                 } else {
-                  if (creditHistoryRepository.debit(userId, creditRequest.amount, creditRequest.requestId)) {
-                    complete(StatusCodes.NoContent)
-                  } else {
-                    complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))
-                  }
+                  complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))
                 }
               }
             }
