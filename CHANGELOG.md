@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.4 ([#24](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/24) 2014-11-28 11:31:38)
+
+Add local/dev to cucumber environments
+
+patch
+
+@daniell
+
 ## 0.10.3 ([#23](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/23) 2014-11-28 11:17:33)
 
 acceptance test for health check endpoint
