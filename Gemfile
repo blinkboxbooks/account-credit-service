@@ -12,4 +12,5 @@ group :test do
   gem 'jsonpath'
   gem 'cucumber-blinkbox'
   gem 'cucumber-rest'
+  gem 'cucumber-helpers'
 end
