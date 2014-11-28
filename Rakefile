@@ -9,7 +9,7 @@ begin
   require 'cucumber/rake/task'
   Cucumber::Rake::Task.new(:features) do |t|
     t.cucumber_opts = "--profile #{ENV['PROFILE']}" if ENV['PROFILE']
-    end
+  end
 rescue LoadError
   task :features do
     $stderr.puts 'Please run: `bundle install` to install required gems.'
