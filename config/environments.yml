@@ -3,3 +3,7 @@ dev_int:
     credit: https://api.dev.bbbtest2.com/
     health: http://harris.blinkbox.local:7011/
 
+local:
+  servers:
+    credit: http://127.0.0.1:9877/
+    health: http://127.0.0.1:9877/
