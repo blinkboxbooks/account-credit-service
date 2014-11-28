@@ -16,7 +16,8 @@ module KnowsAboutAccountCreditRequests
                        :requestId => transaction_id,
                        :amount => {
                          :currency => "GBP",
-                         :value => amount_debit }}
+                         :value => amount_debit }
+    }
 
     http_post :credit, "/admin/users/#{user_id}/accountcredit/debits", request_body
   end
@@ -29,7 +30,8 @@ module KnowsAboutAccountCreditRequests
                        :currency => "GBP",
                        :value => amount },
                      :reason => reason,
-                       :type => 'credit' }
+                       :type => 'credit'
+    }
 
     http_post :credit, "/admin/users/#{user_id}/accountcredit/credits", request_body
   end
