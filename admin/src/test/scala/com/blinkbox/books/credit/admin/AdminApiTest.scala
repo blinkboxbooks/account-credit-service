@@ -111,24 +111,26 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   it should "204 on add debit endpoint, as CSR" in {
-    when(creditHistoryRepository.lookupCreditBalanceForUser(123)).thenReturn(oneMillionPounds)
+    val amount = Money(BigDecimal.valueOf(90.01), "GBP")
+    when(creditHistoryRepository.debitIfUserHasSufficientCredit(123, amount, "good")).thenReturn(true)
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csrAuth ~> route ~> check {
-      verify(creditHistoryRepository).debit(123, Money(BigDecimal.valueOf(90.01), "GBP"), "good")
+      verify(creditHistoryRepository).debitIfUserHasSufficientCredit(123, amount, "good")
       assert(status == StatusCodes.NoContent)
     }
   }
 
   it should "204 on add debit endpoint, as CSM" in {
-    when(creditHistoryRepository.lookupCreditBalanceForUser(123)).thenReturn(oneMillionPounds)
+    val amount = Money(BigDecimal.valueOf(90.01), "GBP")
+    when(creditHistoryRepository.debitIfUserHasSufficientCredit(123, amount, "good")).thenReturn(true)
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csmAuth ~> route ~> check {
+      verify(creditHistoryRepository).debitIfUserHasSufficientCredit(123, amount, "good")
       assert(status == StatusCodes.NoContent)
     }
   }
 
   it should "400 on add debit endpoint, if trying to debit more credit than they have" in {
-    when(creditHistoryRepository.lookupCreditBalanceForUser(123)).thenReturn(Money(BigDecimal.valueOf(1)))
+    when(creditHistoryRepository.debitIfUserHasSufficientCredit(any[Int], any[Money], any[String])).thenReturn(false)
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csrAuth ~> route ~> check {
-      verify(creditHistoryRepository, never()).debit(any[Int], any[Money], any[String])
       assert(status == StatusCodes.BadRequest)
       assert(responseAs[JObject] == errorMessage("InsufficientFunds"))
     }
@@ -153,10 +155,9 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
    *
    */
   it should "204 on add debit endpoint, if requestId has previously succeeded, even if the debit is more than currently available" in {
-    when(creditHistoryRepository.lookupCreditBalanceForUser(123)).thenReturn(Money(BigDecimal.valueOf(1)))
     when(creditHistoryRepository.hasRequestAlreadyBeenProcessed("good")).thenReturn(true)
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csrAuth ~> route ~> check {
-      verify(creditHistoryRepository, never()).debit(any[Int], any[Money], any[String])
+      verify(creditHistoryRepository, never()).debitIfUserHasSufficientCredit(any[Int], any[Money], any[String])
       assert(status == StatusCodes.NoContent)
     }
   }
