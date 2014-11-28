@@ -4,7 +4,7 @@ import com.blinkbox.books.auth.UserRole
 import org.joda.time.DateTime
 
 class CreditHistoryRepository {
-  def debitIfUserHasSufficientCredit(i: Int, money: Money, s: String): Boolean = money.amount < lookupCreditBalanceForUser(i).amount
+  def debit(i: Int, money: Money, s: String): Boolean = money.amount < lookupCreditBalanceForUser(i).amount
 
   private def lookupCreditBalanceForUser(i: Int): Money = Money(BigDecimal.valueOf(1000000))
 

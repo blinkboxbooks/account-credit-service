@@ -49,7 +49,7 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, authenticator: 
                 } else if (creditHistoryRepository.hasRequestAlreadyBeenProcessed(creditRequest.requestId)) {
                   complete(StatusCodes.NoContent)
                 } else {
-                  if (creditHistoryRepository.debitIfUserHasSufficientCredit(userId, creditRequest.amount, creditRequest.requestId)) {
+                  if (creditHistoryRepository.debit(userId, creditRequest.amount, creditRequest.requestId)) {
                     complete(StatusCodes.NoContent)
                   } else {
                     complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))
