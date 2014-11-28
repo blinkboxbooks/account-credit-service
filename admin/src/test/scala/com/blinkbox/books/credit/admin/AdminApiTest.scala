@@ -61,24 +61,21 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   it should "not show issuer information to CSRs" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
-      val json = responseAs[JObject]
-      assert(!containsIssuerInformation(json))
+      assert(!containsIssuerInformation(responseAs[JObject]))
     }
   }
 
   it should "show issuer information to CSMs" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csmAuth ~> route ~> check {
-      val json = responseAs[JObject]
-      assert(containsIssuerInformation(json))
+      assert(containsIssuerInformation(responseAs[JObject]))
     }
   }
 
   it should "show issuer information to users with CSR /and/ CSM roles" in {
     when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csmAndCsrAuth ~> route ~> check {
-      val json = responseAs[JObject]
-      assert(containsIssuerInformation(json))
+      assert(containsIssuerInformation(responseAs[JObject]))
     }
   }
 
