@@ -1,0 +1,4 @@
+default: -p ci-regression-dev-int
+
+ci-regression-local: SERVER=local --strict
+ci-regression-dev-int: SERVER=dev_int --strict

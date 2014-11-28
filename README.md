@@ -20,3 +20,9 @@ the schemas for this service can be found in [schemas](https://git.mobcastdev.co
 
 ### ... the Public service
 `sbt "run-main com.blinkbox.books.credit.Main"`
+
+# Acceptance Tests
+To run all acceptance tests against dev-int execute the following cmd in the project directory:
+```
+Rake test
+```

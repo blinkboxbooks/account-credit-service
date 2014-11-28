@@ -1,0 +1,5 @@
+dev_int:
+  servers:
+    credit: https://api.dev.bbbtest2.com/
+    health: http://harris.blinkbox.local:7011/
+
