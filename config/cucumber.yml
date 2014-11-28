@@ -1,4 +1,4 @@
 default: -p ci-regression-dev-int
 
-ci-regression-local: SERVER=local --strict
+ci-smoke-dev-int: --tags @smoke SERVER=dev_int --strict
 ci-regression-dev-int: SERVER=dev_int --strict
