@@ -40,11 +40,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
   }
 
   override def alreadyBeenProcessed(requestId: String): Boolean = {
-    val foundCreditBalance = accountCreditStore.getCreditBalanceByResquestID(requestId)
-    foundCreditBalance match {
-      case Some(_) => true
-      case None    => false
-    }
+    accountCreditStore.getCreditBalanceByResquestID(requestId).nonEmpty
   }
 }
 
