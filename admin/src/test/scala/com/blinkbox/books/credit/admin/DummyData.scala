@@ -16,7 +16,7 @@ object DummyData {
       ("amount" ->
         ("amount" -> 1000.53) ~
         ("currency" -> "GBP")) ~
-      ("reason" -> "Why not?") ~
+      ("reason" -> "CreditVoucherCode") ~
       ("issuer" ->
         ("name" -> "James Bond") ~
         ("roles" -> List("csr"))),
@@ -39,7 +39,7 @@ object DummyData {
       ("amount" ->
         ("amount" -> 1000.53) ~
         ("currency" -> "GBP")) ~
-      ("reason" -> "Why not?"),
+      ("reason" -> "CreditVoucherCode"),
 
       ("type" -> "debit") ~
       ("requestId" -> "sdfnaksfniofgniaodoir84t839t") ~

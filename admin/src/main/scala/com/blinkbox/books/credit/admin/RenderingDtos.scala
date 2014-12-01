@@ -10,12 +10,12 @@ case class CreditHistoryForRendering(balance: Money, items: List[RenderingCredit
 
 object RenderingFunctions {
   def removeIssuer(cd: CreditOrDebit): RenderingCreditOrDebit = cd match {
-    case Credit(rq,dt, a, r, _) => CreditForRendering(rq, dt, a, r.reason, None)
+    case Credit(rq,dt, a, r, _) => CreditForRendering(rq, dt, a, r.toString(), None)
     case Debit(rq,dt, a) => DebitForRendering(rq,dt, a)
   }
 
   def keepIssuer(cd: CreditOrDebit): RenderingCreditOrDebit = cd match {
-    case Credit(rq,dt, a, r, CreditIssuer(n, roles)) => CreditForRendering(rq,dt, a, r.reason, Some(CreditIssuerForRendering(n, roles.map(_.toString))))
+    case Credit(rq,dt, a, r, CreditIssuer(n, roles)) => CreditForRendering(rq,dt, a, r.toString(), Some(CreditIssuerForRendering(n, roles.map(_.toString))))
     case Debit(rq,dt, a) => DebitForRendering(rq,dt, a)
   }
 }
