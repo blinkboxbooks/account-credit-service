@@ -19,24 +19,22 @@ class DbAccountCreditStore[DB <: DatabaseSupport](db: DB#Database, tables: Accou
   import tables._
   import driver.simple._
 
-  override def addCredit(credit: CreditBalance): Int = {
+  override def addCredit(credit: CreditBalance): Int =
     db.withSession { implicit session =>
       (creditBalance returning creditBalance.map(_.id)) insert credit
-      
-    }
-  }
 
-  override def getCreditBalanceByResquestID(requestId: String): Option[CreditBalance] = {
+    }
+
+  override def getCreditBalanceByResquestID(requestId: String): Option[CreditBalance] =
+    db.withSession {
+      implicit session =>
+        creditBalance.filter { _.requestId === requestId }.firstOption
+    }
+
+  override def getCreditBalanceById(creditBalanceId: Int): Option[CreditBalance] =
     db.withSession { implicit session =>
-      creditBalance.filter { _.requestId === requestId }.firstOption
-    }
-  }
-
-  override def getCreditBalanceById(creditBalanceId: Int): Option[CreditBalance] = {
-   db.withSession { implicit session =>
       creditBalance.filter { _.id === creditBalanceId }.firstOption
     }
-  }
 }
 
 class DefaultDatabaseComponent(config: DatabaseConfig) extends DatabaseComponent {
@@ -45,7 +43,6 @@ class DefaultDatabaseComponent(config: DatabaseConfig) extends DatabaseComponent
 
   override val driver = MySQLDriver
   override val DB = new MySQLDatabaseSupport
-  // TODO: build using datasource
   override val db = Database.forURL(
     driver = "com.mysql.jdbc.Driver",
     url = config.jdbcUrl,

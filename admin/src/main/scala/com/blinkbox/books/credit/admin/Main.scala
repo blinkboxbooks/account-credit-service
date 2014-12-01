@@ -18,7 +18,7 @@ import scala.concurrent.duration._
 import com.blinkbox.books.credit.db.DbAccountCreditStore
 
 object Main extends App with Configuration with Loggers with StrictLogging {
-  logger.info("Starting Account-credit-service-v2")
+  logger.info("Starting Account-credit-service-v2-admin")
   val system = ActorSystem("account-credit-service-v2-admin")
   val appConfig = AppConfig(config)
   implicit val ec = system.dispatcher
