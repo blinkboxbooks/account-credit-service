@@ -29,7 +29,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
     requestId = req.requestId,
     value = req.amount.amount,
     transactionType = TransactionType.Credit,
-    reason = Some(com.blinkbox.books.credit.db.Reason.withName(req.reason.toString())),
+    reason = Some(creditReasonMapping(req.reason)),
     createdAt = nowTime,
     updatedAt = None,
     customerId = customerId,
@@ -41,6 +41,24 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
 
   override def alreadyBeenProcessed(requestId: String): Boolean = {
     accountCreditStore.getCreditBalanceByResquestID(requestId).nonEmpty
+  }
+  
+  /**
+   * Maps Spray layer Credit reason Enum to Database layer Reason Enum
+   */
+  private def creditReasonMapping(creditReason: CreditReason.Reason): Reason.Reason = {
+    
+    creditReason  match {
+      case CreditReason.CreditRefund => Reason.CreditRefund
+      case CreditReason.CreditVoucherCode => Reason.CreditVoucherCode
+      case CreditReason.GoodwillBookIssue => Reason.GoodwillBookIssue
+      case CreditReason.GoodwillCustomerRetention => Reason.GoodwillCustomerRetention
+      case CreditReason.GoodwillServiceIssue => Reason.GoodwillServiceIssue
+      case CreditReason.GoodwillTechnicalIssue => Reason.GoodwillTechnicalIssue
+      case CreditReason.Hudl2Promotion => Reason.Hudl2Promotion
+      case CreditReason.StaffCredit => Reason.StaffCredit
+      case _ => throw new Exception("Invalid Reason")
+    }
   }
 }
 

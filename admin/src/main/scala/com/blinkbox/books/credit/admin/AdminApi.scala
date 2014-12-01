@@ -17,7 +17,6 @@ import com.blinkbox.books.auth.Constraints._
 import com.blinkbox.books.credit.admin.RenderingFunctions._
 import com.blinkbox.books.spray.MonitoringDirectives.monitor
 import com.blinkbox.books.spray.v2.Implicits.throwableMarshaller
-import akka.dispatch.OnSuccess
 
 class AdminApi(creditHistoryRepository: CreditHistoryRepository, adminService: AdminService, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport with StrictLogging {
 
@@ -48,20 +47,19 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, adminService: A
               entity(as[Credit]) { credit =>
                 if (credit.amount.amount <= BigDecimal(0)) {
                   complete(StatusCodes.BadRequest)
+                } else if (credit.amount.currency != "GBP") {
+                  complete(StatusCodes.BadRequest)
                 } else {
-                  adminService.alreadyBeenProcessed(credit.requestId) match {
-                    case true => complete(StatusCodes.Created)
-                    case false => onSuccess(adminService.addCredit(credit, userId)) { resp =>
+                  if (adminService.alreadyBeenProcessed(credit.requestId)) complete(StatusCodes.Created) else
+                    onSuccess(adminService.addCredit(credit, userId)) { resp =>
                       complete(StatusCodes.Created)
                     }
-                  }
                 }
               }
             }
           }
         }
       }
-  }
-
+  }  
 }
 

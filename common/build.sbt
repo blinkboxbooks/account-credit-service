@@ -12,7 +12,6 @@ libraryDependencies ++= {
     "com.github.tototoshi"        %% "slick-joda-mapper"        % "1.2.0",
     "mysql"                        % "mysql-connector-java"     % "5.1.34",
     "org.apache.commons"           % "commons-dbcp2"            % "2.0.1",
-    "org.joda"                     % "joda-money"               % "0.9.1",
     "joda-time"                    % "joda-time"                % "2.5",
     "com.h2database"               % "h2"                       % "1.4.182" % Test
   )
