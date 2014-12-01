@@ -56,8 +56,8 @@ paths:
           schema:
             $ref: Credit
       responses:
-        201:
-          description: Account credit successfully update
+        204:
+          description: Account credit successfully updated
         401:
           description: Not authenticated
         403:
@@ -119,7 +119,7 @@ definitions:
       requestId:
         title: RequestId
         type: string
-        description: An identifier used to make this POST idempotent. If the service has already applied a credit change with this ID, this request does not add more credit, and returns 201. Clients are encouraged to use a globally unique identifier.
+        description: An identifier used to make this POST idempotent. If the service has already applied a credit change with this ID, this request does not add more credit, and returns 204. Clients are encouraged to use a globally unique identifier.
       type:
         title: Type
         type: string
@@ -160,7 +160,7 @@ definitions:
       requestId:
         title: RequestId
         type: string
-        description: An identifier used to make this POST idempotent. If the service has already applied a debit change with this ID, this request does not add more debit, and returns 201. Clients are encouraged to use a globally unique identifier.
+        description: An identifier used to make this POST idempotent. If the service has already applied a debit change with this ID, this request does not add more debit, and returns 204. Clients are encouraged to use a globally unique identifier.
       type:
         title: Type
         type: string
