@@ -46,11 +46,14 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, adminService: A
           path("accountcredit" / "credits") {
             authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { implicit adminUser =>
               entity(as[Credit]) { credit =>
-                if (credit.amount.amount == BigDecimal.valueOf(0) || credit.amount.amount < BigDecimal.valueOf(0)) {
+                if (credit.amount.amount <= BigDecimal(0)) {
                   complete(StatusCodes.BadRequest)
                 } else {
-                  onSuccess(adminService.addCredit(credit, userId)) { resp =>
-                    complete(resp)
+                  adminService.alreadyBeenProcessed(credit.requestId) match {
+                    case true => complete(StatusCodes.Created)
+                    case false => onSuccess(adminService.addCredit(credit, userId)) { resp =>
+                      complete(StatusCodes.Created)
+                    }
                   }
                 }
               }

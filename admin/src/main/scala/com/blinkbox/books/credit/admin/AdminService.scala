@@ -8,38 +8,21 @@ import com.blinkbox.books.time.TimeSupport
 import scala.concurrent.Future
 import com.blinkbox.books.time.SystemClock
 import com.blinkbox.books.auth.UserRole
-import scala.util.Success
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait AdminService {
-  def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[CreditForRendering]
+  def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[Unit]
+
+  def alreadyBeenProcessed(requestId: String): Boolean
 }
 
 class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminService {
 
   val nowTime = SystemClock.now()
 
-  override def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[CreditForRendering] = {
-    val foundCreditBalance = accountCreditStore.getCreditBalanceByResquestID(req.requestId)
-
-    foundCreditBalance match {
-      case Some(_) => Future { copyCreditBalanceToDTO(foundCreditBalance.get, adminUser) }
-      case None    => Future { copyCreditBalanceToDTO(addCreditToDb(req, adminUser, customerId), adminUser) }
-    }
+  override def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[Unit] = Future {
+    accountCreditStore.addCredit(copyAddCreditReqToCreditBalance(req, customerId, adminUser))
   }
-
-  private def addCreditToDb(req: Credit, adminUser: User, customerId: Int): CreditBalance = {
-    val creditBalance = copyAddCreditReqToCreditBalance(req, customerId, adminUser)
-    val id = accountCreditStore.addCredit(creditBalance)
-    accountCreditStore.getCreditBalanceById(id).get
-  }
-
-  private def copyCreditBalanceToDTO(creditBalance: CreditBalance, adminUser: User): CreditForRendering = new CreditForRendering(
-    creditBalance.requestId,
-    creditBalance.createdAt,
-    new Money(creditBalance.value, "GBP"),
-    creditBalance.reason.get.toString(),
-    Some(new CreditIssuerForRendering(adminUser.id.toString, getAdminUserRoles(adminUser))))
 
   private def copyAddCreditReqToCreditBalance(req: Credit, customerId: Int, adminUser: User): CreditBalance = CreditBalance(
     id = None,
@@ -54,6 +37,14 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
 
   private def getAdminUserRoles(user: User): Set[String] = {
     user.roles.map(r => r.toString())
+  }
+
+  override def alreadyBeenProcessed(requestId: String): Boolean = {
+    val foundCreditBalance = accountCreditStore.getCreditBalanceByResquestID(requestId)
+    foundCreditBalance match {
+      case Some(_) => true
+      case None    => false
+    }
   }
 }
 
