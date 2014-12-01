@@ -135,3 +135,4 @@ These are the new feature :
 * Returns `pong` on `GET /health/ping`
 * Logs to greylog
 * Reads some config
+
