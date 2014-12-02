@@ -7,7 +7,7 @@ module KnowsAboutBbbUsers
   end
 
   def use_admin_user(role)
-    user = data_for_a(:user, which: "has the #{role} role")
+    user = data_for_a(:user, which: "has the #{role.to_s.downcase} role")
     @last_admin_user = authenticate_user(user['username'], user['password'])
   end
 
@@ -23,6 +23,21 @@ module KnowsAboutBbbUsers
     @last_public_user.instance_eval %Q"
       def user_id
         '999999'
+      end
+    "
+  end
+
+  def use_admin_user_without_permissions
+    @last_admin_user = Blinkbox::User.new(:username => random_email, :password => 'abc123')
+    @last_admin_user.register
+    @last_admin_user.authenticate
+  end
+
+  def use_logged_out_admin_user
+    @last_admin_user = Blinkbox::User.new(:username => 'logged-out-user@bbb.com', :password => 'abc123')
+    @last_admin_user.instance_eval %Q"
+      def access_token
+        false
       end
     "
   end
