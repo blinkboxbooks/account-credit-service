@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.10.5 ([#26](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/26) 2014-12-02 11:14:35)
+
+Add credit acceptance tests
+
+Patch - Acceptance tests for add credit functionality  
+http://jira.blinkbox.local/jira/browse/CRED-21
+
 ## 0.10.4 ([#24](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/24) 2014-11-28 11:31:38)
 
 Add local/dev to cucumber environments
