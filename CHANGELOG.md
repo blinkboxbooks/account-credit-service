@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.10.7 ([#29](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/29) 2014-12-02 12:13:33)
+
+Add Gemfile.lock
+
+http://yehudakatz.com/2010/12/16/clarifying-the-roles-of-the-gemspec-and-gemfile/
+for why we should add the Gemfile.lock in applications
+
+Some of our other applications also have a Gemfile.lock:
+* https://git.mobcastdev.com/Agora/gifting-service/blob/49db46616fd49b455b07a5e3b84d175c7dbc4348/Gemfile.lock
+* https://git.mobcastdev.com/Agora/library-service/blob/36e5fe1ef1f91bea74b1b9793c144028c0ad8573/Gemfile.lock
+
+@DanielL thoughts?
+
+patch
+
 ## 0.10.6 ([#22](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/22) 2014-12-02 11:34:54)
 
 Made requestId column unique
