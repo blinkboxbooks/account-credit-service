@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.10.6 ([#22](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/22) 2014-12-02 11:34:54)
+
+Made requestId column unique
+
+##improvement
+- made requestId column unique to enforce one requestID per column rule
+
 ## 0.10.5 ([#26](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/26) 2014-12-02 11:14:35)
 
 Add credit acceptance tests
