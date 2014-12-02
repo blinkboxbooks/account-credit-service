@@ -27,14 +27,15 @@ CREATE TABLE credit_balance (
  updated_at  datetime ,
  customer_id INT(11) NOT NULL,
  admin_user_id INT(11) ,
+ UNIQUE (request_id),
  PRIMARY KEY (credit_balance_id),
  FOREIGN KEY `fk_credit_balance_transaction_types` (`transaction_type_id`) references `transaction_types` (`transaction_type_id`),
  FOREIGN KEY `fk_credit_balance_reasons` (`reason_id`) references `reasons` (`reason_id`)
  ) ENGINE = InnoDB, DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ;
 
 
-INSERT INTO transaction_types (`transaction_type_id `, `type`) VALUES ('0', 'Credit');
-INSERT INTO transaction_types (`transaction_type_id `, `type`) VALUES ('1', 'Debit');
+INSERT INTO transaction_types (`transaction_type_id`, `type`) VALUES ('0', 'Credit');
+INSERT INTO transaction_types (`transaction_type_id`, `type`) VALUES ('1', 'Debit');
 
 INSERT INTO reasons (`reason_id`, `type`) VALUES ('0', 'GoodwillBookIssue');
 INSERT INTO reasons (`reason_id`, `type`) VALUES ('1', 'GoodwillTechnicalIssue');
