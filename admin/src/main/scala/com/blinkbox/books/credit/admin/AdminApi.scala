@@ -40,8 +40,8 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, adminService: A
             }
           }
         } ~
-        path("debits") {
-          post {
+        post {
+          path("debits") {
             authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
               entity(as[CreditRequest]) { creditRequest =>
                 if (creditRequest.amount.amount <= BigDecimal(0)) {
@@ -57,21 +57,20 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, adminService: A
                 }
               }
             }
-          }
-        } ~
-        path("credits") {
-          post {
+          } ~
+          path("credits") {
             authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { implicit adminUser =>
               entity(as[Credit]) { credit =>
                 if (credit.amount.amount <= BigDecimal(0)) {
                   complete(StatusCodes.BadRequest)
                 } else if (credit.amount.currency != "GBP") {
                   complete(StatusCodes.BadRequest)
+                } else if (adminService.alreadyBeenProcessed(credit.requestId)) {
+                  complete(StatusCodes.Created)
                 } else {
-                  if (adminService.alreadyBeenProcessed(credit.requestId)) complete(StatusCodes.Created) else
-                    onSuccess(adminService.addCredit(credit, userId)) { resp =>
-                      complete(StatusCodes.Created)
-                    }
+                  onSuccess(adminService.addCredit(credit, userId)) { resp =>
+                    complete(StatusCodes.Created)
+                  }
                 }
               }
             }
