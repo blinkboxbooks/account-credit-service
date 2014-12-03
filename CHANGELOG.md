@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.11.0 ([#30](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/30) 2014-12-03 16:05:37)
+
+Cred 29 impl add credit fixed
+
+#### New feature
+* implemented add credit endpoint
+* implemented persistence layer against the latest schema(slick )
+
 ## 0.10.7 ([#29](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/29) 2014-12-02 12:13:33)
 
 Add Gemfile.lock
