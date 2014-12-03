@@ -123,7 +123,7 @@ definitions:
       requestId:
         title: RequestId
         type: string
-        description: An identifier used to make this POST idempotent. If the service has already applied a credit change with this ID, this request does not add more credit, and returns 204. Clients are encouraged to use a globally unique identifier.
+        description: An identifier used to make this POST idempotent. If the service has already applied a credit change with this ID, this request does not add more credit, and returns 204. Clients are encouraged to use a globally unique identifier. Unless you have a good reason not to, this should be a GUID.
       type:
         title: Type
         type: string
@@ -164,7 +164,7 @@ definitions:
       requestId:
         title: RequestId
         type: string
-        description: An identifier used to make this POST idempotent. If the service has already applied a debit change with this ID, this request does not add more debit, and returns 204. Clients are encouraged to use a globally unique identifier.
+        description: An identifier used to make this POST idempotent. If the service has already applied a debit change with this ID, this request does not add more debit, and returns 204. Clients are encouraged to use a globally unique identifier. Unless you have a good reason not to, this should be a GUID.
       type:
         title: Type
         type: string
