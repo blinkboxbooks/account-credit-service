@@ -11,16 +11,18 @@ object DummyData {
       ("currency" -> "GBP")) ~
     ("items" -> List(
       ("type" -> "credit") ~
+      ("requestId" -> "sdfnaksfniofgniaodoir84t839t") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
         ("amount" -> JDecimal(1000.53)) ~
         ("currency" -> "GBP")) ~
-      ("reason" -> "Why not?") ~
+      ("reason" -> "CreditVoucherCode") ~
       ("issuer" ->
         ("name" -> "James Bond") ~
         ("roles" -> List("csr"))),
 
       ("type" -> "debit") ~
+      ("requestId" -> "sdfnaksfniofgniaodoir84t839t") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
         ("amount" -> JDecimal(1000.53)) ~
@@ -32,13 +34,15 @@ object DummyData {
       ("currency" -> "GBP")) ~
     ("items" -> List(
       ("type" -> "credit") ~
+      ("requestId" -> "sdfnaksfniofgniaodoir84t839t") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
         ("amount" -> JDecimal(1000.53)) ~
         ("currency" -> "GBP")) ~
-      ("reason" -> "Why not?"),
+      ("reason" -> "CreditVoucherCode"),
 
       ("type" -> "debit") ~
+      ("requestId" -> "sdfnaksfniofgniaodoir84t839t") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
         ("amount" -> JDecimal(1000.53)) ~

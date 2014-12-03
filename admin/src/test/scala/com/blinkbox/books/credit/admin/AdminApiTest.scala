@@ -8,22 +8,29 @@ import org.json4s._
 import org.scalatest.{BeforeAndAfter, FlatSpec}
 import org.mockito.Mockito._
 import spray.http.HttpHeaders.Authorization
-import spray.http.{OAuth2BearerToken, StatusCodes}
+import spray.http.{ OAuth2BearerToken, StatusCodes }
 import spray.routing.authentication.{ContextAuthenticator, Authentication}
 import spray.routing._
+import spray.routing.AuthenticationFailedRejection.CredentialsRejected
+import spray.routing.authentication.{ ContextAuthenticator, Authentication }
+import spray.routing.{ Route, AuthenticationFailedRejection, RequestContext, HttpService }
 import com.blinkbox.books.spray.v2.`application/vnd.blinkbox.books.v2+json`
 import spray.testkit.ScalatestRouteTest
 import scala.concurrent.Future
 import org.mockito.Matchers._
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService with MockitoSyrup with v2.JsonSupport with BeforeAndAfter {
 
   def actorRefFactory = system
   val creditHistory = CreditHistoryRepository.dummy
   val creditHistoryRepository = mock[CreditHistoryRepository]
+  val adminService = mock[AdminService]
   val authenticator = new StubAuthenticator
 
-  val api = new AdminApi(creditHistoryRepository, authenticator)
+  val api = new AdminApi(creditHistoryRepository, adminService, authenticator)
   val route = api.route
 
   override implicit def jsonFormats = api.jsonFormats

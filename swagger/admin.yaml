@@ -57,7 +57,7 @@ paths:
             $ref: Credit
       responses:
         204:
-          description: Account credit successfully update
+          description: Account credit successfully updated
         401:
           description: Not authenticated
         403:
