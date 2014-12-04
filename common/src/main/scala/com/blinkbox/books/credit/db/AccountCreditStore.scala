@@ -12,12 +12,19 @@ trait AccountCreditStore {
   def addCredit(credit: CreditBalance): Int
   def getCreditBalanceByRequestID(requestId: String): Option[CreditBalance]
   def getCreditBalanceById(creditBalanceId: Int): Option[CreditBalance]
+  def getCreditHistoryForUser(userId: Int): Seq[CreditBalance]
 }
 
 class DbAccountCreditStore[DB <: DatabaseSupport](db: DB#Database, tables: AccountCreditTables[DB#Profile], exceptionFilter: DB#ExceptionFilter, implicit val exc: ExecutionContext) extends AccountCreditStore with StrictLogging {
 
   import tables._
   import driver.simple._
+
+  override def getCreditHistoryForUser(userId: Int): Seq[CreditBalance] = {
+    db.withSession { implicit session =>
+      creditBalance.filter { _.customerId === userId }.list.toSeq
+    }
+  }
 
   override def addCredit(credit: CreditBalance): Int =
     db.withSession { implicit session =>

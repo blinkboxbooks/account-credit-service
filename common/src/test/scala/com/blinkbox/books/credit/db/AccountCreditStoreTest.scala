@@ -34,7 +34,7 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
   import tables.driver.simple._
   import tables._
   val dao = new DbAccountCreditStore[H2DatabaseSupport](db, tables, exceptionFilter, global)
-  val nowTime = SystemClock.now()
+  def nowTime = SystemClock.now()
 
   override def beforeEach() {
     db.withSession { implicit session =>
@@ -54,6 +54,17 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
       dao.addCredit(creditBalance)
       assert(dao.getCreditBalanceById(1).map(_.id) == Some(creditBalance.id))
       assert(dao.getCreditBalanceById(1).map(_.requestId) == Some(creditBalance.requestId))
+    }
+  }
+
+  test("get credit history") {
+    val credit = new CreditBalance(Some(1), "foo", 10.44, TransactionType.Credit, Some(Reason.GoodwillBookIssue), nowTime, None, 2387, Some(889))
+    db.withSession { implicit session =>
+      dao.addCredit(credit)
+    }
+
+    db.withSession { implicit session =>
+      assert(dao.getCreditHistoryForUser(2387) == List(credit))
     }
   }
 
