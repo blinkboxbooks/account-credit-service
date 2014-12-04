@@ -20,14 +20,13 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
   def nowTime = SystemClock.now()
 
   override def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit] =
-    lookupCreditHistoryForUser(userId).map{ _.netBalance }.map { currentBalance: Money => {
-      val newBalance = currentBalance.value - amount.value
+    lookupCreditHistoryForUser(userId).map { creditHistory =>
+      val newBalance = creditHistory.netBalance.value - amount.value
       val insufficientFunds = newBalance < 0
       if (insufficientFunds)
         throw new InsufficientFundsException
       else
         accountCreditStore.addDebit(CreditBalanceFactory.fromDebit(requestId, amount.value, userId))
-    }
   }
 
   override def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory] = Future {
