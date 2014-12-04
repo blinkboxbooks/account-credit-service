@@ -30,7 +30,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
       None
 
   def hasRequestAlreadyBeenProcessed(requestId: String): Boolean = {
-    accountCreditStore.getCreditBalanceByRequestID(requestId).nonEmpty
+    accountCreditStore.getCreditBalanceByRequestId(requestId).nonEmpty
   }
 
   override def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[Unit] = Future {
