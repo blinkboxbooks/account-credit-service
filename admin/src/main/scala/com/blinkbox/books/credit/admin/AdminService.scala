@@ -12,7 +12,6 @@ trait AdminService {
   def debit(i: Int, money: Money, s: String): Boolean
   def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[Unit]
   def lookupCreditHistoryForUser(userId: Int): Option[CreditHistory]
-  def alreadyBeenProcessed(requestId: String): Boolean
   def hasRequestAlreadyBeenProcessed(requestId: String): Boolean
 }
 
@@ -30,7 +29,9 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
     else
       None
 
-  def hasRequestAlreadyBeenProcessed(requestId: String): Boolean = requestId == "used"
+  def hasRequestAlreadyBeenProcessed(requestId: String): Boolean = {
+    accountCreditStore.getCreditBalanceByResquestID(requestId).nonEmpty
+  }
 
   override def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[Unit] = Future {
     accountCreditStore.addCredit(copyAddCreditReqToCreditBalance(req, customerId, adminUser))
@@ -49,10 +50,6 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
 
   private def getAdminUserRoles(user: User): Set[String] = {
     user.roles.map(r => r.toString())
-  }
-
-  override def alreadyBeenProcessed(requestId: String): Boolean = {
-    accountCreditStore.getCreditBalanceByResquestID(requestId).nonEmpty
   }
   
   /**

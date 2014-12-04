@@ -65,7 +65,7 @@ class AdminApi(adminService: AdminService, authenticator: ContextAuthenticator[U
                   complete(StatusCodes.BadRequest)
                 } else if (credit.amount.currency != "GBP") {
                   complete(StatusCodes.BadRequest)
-                } else if (adminService.alreadyBeenProcessed(credit.requestId)) {
+                } else if (adminService.hasRequestAlreadyBeenProcessed(credit.requestId)) {
                   complete(StatusCodes.Created)
                 } else {
                   onSuccess(adminService.addCredit(credit, userId)) { resp =>
