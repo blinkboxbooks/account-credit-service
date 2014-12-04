@@ -21,13 +21,13 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
 
   def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit] =
     lookupCreditHistoryForUser(userId).map{ _.netBalance }.map { currentBalance: Money => {
-      val newBalance = currentBalance.amount - amount.amount
+      val newBalance = currentBalance.value - amount.value
       val insufficientFunds = newBalance < 0
       println(insufficientFunds)
       if (insufficientFunds)
         throw new InsufficientFundsException
       else
-        accountCreditStore.addDebit(CreditBalance(None, requestId, amount.amount, TransactionType.Debit, None, nowTime, None, userId, None))
+        accountCreditStore.addDebit(CreditBalance(None, requestId, amount.value, TransactionType.Debit, None, nowTime, None, userId, None))
     }
   }
 
@@ -40,15 +40,15 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
     }
 
     val netBalance: BigDecimal = history.foldLeft(BigDecimal(0))((cumulative: BigDecimal, e: CreditOrDebit) => e match {
-      case Credit(_, _, a, _, _) => cumulative + a.amount
-      case Debit(_, _, a) => cumulative - a.amount
+      case Credit(_, _, a, _, _) => cumulative + a.value
+      case Debit(_, _, a) => cumulative - a.value
     })
 
     CreditHistory(Money(netBalance), history.toList)
   }
 
   def hasRequestAlreadyBeenProcessed(requestId: String): Boolean =
-    accountCreditStore.getCreditBalanceByRequestID(requestId).nonEmpty
+    accountCreditStore.getCreditBalanceByRequestId(requestId).nonEmpty
 
   override def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[Unit] = Future {
     accountCreditStore.addCredit(copyAddCreditReqToCreditBalance(req, customerId, adminUser))
@@ -57,7 +57,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
   private def copyAddCreditReqToCreditBalance(req: Credit, customerId: Int, adminUser: User): CreditBalance = CreditBalance(
     id = None,
     requestId = req.requestId,
-    value = req.amount.amount,
+    value = req.amount.value,
     transactionType = TransactionType.Credit,
     reason = Some(creditReasonMapping(req.reason)),
     createdAt = nowTime,
@@ -92,13 +92,13 @@ object DefaultAdminService {
   val dummy = {
     val thePast = new DateTime(2012,1,2,3,4,5)
     val cheap = Money(BigDecimal.valueOf(1000.53))
-    val requestId= "sdfnaksfniofgniaodoir84t839t"
-    val credits: List[Credit] = List(Credit(requestId,thePast, cheap, CreditReason.CreditVoucherCode, CreditIssuer("James Bond", Set(UserRole.CustomerServicesRep))))
-    val debits: List[Debit] = List(Debit(requestId,thePast, cheap))
+    val requestId = "sdfnaksfniofgniaodoir84t839t"
+    val credits = List(Credit(requestId, thePast, cheap, CreditReason.CreditVoucherCode, CreditIssuer("James Bond", Set(UserRole.CustomerServicesRep))))
+    val debits = List(Debit(requestId, thePast, cheap))
     implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isBefore _)
     val eithers = (credits ++ debits).sortBy {
-      case Debit(rq,dt, _) => dt
-      case Credit(rq,dt, _, _, _) => dt
+      case Debit(rq, dt, _) => dt
+      case Credit(rq, dt, _, _, _) => dt
     }
     CreditHistory(cheap, eithers)
   }

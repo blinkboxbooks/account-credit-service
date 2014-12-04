@@ -47,7 +47,7 @@ class AdminApi(adminService: AdminService, authenticator: ContextAuthenticator[U
           path("debits") {
             authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
               entity(as[DebitRequest]) { debitRequest =>
-                if (debitRequest.amount.amount <= BigDecimal(0)) {
+                if (debitRequest.amount.value <= BigDecimal(0)) {
                   complete(StatusCodes.BadRequest, v2.Error("InvalidAmount", None))
                 } else if (debitRequest.amount.currency != "GBP") {
                   complete(StatusCodes.BadRequest, v2.Error("UnsupportedCurrency", None))
@@ -66,7 +66,7 @@ class AdminApi(adminService: AdminService, authenticator: ContextAuthenticator[U
           path("credits") {
             authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { implicit adminUser =>
               entity(as[Credit]) { credit =>
-                if (credit.amount.amount <= BigDecimal(0)) {
+                if (credit.amount.value <= BigDecimal(0)) {
                   complete(StatusCodes.BadRequest)
                 } else if (credit.amount.currency != "GBP") {
                   complete(StatusCodes.BadRequest)

@@ -27,7 +27,7 @@ class AdminServiceTest extends FlatSpec with BeforeAndAfter with MockitoSyrup wi
     when(accountCreditStore.getCreditHistoryForUser(1)).thenReturn(creditHistory)
 
     whenReady(adminService.lookupCreditHistoryForUser(1)) { result =>
-      assert(result.netBalance.amount == 8.36)
+      assert(result.netBalance.value == 8.36)
       assert(result.history.size == 2)
     }
   }

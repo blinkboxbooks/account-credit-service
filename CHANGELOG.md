@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.12.1 ([#31](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/31) 2014-12-04 14:55:46)
+
+Rename swagger files & suggest clients use GUID for requestId
+
+patch
+
+This should only be merged after https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/25 has been merged.
+
+## 0.12.0 ([#25](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/25) 2014-12-04 13:24:15)
+
+CRED-38 Add spray layer for Add Debit endpoint (unscrewed)
+
+Requirements: http://jira.blinkbox.local/jira/browse/CRED-19
+new feature
+
 ## 0.11.0 ([#30](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/30) 2014-12-03 16:05:37)
 
 Cred 29 impl add credit fixed

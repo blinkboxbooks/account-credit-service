@@ -7,14 +7,14 @@ object DummyData {
 
   val expectedForCsm: JObject =
     ("balance" ->
-      ("amount" -> JDecimal(1000.53)) ~
+      ("value" -> JDecimal(1000.53)) ~
       ("currency" -> "GBP")) ~
     ("items" -> List(
       ("type" -> "credit") ~
       ("requestId" -> "sdfnaksfniofgniaodoir84t839t") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
-        ("amount" -> JDecimal(1000.53)) ~
+        ("value" -> JDecimal(1000.53)) ~
         ("currency" -> "GBP")) ~
       ("reason" -> "CreditVoucherCode") ~
       ("issuer" ->
@@ -25,19 +25,19 @@ object DummyData {
       ("requestId" -> "sdfnaksfniofgniaodoir84t839t") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
-        ("amount" -> JDecimal(1000.53)) ~
+        ("value" -> JDecimal(1000.53)) ~
         ("currency" -> "GBP"))))
 
   var expectedForCsr: JObject =
     ("balance" ->
-      ("amount" -> JDecimal(1000.53)) ~
+      ("value" -> JDecimal(1000.53)) ~
       ("currency" -> "GBP")) ~
     ("items" -> List(
       ("type" -> "credit") ~
       ("requestId" -> "sdfnaksfniofgniaodoir84t839t") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
-        ("amount" -> JDecimal(1000.53)) ~
+        ("value" -> JDecimal(1000.53)) ~
         ("currency" -> "GBP")) ~
       ("reason" -> "CreditVoucherCode"),
 
@@ -45,6 +45,6 @@ object DummyData {
       ("requestId" -> "sdfnaksfniofgniaodoir84t839t") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
-        ("amount" -> JDecimal(1000.53)) ~
+        ("value" -> JDecimal(1000.53)) ~
         ("currency" -> "GBP"))))
 }
