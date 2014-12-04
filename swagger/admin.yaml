@@ -91,6 +91,10 @@ paths:
       responses:
         204:
           description: Account debit successfully update
+        400:
+          description: Amount is non-negative, or currency is not GBP
+        400:
+          description: Insufficient funds
         401:
           description: Not authenticated
         403:
