@@ -64,13 +64,8 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
     customerId = customerId,
     adminUserId = Some(adminUser.id))
 
-  private def getAdminUserRoles(user: User): Set[String] = {
-    user.roles.map(r => r.toString())
-  }
+  private def getAdminUserRoles(user: User): Set[String] = user.roles.map(r => r.toString())
   
-  /**
-   * Maps Spray layer Credit reason Enum to Database layer Reason Enum
-   */
   private def creditReasonMapping(creditReason: CreditReason.Reason): Reason.Reason = {
     
     creditReason  match {
