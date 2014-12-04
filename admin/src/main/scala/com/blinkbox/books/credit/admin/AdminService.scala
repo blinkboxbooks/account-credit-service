@@ -9,7 +9,7 @@ import com.blinkbox.books.auth.UserRole
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait AdminService {
-  def debit(i: Int, money: Money, s: String): Boolean
+  def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit]
   def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[Unit]
   def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory]
   def hasRequestAlreadyBeenProcessed(requestId: String): Boolean
@@ -19,9 +19,17 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
 
   def nowTime = SystemClock.now()
 
-  def debit(i: Int, money: Money, s: String): Boolean = money.amount < lookupCreditBalanceForUser(i).amount
-
-  private def lookupCreditBalanceForUser(i: Int): Money = Money(BigDecimal.valueOf(1000000))
+  def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit] =
+    lookupCreditHistoryForUser(userId).map{ _.netBalance }.map { currentBalance: Money => {
+      val newBalance = currentBalance.amount - amount.amount
+      val insufficientFunds = newBalance < 0
+      println(insufficientFunds)
+      if (insufficientFunds)
+        throw new InsufficientFundsException
+      else
+        accountCreditStore.addDebit(CreditBalance(None, requestId, amount.amount, TransactionType.Debit, None, nowTime, None, userId, None))
+    }
+  }
 
   def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory] = Future {
     val history = accountCreditStore.getCreditHistoryForUser(userId).map { h: CreditBalance =>

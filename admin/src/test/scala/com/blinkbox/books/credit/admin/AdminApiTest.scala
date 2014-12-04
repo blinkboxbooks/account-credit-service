@@ -1,6 +1,7 @@
 package com.blinkbox.books.credit.admin
 
 import com.blinkbox.books.auth.User
+import com.blinkbox.books.credit.db.InsufficientFundsException
 import com.blinkbox.books.spray.v2
 import com.blinkbox.books.test.MockitoSyrup
 import org.json4s.JsonAST.JObject
@@ -116,24 +117,24 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   it should "204 on add debit endpoint, as CSR" in {
     val amount = Money(BigDecimal.valueOf(90.01), "GBP")
-    when(adminService.debit(123, amount, "good")).thenReturn(true)
+    when(adminService.addDebit(123, amount, "good")).thenReturn(Future.successful(()))
     Post("/admin/users/123/accountcredit/debits", debitRequest) ~> csrAuth ~> route ~> check {
-      verify(adminService).debit(123, amount, "good")
+      verify(adminService).addDebit(123, amount, "good")
       assert(status == StatusCodes.NoContent)
     }
   }
 
   it should "204 on add debit endpoint, as CSM" in {
     val amount = Money(BigDecimal.valueOf(90.01), "GBP")
-    when(adminService.debit(123, amount, "good")).thenReturn(true)
+    when(adminService.addDebit(123, amount, "good")).thenReturn(Future.successful(()))
     Post("/admin/users/123/accountcredit/debits", debitRequest) ~> csmAuth ~> route ~> check {
-      verify(adminService).debit(123, amount, "good")
+      verify(adminService).addDebit(123, amount, "good")
       assert(status == StatusCodes.NoContent)
     }
   }
 
   it should "400 on add debit endpoint, if trying to debit more credit than they have" in {
-    when(adminService.debit(any[Int], any[Money], any[String])).thenReturn(false)
+    when(adminService.addDebit(any[Int], any[Money], any[String])).thenReturn(Future.failed(new InsufficientFundsException))
     Post("/admin/users/123/accountcredit/debits", debitRequest) ~> csrAuth ~> route ~> check {
       assert(status == StatusCodes.BadRequest)
       assert(responseAs[JObject] == errorMessage("InsufficientFunds"))
@@ -161,7 +162,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   it should "204 on add debit endpoint, if requestId has previously succeeded, even if the debit is more than currently available" in {
     when(adminService.hasRequestAlreadyBeenProcessed("good")).thenReturn(true)
     Post("/admin/users/123/accountcredit/debits", debitRequest) ~> csrAuth ~> route ~> check {
-      verify(adminService, never()).debit(any[Int], any[Money], any[String])
+      verify(adminService, never()).addDebit(any[Int], any[Money], any[String])
       assert(status == StatusCodes.NoContent)
     }
   }

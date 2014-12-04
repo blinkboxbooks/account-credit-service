@@ -1,5 +1,6 @@
 package com.blinkbox.books.credit.admin
 
+import com.blinkbox.books.credit.db.InsufficientFundsException
 import com.blinkbox.books.json.ExplicitTypeHints
 import com.blinkbox.books.spray.v2
 import spray.http.StatusCodes
@@ -17,6 +18,8 @@ import com.blinkbox.books.auth.Constraints._
 import com.blinkbox.books.credit.admin.RenderingFunctions._
 import com.blinkbox.books.spray.MonitoringDirectives.monitor
 import com.blinkbox.books.spray.v2.Implicits.throwableMarshaller
+import scala.util.Success
+import scala.util.Failure
 
 class AdminApi(adminService: AdminService, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport with StrictLogging {
 
@@ -50,10 +53,12 @@ class AdminApi(adminService: AdminService, authenticator: ContextAuthenticator[U
                   complete(StatusCodes.BadRequest, v2.Error("UnsupportedCurrency", None))
                 } else if (adminService.hasRequestAlreadyBeenProcessed(debitRequest.requestId)) {
                   complete(StatusCodes.NoContent)
-                } else if (adminService.debit(userId, debitRequest.amount, debitRequest.requestId)) {
-                  complete(StatusCodes.NoContent)
                 } else {
-                  complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))
+                  onComplete(adminService.addDebit(userId, debitRequest.amount, debitRequest.requestId)) {
+                    case Success(_) => complete(StatusCodes.NoContent)
+                    case Failure(ex: InsufficientFundsException) => complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))
+                    case Failure(ex) => complete(StatusCodes.InternalServerError)
+                  }
                 }
               }
             }
