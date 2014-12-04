@@ -23,7 +23,6 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
     lookupCreditHistoryForUser(userId).map{ _.netBalance }.map { currentBalance: Money => {
       val newBalance = currentBalance.value - amount.value
       val insufficientFunds = newBalance < 0
-      println(insufficientFunds)
       if (insufficientFunds)
         throw new InsufficientFundsException
       else
