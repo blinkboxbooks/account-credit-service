@@ -43,14 +43,14 @@ class AdminApi(adminService: AdminService, authenticator: ContextAuthenticator[U
         post {
           path("debits") {
             authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
-              entity(as[CreditRequest]) { creditRequest =>
-                if (creditRequest.amount.amount <= BigDecimal(0)) {
+              entity(as[DebitRequest]) { debitRequest =>
+                if (debitRequest.amount.amount <= BigDecimal(0)) {
                   complete(StatusCodes.BadRequest, v2.Error("InvalidAmount", None))
-                } else if (creditRequest.amount.currency != "GBP") {
+                } else if (debitRequest.amount.currency != "GBP") {
                   complete(StatusCodes.BadRequest, v2.Error("UnsupportedCurrency", None))
-                } else if (adminService.hasRequestAlreadyBeenProcessed(creditRequest.requestId)) {
+                } else if (adminService.hasRequestAlreadyBeenProcessed(debitRequest.requestId)) {
                   complete(StatusCodes.NoContent)
-                } else if (adminService.debit(userId, creditRequest.amount, creditRequest.requestId)) {
+                } else if (adminService.debit(userId, debitRequest.amount, debitRequest.requestId)) {
                   complete(StatusCodes.NoContent)
                 } else {
                   complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))
@@ -81,4 +81,4 @@ class AdminApi(adminService: AdminService, authenticator: ContextAuthenticator[U
   }
 }
 
-case class CreditRequest(amount: Money, requestId: String)
+case class DebitRequest(amount: Money, requestId: String)
