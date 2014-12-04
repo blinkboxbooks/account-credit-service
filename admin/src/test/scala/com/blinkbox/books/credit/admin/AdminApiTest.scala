@@ -25,12 +25,11 @@ import org.scalatest.junit.JUnitRunner
 class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService with MockitoSyrup with v2.JsonSupport with BeforeAndAfter {
 
   def actorRefFactory = system
-  val creditHistory = CreditHistoryRepository.dummy
-  val creditHistoryRepository = mock[CreditHistoryRepository]
+  val creditHistory = DefaultAdminService.dummy
   val adminService = mock[AdminService]
   val authenticator = new StubAuthenticator
 
-  val api = new AdminApi(creditHistoryRepository, adminService, authenticator)
+  val api = new AdminApi(adminService, authenticator)
   val route = api.route
 
   override implicit def jsonFormats = api.jsonFormats
@@ -46,11 +45,11 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   val oneMillionPounds = Money(BigDecimal.valueOf(1000000))
 
   before {
-    reset(creditHistoryRepository)
+    reset(adminService)
   }
 
   "AdminApi" should "200 on credit history request for known user as CSR" in {
-    when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
       assert(DummyData.expectedForCsr == responseAs[JValue])
       assert(status == StatusCodes.OK)
@@ -58,7 +57,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   it should "200 on credit history request for known user as CSM" in {
-    when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csmAuth ~> route ~> check {
       assert(DummyData.expectedForCsm == responseAs[JValue])
       assert(status == StatusCodes.OK)
@@ -66,28 +65,28 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   it should "not show issuer information to CSRs" in {
-    when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
       assert(!containsIssuerInformation(responseAs[JObject]))
     }
   }
 
   it should "show issuer information to CSMs" in {
-    when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csmAuth ~> route ~> check {
       assert(containsIssuerInformation(responseAs[JObject]))
     }
   }
 
   it should "show issuer information to users with CSR /and/ CSM roles" in {
-    when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csmAndCsrAuth ~> route ~> check {
       assert(containsIssuerInformation(responseAs[JObject]))
     }
   }
 
   it should "return v2 media type on credit history request" in {
-    when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
       assert(status == StatusCodes.OK)
       assert(mediaType == `application/vnd.blinkbox.books.v2+json`)
@@ -95,14 +94,14 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   it should "404 on credit history request for unknown user" in {
-    when(creditHistoryRepository.lookupCreditHistoryForUser(666)).thenReturn(None)
+    when(adminService.lookupCreditHistoryForUser(666)).thenReturn(None)
     Get("/admin/users/666/accountcredit") ~> csrAuth ~> route ~> check {
       assert(status == StatusCodes.NotFound)
     }
   }
 
   it should "401 on credit history request when passed incorrect credentials" in {
-    when(creditHistoryRepository.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
     Get("/admin/users/123/accountcredit") ~> invalidAuth ~> route ~> check {
       assert(status == StatusCodes.Unauthorized)
     }
@@ -116,24 +115,24 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   it should "204 on add debit endpoint, as CSR" in {
     val amount = Money(BigDecimal.valueOf(90.01), "GBP")
-    when(creditHistoryRepository.debit(123, amount, "good")).thenReturn(true)
+    when(adminService.debit(123, amount, "good")).thenReturn(true)
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csrAuth ~> route ~> check {
-      verify(creditHistoryRepository).debit(123, amount, "good")
+      verify(adminService).debit(123, amount, "good")
       assert(status == StatusCodes.NoContent)
     }
   }
 
   it should "204 on add debit endpoint, as CSM" in {
     val amount = Money(BigDecimal.valueOf(90.01), "GBP")
-    when(creditHistoryRepository.debit(123, amount, "good")).thenReturn(true)
+    when(adminService.debit(123, amount, "good")).thenReturn(true)
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csmAuth ~> route ~> check {
-      verify(creditHistoryRepository).debit(123, amount, "good")
+      verify(adminService).debit(123, amount, "good")
       assert(status == StatusCodes.NoContent)
     }
   }
 
   it should "400 on add debit endpoint, if trying to debit more credit than they have" in {
-    when(creditHistoryRepository.debit(any[Int], any[Money], any[String])).thenReturn(false)
+    when(adminService.debit(any[Int], any[Money], any[String])).thenReturn(false)
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csrAuth ~> route ~> check {
       assert(status == StatusCodes.BadRequest)
       assert(responseAs[JObject] == errorMessage("InsufficientFunds"))
@@ -159,9 +158,9 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
    *
    */
   it should "204 on add debit endpoint, if requestId has previously succeeded, even if the debit is more than currently available" in {
-    when(creditHistoryRepository.hasRequestAlreadyBeenProcessed("good")).thenReturn(true)
+    when(adminService.hasRequestAlreadyBeenProcessed("good")).thenReturn(true)
     Post("/admin/users/123/accountcredit/debits", creditRequest) ~> csrAuth ~> route ~> check {
-      verify(creditHistoryRepository, never()).debit(any[Int], any[Money], any[String])
+      verify(adminService, never()).debit(any[Int], any[Money], any[String])
       assert(status == StatusCodes.NoContent)
     }
   }

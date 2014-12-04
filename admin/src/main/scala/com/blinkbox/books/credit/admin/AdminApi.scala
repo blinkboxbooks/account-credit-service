@@ -18,7 +18,7 @@ import com.blinkbox.books.credit.admin.RenderingFunctions._
 import com.blinkbox.books.spray.MonitoringDirectives.monitor
 import com.blinkbox.books.spray.v2.Implicits.throwableMarshaller
 
-class AdminApi(creditHistoryRepository: CreditHistoryRepository, adminService: AdminService, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport with StrictLogging {
+class AdminApi(adminService: AdminService, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport with StrictLogging {
 
   override implicit def jsonFormats = {
     val typeHints =
@@ -34,7 +34,7 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, adminService: A
           get {
             authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
               val issuerBehaviour = if (adminUser.isInRole(UserRole.CustomerServicesManager)) keepIssuer _ else removeIssuer _
-              complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map {
+              complete(adminService.lookupCreditHistoryForUser(userId).map {
                 case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(issuerBehaviour))
               })
             }
@@ -48,9 +48,9 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, adminService: A
                   complete(StatusCodes.BadRequest, v2.Error("InvalidAmount", None))
                 } else if (creditRequest.amount.currency != "GBP") {
                   complete(StatusCodes.BadRequest, v2.Error("UnsupportedCurrency", None))
-                } else if (creditHistoryRepository.hasRequestAlreadyBeenProcessed(creditRequest.requestId)) {
+                } else if (adminService.hasRequestAlreadyBeenProcessed(creditRequest.requestId)) {
                   complete(StatusCodes.NoContent)
-                } else if (creditHistoryRepository.debit(userId, creditRequest.amount, creditRequest.requestId)) {
+                } else if (adminService.debit(userId, creditRequest.amount, creditRequest.requestId)) {
                   complete(StatusCodes.NoContent)
                 } else {
                   complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))

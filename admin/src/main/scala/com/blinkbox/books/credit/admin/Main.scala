@@ -38,7 +38,7 @@ object Main extends App with Configuration with Loggers with StrictLogging {
 
   val adminService = new DefaultAdminService(accountCreditStore)
 
-  val service = system.actorOf(Props(classOf[AdminApiActor], new AdminApi(new CreditHistoryRepository, adminService, authenticator)))
+  val service = system.actorOf(Props(classOf[AdminApiActor], new AdminApi(adminService, authenticator)))
 
   logger.info("App started")
   HttpServer(Http.Bind(service, interface = appConfig.interface, port = appConfig.port))(system, system.dispatcher, Timeout(10.seconds))
