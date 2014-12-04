@@ -53,13 +53,32 @@ Then(/^the credit history contains the above events$/) do
 end
 
 Then(/^the event items in the history response (does not )?contains? the following attributes:$/) do | does_not_contain, table |
-  jsonpath_list = table.transpose.raw[0]
-  jsonpath_list.each do | path |
-    path_to_field = JsonPath.new(path)
-    if does_not_contain
-      expect(path_to_field.on(parse_response_data.to_s)).to be_empty
-    else
-      expect(path_to_field.on(parse_response_data.to_s)).not_to be_empty
-    end
+  attr_list = table.transpose.raw[0]
+  attr_list.each do | attr |
+    field_exists?(attr, !does_not_contain)
   end
+end
+
+def field_exists?(field_name, exists)
+  if field_name == 'issuer'
+    path_to_field = JsonPath.new('$items[*].issuer.name')
+    jsonpath_exists?(path_to_field, exists)
+
+    path_to_field = JsonPath.new('$items[*].issuer.roles[*]')
+    jsonpath_exists?(path_to_field, exists)
+  elsif field_name == 'amount'
+    path_to_field = JsonPath.new('$items[*].amount.currency')
+    jsonpath_exists?(path_to_field, exists)
+
+
+    path_to_field = JsonPath.new('$items[*].amount.value')
+    jsonpath_exists?(path_to_field, exists)
+  else
+    path_to_field = JsonPath.new("$items[*].#{field_name}")
+    jsonpath_exists?(path_to_field, exists)
+  end
+end
+
+def jsonpath_exists?(path_to_field, expected_is_present)
+  expect(!path_to_field.on(parse_response_data.to_s).empty?).to expected_is_present
 end

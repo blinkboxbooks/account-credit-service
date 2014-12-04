@@ -25,27 +25,25 @@ Feature: Admin Credit History
     And I am logged in as a CSM user
     When I request for the user's credit history
     Then the event items in the history response contains the following attributes:
-      | $items[*].type            |
-      | $items[*].dateTime        |
-      | $items[*].reason          |
-      | $items[*].issuer.name     |
-      | $items[*].issue.roles[*]  |
-      | $items[*].amount.currency |
-      | $items[*].amount.value    |
+      | type     |
+      | dateTime |
+      | reason   |
+      | name     |
+      | issuer   |
+      | amount   |
 
   Scenario: Requesting credit history as CSM user and checking which fields returned
     Given a user with credit history
     And I am logged in as a CSR user
     When I request for the user's credit history
     Then the event items in the history response contains the following attributes:
-      | $items[*].type            |
-      | $items[*].dateTime        |
-      | $items[*].reason          |
-      | $items[*].amount.currency |
-      | $items[*].amount.value    |
+      | type     |
+      | dateTime |
+      | reason   |
+      | name     |
+      | amount   |
     And the event items in the history response does not contain the following attributes:
-      | $items[*].issuer.name    |
-      | $items[*].issue.roles[*] |
+      | issuer   |
 
   Scenario: Requesting credit history as unknown user
     Given a user with credit history
