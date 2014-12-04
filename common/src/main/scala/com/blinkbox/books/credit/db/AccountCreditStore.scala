@@ -33,6 +33,7 @@ class DbAccountCreditStore[DB <: DatabaseSupport](db: DB#Database, tables: Accou
     }
 
   override def addDebit(credit: CreditBalance): Int = addCredit(credit)
+  
   override def getCreditBalanceByRequestId(requestId: String): Option[CreditBalance] =
     db.withSession {
       implicit session =>
