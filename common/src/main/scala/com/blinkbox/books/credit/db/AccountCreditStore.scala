@@ -10,6 +10,7 @@ import scala.slick.jdbc.JdbcBackend.Database
 
 trait AccountCreditStore {
   def addCredit(credit: CreditBalance): Int
+  def addDebit(credit: CreditBalance): Int
   def getCreditBalanceByRequestID(requestId: String): Option[CreditBalance]
   def getCreditBalanceById(creditBalanceId: Int): Option[CreditBalance]
   def getCreditHistoryForUser(userId: Int): Seq[CreditBalance]
@@ -29,8 +30,9 @@ class DbAccountCreditStore[DB <: DatabaseSupport](db: DB#Database, tables: Accou
   override def addCredit(credit: CreditBalance): Int =
     db.withSession { implicit session =>
       (creditBalance returning creditBalance.map(_.id)) insert credit
-
     }
+
+  override def addDebit(credit: CreditBalance): Int = addCredit(credit)
 
   override def getCreditBalanceByRequestID(requestId: String): Option[CreditBalance] =
     db.withSession {

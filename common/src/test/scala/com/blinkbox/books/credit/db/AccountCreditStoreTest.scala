@@ -68,6 +68,17 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
     }
   }
 
+  test("add debit") {
+    val debit = new CreditBalance(Some(1), "foo", 90.01, TransactionType.Debit, None, nowTime, None, 2387, None)
+    db.withSession { implicit session =>
+      dao.addDebit(debit)
+    }
+
+    db.withSession { implicit session =>
+      assert(dao.getCreditHistoryForUser(2387) == List(debit))
+    }
+  }
+
   private def newCredit(id: Int): CreditBalance = new CreditBalance(
     Some(id),
     "377d0f7a57a9c41edsgdsfgf290f169254ed2f6d4",
