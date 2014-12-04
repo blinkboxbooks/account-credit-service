@@ -47,9 +47,8 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
     CreditHistory(Money(netBalance), history.toList)
   }
 
-  def hasRequestAlreadyBeenProcessed(requestId: String): Boolean = {
+  def hasRequestAlreadyBeenProcessed(requestId: String): Boolean =
     accountCreditStore.getCreditBalanceByRequestID(requestId).nonEmpty
-  }
 
   override def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[Unit] = Future {
     accountCreditStore.addCredit(copyAddCreditReqToCreditBalance(req, customerId, adminUser))
