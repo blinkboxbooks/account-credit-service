@@ -26,7 +26,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
       if (insufficientFunds)
         throw new InsufficientFundsException
       else
-        accountCreditStore.addDebit(CreditBalance(None, requestId, amount.value, TransactionType.Debit, None, nowTime, None, userId, None))
+        accountCreditStore.addDebit(CreditBalanceFactory.fromDebit(requestId, amount.value, userId))
     }
   }
 
