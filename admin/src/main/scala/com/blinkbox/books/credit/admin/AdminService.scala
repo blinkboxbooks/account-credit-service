@@ -19,7 +19,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
 
   val nowTime = SystemClock.now()
 
-  def debit(i: Int, money: Money, s: String): Boolean = money.amount < lookupCreditBalanceForUser(i).amount
+  def debit(i: Int, money: Money, s: String): Boolean = money.value < lookupCreditBalanceForUser(i).value
 
   private def lookupCreditBalanceForUser(i: Int): Money = Money(BigDecimal.valueOf(1000000))
 
@@ -40,7 +40,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
   private def copyAddCreditReqToCreditBalance(req: Credit, customerId: Int, adminUser: User): CreditBalance = CreditBalance(
     id = None,
     requestId = req.requestId,
-    value = req.amount.amount,
+    value = req.amount.value,
     transactionType = TransactionType.Credit,
     reason = Some(creditReasonMapping(req.reason)),
     createdAt = nowTime,
