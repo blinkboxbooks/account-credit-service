@@ -31,16 +31,16 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
   }
 
   override def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory] = Future {
-    val history = accountCreditStore.getCreditHistoryForUser(userId).map { h: CreditBalance =>
-      if (h.transactionType == TransactionType.Debit)
-        Debit(h.requestId, h.createdAt, Money(h.value))
+    val history = accountCreditStore.getCreditHistoryForUser(userId).map { cb: CreditBalance =>
+      if (cb.transactionType == TransactionType.Debit)
+        Debit(cb.requestId, cb.createdAt, Money(cb.value))
       else
-        Credit(h.requestId, h.createdAt, Money(h.value), CreditReason.CreditRefund, CreditIssuer(h.adminUserId.get.toString, Set()))
+        Credit(cb.requestId, cb.createdAt, Money(cb.value), CreditReason.CreditRefund, CreditIssuer(cb.adminUserId.get.toString, Set()))
     }
 
-    val netBalance: BigDecimal = history.foldLeft(BigDecimal(0))((cumulative: BigDecimal, e: CreditOrDebit) => e match {
-      case Credit(_, _, a, _, _) => cumulative + a.value
-      case Debit(_, _, a) => cumulative - a.value
+    val netBalance = history.foldLeft(BigDecimal(0))((cumulativeAmount, creditOrDebit) => creditOrDebit match {
+      case Credit(_, _, amount, _, _) => cumulativeAmount + amount.value
+      case Debit(_, _, amount) => cumulativeAmount - amount.value
     })
 
     CreditHistory(Money(netBalance), history.toList)
