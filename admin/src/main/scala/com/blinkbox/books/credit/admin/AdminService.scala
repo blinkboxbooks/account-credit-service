@@ -19,7 +19,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
 
   def nowTime = SystemClock.now()
 
-  def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit] =
+  override def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit] =
     lookupCreditHistoryForUser(userId).map{ _.netBalance }.map { currentBalance: Money => {
       val newBalance = currentBalance.value - amount.value
       val insufficientFunds = newBalance < 0
@@ -30,7 +30,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
     }
   }
 
-  def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory] = Future {
+  override def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory] = Future {
     val history = accountCreditStore.getCreditHistoryForUser(userId).map { h: CreditBalance =>
       if (h.transactionType == TransactionType.Debit)
         Debit(h.requestId, h.createdAt, Money(h.value))
@@ -46,7 +46,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
     CreditHistory(Money(netBalance), history.toList)
   }
 
-  def hasRequestAlreadyBeenProcessed(requestId: String): Boolean =
+  override def hasRequestAlreadyBeenProcessed(requestId: String): Boolean =
     accountCreditStore.getCreditBalanceByRequestId(requestId).nonEmpty
 
   override def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[Unit] = Future {
