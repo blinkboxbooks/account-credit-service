@@ -18,7 +18,7 @@ import com.blinkbox.books.credit.admin.RenderingFunctions._
 import com.blinkbox.books.spray.MonitoringDirectives.monitor
 import com.blinkbox.books.spray.v2.Implicits.throwableMarshaller
 
-class AdminApi(creditHistoryRepository: CreditHistoryRepository, adminService: AdminService, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport with StrictLogging {
+class AdminApi(adminService: AdminService, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport with StrictLogging {
 
   override implicit def jsonFormats = {
     val typeHints =
@@ -34,7 +34,7 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, adminService: A
           get {
             authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
               val issuerBehaviour = if (adminUser.isInRole(UserRole.CustomerServicesManager)) keepIssuer _ else removeIssuer _
-              complete(creditHistoryRepository.lookupCreditHistoryForUser(userId).map {
+              complete(adminService.lookupCreditHistoryForUser(userId).map {
                 case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(issuerBehaviour))
               })
             }
@@ -43,14 +43,14 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, adminService: A
         post {
           path("debits") {
             authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
-              entity(as[CreditRequest]) { creditRequest =>
-                if (creditRequest.amount.amount <= BigDecimal(0)) {
+              entity(as[DebitRequest]) { debitRequest =>
+                if (debitRequest.amount.value <= BigDecimal(0)) {
                   complete(StatusCodes.BadRequest, v2.Error("InvalidAmount", None))
-                } else if (creditRequest.amount.currency != "GBP") {
+                } else if (debitRequest.amount.currency != "GBP") {
                   complete(StatusCodes.BadRequest, v2.Error("UnsupportedCurrency", None))
-                } else if (creditHistoryRepository.hasRequestAlreadyBeenProcessed(creditRequest.requestId)) {
+                } else if (adminService.hasRequestAlreadyBeenProcessed(debitRequest.requestId)) {
                   complete(StatusCodes.NoContent)
-                } else if (creditHistoryRepository.debit(userId, creditRequest.amount, creditRequest.requestId)) {
+                } else if (adminService.debit(userId, debitRequest.amount, debitRequest.requestId)) {
                   complete(StatusCodes.NoContent)
                 } else {
                   complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))
@@ -61,11 +61,11 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, adminService: A
           path("credits") {
             authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { implicit adminUser =>
               entity(as[Credit]) { credit =>
-                if (credit.amount.amount <= BigDecimal(0)) {
+                if (credit.amount.value <= BigDecimal(0)) {
                   complete(StatusCodes.BadRequest)
                 } else if (credit.amount.currency != "GBP") {
                   complete(StatusCodes.BadRequest)
-                } else if (adminService.alreadyBeenProcessed(credit.requestId)) {
+                } else if (adminService.hasRequestAlreadyBeenProcessed(credit.requestId)) {
                   complete(StatusCodes.Created)
                 } else {
                   onSuccess(adminService.addCredit(credit, userId)) { resp =>
@@ -81,4 +81,4 @@ class AdminApi(creditHistoryRepository: CreditHistoryRepository, adminService: A
   }
 }
 
-case class CreditRequest(amount: Money, requestId: String)
+case class DebitRequest(amount: Money, requestId: String)
