@@ -87,21 +87,3 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
     }
   }
 }
-
-object DefaultAdminService {
-  val dummy = {
-    val thePast = new DateTime(2012,1,2,3,4,5)
-    val cheap = Money(BigDecimal.valueOf(1000.53))
-    val requestId = "sdfnaksfniofgniaodoir84t839t"
-    val credits = List(Credit(requestId, thePast, cheap, CreditReason.CreditVoucherCode, CreditIssuer("James Bond", Set(UserRole.CustomerServicesRep))))
-    val debits = List(Debit(requestId, thePast, cheap))
-    implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isBefore _)
-    val eithers = (credits ++ debits).sortBy {
-      case Debit(rq, dt, _) => dt
-      case Credit(rq, dt, _, _, _) => dt
-    }
-    CreditHistory(cheap, eithers)
-  }
-
-  val zeroCreditHistory = CreditHistory(Money(BigDecimal(0)), List())
-}

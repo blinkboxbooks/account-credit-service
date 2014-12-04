@@ -1,9 +1,10 @@
 package com.blinkbox.books.credit.admin
 
-import com.blinkbox.books.auth.User
+import com.blinkbox.books.auth.{UserRole, User}
 import com.blinkbox.books.credit.db.InsufficientFundsException
 import com.blinkbox.books.spray.v2
 import com.blinkbox.books.test.MockitoSyrup
+import org.joda.time.DateTime
 import org.json4s.JsonAST.JObject
 import org.json4s._
 import org.scalatest.{BeforeAndAfter, FlatSpec}
@@ -26,7 +27,7 @@ import org.scalatest.junit.JUnitRunner
 class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService with MockitoSyrup with v2.JsonSupport with BeforeAndAfter {
 
   def actorRefFactory = system
-  val creditHistory = DefaultAdminService.dummy
+  val creditHistory = AdminApiTest.dummy
 
   val adminService = mock[AdminService]
   val authenticator = new StubAuthenticator
@@ -96,7 +97,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   it should "200 on credit history request for unknown user" in {
-    when(adminService.lookupCreditHistoryForUser(666)).thenReturn(Future.successful(DefaultAdminService.zeroCreditHistory))
+    when(adminService.lookupCreditHistoryForUser(666)).thenReturn(Future.successful(AdminApiTest.zeroCreditHistory))
     Get("/admin/users/666/accountcredit") ~> csrAuth ~> route ~> check {
       assert(status == StatusCodes.OK)
     }
@@ -229,6 +230,24 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     ("code" -> code)
   }
 
+}
+
+object AdminApiTest {
+  val dummy = {
+  val thePast = new DateTime(2012,1,2,3,4,5)
+  val cheap = Money(BigDecimal.valueOf(1000.53))
+  val requestId = "sdfnaksfniofgniaodoir84t839t"
+  val credits = List(Credit(requestId, thePast, cheap, CreditReason.CreditVoucherCode, CreditIssuer("James Bond", Set(UserRole.CustomerServicesRep))))
+  val debits = List(Debit(requestId, thePast, cheap))
+  implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isBefore _)
+  val eithers = (credits ++ debits).sortBy {
+    case Debit(rq, dt, _) => dt
+    case Credit(rq, dt, _, _, _) => dt
+  }
+  CreditHistory(cheap, eithers)
+}
+
+  val zeroCreditHistory = CreditHistory(Money(BigDecimal(0)), List())
 }
 
 class StubAuthenticator extends ContextAuthenticator[User] {
