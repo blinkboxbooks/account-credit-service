@@ -80,8 +80,8 @@ object DefaultAdminService {
     val debits = List(Debit(requestId, thePast, cheap))
     implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isBefore _)
     val eithers = (credits ++ debits).sortBy {
-      case Debit(rq,dt, _) => dt
-      case Credit(rq,dt, _, _, _) => dt
+      case Debit(rq, dt, _) => dt
+      case Credit(rq, dt, _, _, _) => dt
     }
     CreditHistory(cheap, eithers)
   }
