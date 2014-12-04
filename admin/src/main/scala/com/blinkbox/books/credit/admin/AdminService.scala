@@ -11,23 +11,33 @@ import scala.concurrent.ExecutionContext.Implicits.global
 trait AdminService {
   def debit(i: Int, money: Money, s: String): Boolean
   def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[Unit]
-  def lookupCreditHistoryForUser(userId: Int): Option[CreditHistory]
+  def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory]
   def hasRequestAlreadyBeenProcessed(requestId: String): Boolean
 }
 
 class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminService {
 
-  val nowTime = SystemClock.now()
+  def nowTime = SystemClock.now()
 
   def debit(i: Int, money: Money, s: String): Boolean = money.amount < lookupCreditBalanceForUser(i).amount
 
   private def lookupCreditBalanceForUser(i: Int): Money = Money(BigDecimal.valueOf(1000000))
 
-  def lookupCreditHistoryForUser(userId: Int): Option[CreditHistory] =
-    if (userId == 7)
-      Some(DefaultAdminService.dummy)
-    else
-      None
+  def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory] = Future {
+    val history = accountCreditStore.getCreditHistoryForUser(userId).map { h: CreditBalance =>
+      if (h.transactionType == TransactionType.Debit)
+        Debit(h.requestId, h.createdAt, Money(h.value))
+      else
+        Credit(h.requestId, h.createdAt, Money(h.value), CreditReason.CreditRefund, CreditIssuer(h.adminUserId.get.toString, Set()))
+    }
+
+    val netBalance: BigDecimal = history.foldLeft(BigDecimal(0))((cumulative: BigDecimal, e: CreditOrDebit) => e match {
+      case Credit(_, _, a, _, _) => cumulative + a.amount
+      case Debit(_, _, a) => cumulative - a.amount
+    })
+
+    CreditHistory(Money(netBalance), history.toList)
+  }
 
   def hasRequestAlreadyBeenProcessed(requestId: String): Boolean = {
     accountCreditStore.getCreditBalanceByRequestID(requestId).nonEmpty
@@ -85,4 +95,6 @@ object DefaultAdminService {
     }
     CreditHistory(cheap, eithers)
   }
+
+  val zeroCreditHistory = CreditHistory(Money(BigDecimal(0)), List())
 }

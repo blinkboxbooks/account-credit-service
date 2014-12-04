@@ -26,6 +26,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   def actorRefFactory = system
   val creditHistory = DefaultAdminService.dummy
+
   val adminService = mock[AdminService]
   val authenticator = new StubAuthenticator
 
@@ -49,7 +50,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   "AdminApi" should "200 on credit history request for known user as CSR" in {
-    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
       assert(DummyData.expectedForCsr == responseAs[JValue])
       assert(status == StatusCodes.OK)
@@ -57,7 +58,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   it should "200 on credit history request for known user as CSM" in {
-    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csmAuth ~> route ~> check {
       assert(DummyData.expectedForCsm == responseAs[JValue])
       assert(status == StatusCodes.OK)
@@ -65,43 +66,43 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   it should "not show issuer information to CSRs" in {
-    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
       assert(!containsIssuerInformation(responseAs[JObject]))
     }
   }
 
   it should "show issuer information to CSMs" in {
-    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csmAuth ~> route ~> check {
       assert(containsIssuerInformation(responseAs[JObject]))
     }
   }
 
   it should "show issuer information to users with CSR /and/ CSM roles" in {
-    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csmAndCsrAuth ~> route ~> check {
       assert(containsIssuerInformation(responseAs[JObject]))
     }
   }
 
   it should "return v2 media type on credit history request" in {
-    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
       assert(status == StatusCodes.OK)
       assert(mediaType == `application/vnd.blinkbox.books.v2+json`)
     }
   }
 
-  it should "404 on credit history request for unknown user" in {
-    when(adminService.lookupCreditHistoryForUser(666)).thenReturn(None)
+  it should "200 on credit history request for unknown user" in {
+    when(adminService.lookupCreditHistoryForUser(666)).thenReturn(Future.successful(DefaultAdminService.zeroCreditHistory))
     Get("/admin/users/666/accountcredit") ~> csrAuth ~> route ~> check {
-      assert(status == StatusCodes.NotFound)
+      assert(status == StatusCodes.OK)
     }
   }
 
   it should "401 on credit history request when passed incorrect credentials" in {
-    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
     Get("/admin/users/123/accountcredit") ~> invalidAuth ~> route ~> check {
       assert(status == StatusCodes.Unauthorized)
     }
