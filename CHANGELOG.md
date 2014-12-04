@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.12.2 ([#32](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/32) 2014-12-04 18:06:28)
+
+Refactoring
+
+patch
+
 ## 0.12.1 ([#31](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/31) 2014-12-04 14:55:46)
 
 Rename swagger files & suggest clients use GUID for requestId
