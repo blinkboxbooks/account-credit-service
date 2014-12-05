@@ -14,14 +14,8 @@ trait AdminService {
 
 class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) extends AdminService {
 
-  override def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit] =
-    lookupCreditHistoryForUser(userId).map { creditHistory =>
-      val newBalance = creditHistory.netBalance.value - amount.value
-      val insufficientFunds = newBalance < 0
-      if (insufficientFunds)
-        throw new InsufficientFundsException
-      else
-        accountCreditStore.addDebit(CreditBalanceFactory.fromDebit(requestId, amount.value, userId))
+  override def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit] = Future {
+    accountCreditStore.addDebit(userId, requestId, amount)
   }
 
   override def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory] = Future {

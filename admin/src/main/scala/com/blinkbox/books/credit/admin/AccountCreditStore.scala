@@ -10,7 +10,7 @@ import scala.slick.jdbc.JdbcBackend.Database
 
 trait AccountCreditStore {
   def addCredit(credit: CreditBalance): Int
-  def addDebit(credit: CreditBalance): Int
+  def addDebit(userId: Int, requestId: String, amount: Money): Unit
   def getCreditBalanceByRequestId(requestId: String): Option[CreditBalance]
   def getCreditBalanceById(creditBalanceId: Int): Option[CreditBalance]
   def getCreditHistoryForUser(userId: Int): Seq[CreditBalance]
@@ -32,7 +32,19 @@ class DbAccountCreditStore[DB <: DatabaseSupport](db: DB#Database, tables: Accou
       (creditBalance returning creditBalance.map(_.id)) insert credit
     }
 
-  override def addDebit(credit: CreditBalance): Int = addCredit(credit)
+  override def addDebit(userId: Int, requestId: String, amount: Money): Unit = {
+    db.withSession { implicit session =>
+      val creditHistory = CreditHistory.buildFromCreditBalances(creditBalance.filter { _.customerId === userId }.list.toSeq)
+      val newBalance = creditHistory.netBalance.value - amount.value
+      val insufficientFunds = newBalance < 0
+      if (insufficientFunds)
+        throw new InsufficientFundsException
+      else
+        addDebit(CreditBalanceFactory.fromDebit(requestId, amount.value, userId))
+    }
+  }
+
+  private def addDebit(credit: CreditBalance): Int = addCredit(credit)
   
   override def getCreditBalanceByRequestId(requestId: String): Option[CreditBalance] =
     db.withSession {

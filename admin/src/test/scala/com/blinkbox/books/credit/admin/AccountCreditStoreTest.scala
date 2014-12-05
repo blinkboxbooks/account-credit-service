@@ -65,13 +65,52 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
   }
 
   test("add debit") {
-    val debit = new CreditBalance(Some(1), "foo", 90.01, TransactionType.Debit, None, nowTime, None, 2387, None)
+    val credit = 10
     db.withSession { implicit session =>
-      dao.addDebit(debit)
+      dao.addCredit(CreditBalanceFactory.fromCredit("foo", credit, Reason.GoodwillBookIssue, 2387, 889))
+    }
+
+    val balance = credit
+
+    db.withSession { implicit session =>
+      dao.addDebit(2387, "foo", Money(BigDecimal(credit - 1)))
     }
 
     db.withSession { implicit session =>
-      assert(dao.getCreditHistoryForUser(2387) == List(debit))
+      val history = CreditHistory.buildFromCreditBalances(dao.getCreditHistoryForUser(2387))
+      assert(history.netBalance.value == 1)
+      assert(history.history.size == 2)
+    }
+  }
+
+  test("adding debit without having sufficient credit should throw exception") {
+    val credit = 10
+    db.withSession { implicit session =>
+      dao.addCredit(CreditBalanceFactory.fromCredit("foo", credit, Reason.GoodwillBookIssue, 2387, 889))
+    }
+
+    db.withSession { implicit session =>
+      val history = CreditHistory.buildFromCreditBalances(dao.getCreditHistoryForUser(2387))
+      assert(history.netBalance.value == credit)
+      assert(history.history.size == 1)
+    }
+
+    val balance = credit
+
+    db.withSession { implicit session =>
+      try {
+        dao.addDebit(2387, "foo", Money(BigDecimal(balance + 1)))
+        fail("Expected to throw exception, but didn't.")
+      } catch {
+        case ex: InsufficientFundsException =>
+        case ex: Exception => fail("Unexpected exception: $ex")
+      }
+    }
+
+    db.withSession { implicit session =>
+      val history = CreditHistory.buildFromCreditBalances(dao.getCreditHistoryForUser(2387))
+      assert(history.netBalance.value == credit)
+      assert(history.history.size == 1)
     }
   }
 
