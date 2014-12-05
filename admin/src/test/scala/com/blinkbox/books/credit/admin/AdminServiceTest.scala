@@ -21,18 +21,6 @@ class AdminServiceTest extends FlatSpec with BeforeAndAfter with MockitoSyrup wi
     adminService = new DefaultAdminService(accountCreditStore, SystemClock)
   }
 
-  "getCreditHistoryForUser" should "correctly compute the net balance" in {
-    val creditHistory = List(
-      CreditBalance(Some(1), "foo", 13.37, TransactionType.Credit, None, new DateTime(), None, 1, Some(666)),
-      CreditBalance(Some(2), "bar", 5.01, TransactionType.Debit, Some(com.blinkbox.books.credit.db.Reason.CreditRefund), new DateTime(), None, 1, None))
-    when(accountCreditStore.getCreditHistoryForUser(1)).thenReturn(creditHistory)
-
-    whenReady(adminService.lookupCreditHistoryForUser(1)) { result =>
-      assert(result.netBalance.value == 8.36)
-      assert(result.history.size == 2)
-    }
-  }
-
   "debit" should "call debit if user has enough credit" in {
     val creditHistory = List(CreditBalance(Some(1), "foo", 13.37, TransactionType.Credit, None, new DateTime(), None, 1, Some(666)))
     when(accountCreditStore.getCreditHistoryForUser(1)).thenReturn(creditHistory)
