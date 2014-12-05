@@ -57,7 +57,7 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
   }
 
   test("get credit history") {
-    val credit = new CreditBalance(None, "foo", 10.44, TransactionType.Credit, Some(Reason.GoodwillBookIssue), nowTime, None, customerId, Some(adminId))
+    val credit = new CreditBalance(Some(1), "foo", 10.44, TransactionType.Credit, Some(Reason.GoodwillBookIssue), nowTime, None, customerId, Some(adminId))
     db.withSession { implicit session =>
       dao.addCredit(credit)
     }
