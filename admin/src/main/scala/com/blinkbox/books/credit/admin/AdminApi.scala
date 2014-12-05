@@ -1,6 +1,5 @@
 package com.blinkbox.books.credit.admin
 
-import com.blinkbox.books.credit.db.InsufficientFundsException
 import com.blinkbox.books.json.ExplicitTypeHints
 import com.blinkbox.books.spray.v2
 import spray.http.StatusCodes

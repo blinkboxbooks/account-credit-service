@@ -1,10 +1,10 @@
-package com.blinkbox.books.credit.db
+package com.blinkbox.books.credit.admin
 
 import com.blinkbox.books.config.DatabaseConfig
-import com.blinkbox.books.slick.{ DatabaseComponent, DatabaseSupport, MySQLDatabaseSupport, TablesContainer }
+import com.blinkbox.books.slick.{DatabaseComponent, DatabaseSupport, MySQLDatabaseSupport, TablesContainer}
 import com.typesafe.scalalogging.StrictLogging
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.ExecutionContext
 import scala.slick.driver.MySQLDriver
 import scala.slick.jdbc.JdbcBackend.Database
 

@@ -1,7 +1,6 @@
 package com.blinkbox.books.credit.admin
 
 import com.blinkbox.books.auth.{UserRole, User}
-import com.blinkbox.books.credit.db.InsufficientFundsException
 import com.blinkbox.books.spray.v2
 import com.blinkbox.books.test.MockitoSyrup
 import org.joda.time.DateTime

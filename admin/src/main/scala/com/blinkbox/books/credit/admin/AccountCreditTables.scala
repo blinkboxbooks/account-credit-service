@@ -1,12 +1,12 @@
-package com.blinkbox.books.credit.db
+package com.blinkbox.books.credit.admin
 
-import java.sql.Timestamp
+import com.blinkbox.books.credit.admin.Reason._
+import com.blinkbox.books.credit.admin.TransactionType._
 import com.blinkbox.books.slick.TablesContainer
-import org.joda.time.{ DateTimeZone, DateTime }
+import org.joda.time.DateTime
+
 import scala.slick.driver.JdbcProfile
-import slick.lifted.ProvenShape.proveShapeOf
-import Reason._
-import TransactionType._
+import scala.slick.lifted.ProvenShape.proveShapeOf
 
 trait AccountCreditTables[Profile <: JdbcProfile] extends TablesContainer[Profile] {
   import driver.simple._

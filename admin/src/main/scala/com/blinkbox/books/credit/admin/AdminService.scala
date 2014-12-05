@@ -1,7 +1,6 @@
 package com.blinkbox.books.credit.admin
 
 import com.blinkbox.books.auth.User
-import com.blinkbox.books.credit.db._
 import scala.concurrent.Future
 import com.blinkbox.books.time.Clock
 import scala.concurrent.ExecutionContext.Implicits.global

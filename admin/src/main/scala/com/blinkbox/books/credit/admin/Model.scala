@@ -1,7 +1,6 @@
 package com.blinkbox.books.credit.admin
 
 import com.blinkbox.books.auth.UserRole._
-import com.blinkbox.books.credit.db.{TransactionType, CreditBalance}
 import org.joda.time.DateTime
 
 case class Money(value: BigDecimal, currency: String = "GBP")

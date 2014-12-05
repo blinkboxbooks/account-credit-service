@@ -1,20 +1,15 @@
-package com.blinkbox.books.credit.db
+package com.blinkbox.books.credit.admin
+
+import com.blinkbox.books.slick.{DatabaseComponent, H2DatabaseSupport, TablesContainer}
+import com.blinkbox.books.time.SystemClock
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.{BeforeAndAfterEach, FunSuite}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.math.BigDecimal.double2bigDecimal
 import scala.slick.driver.H2Driver
 import scala.slick.jdbc.JdbcBackend.Database
-
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.Finders
-import org.scalatest.FunSuite
-
-import com.blinkbox.books.slick.DatabaseComponent
-import com.blinkbox.books.slick.H2DatabaseSupport
-import com.blinkbox.books.slick.TablesContainer
-import com.blinkbox.books.time.SystemClock
 
 trait TestDatabase extends DatabaseComponent {
   override val DB = new H2DatabaseSupport
@@ -33,6 +28,7 @@ trait TestDatabase extends DatabaseComponent {
 class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestDatabase {
   import tables.driver.simple._
   import tables._
+
   val dao = new DbAccountCreditStore[H2DatabaseSupport](db, tables, exceptionFilter, global)
   def nowTime = SystemClock.now()
 

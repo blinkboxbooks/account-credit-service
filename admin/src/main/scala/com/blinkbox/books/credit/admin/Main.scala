@@ -11,11 +11,9 @@ import com.typesafe.scalalogging.StrictLogging
 import spray.can.Http
 import spray.http.Uri.Path
 import spray.routing.HttpServiceActor
-import com.blinkbox.books.credit.db._
 import com.blinkbox.books.slick.MySQLDatabaseSupport
 import com.blinkbox.books.config.{ DatabaseConfig, Configuration }
 import scala.concurrent.duration._
-import com.blinkbox.books.credit.db.DbAccountCreditStore
 import com.blinkbox.books.time.SystemClock
 
 object Main extends App with Configuration with Loggers with StrictLogging {

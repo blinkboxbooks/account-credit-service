@@ -1,4 +1,4 @@
-package com.blinkbox.books.credit.db
+package com.blinkbox.books.credit.admin
 
 import org.joda.time.DateTime
 
