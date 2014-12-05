@@ -1,8 +1,9 @@
 package com.blinkbox.books.credit.admin
 
-import com.blinkbox.books.auth.User
+import com.blinkbox.books.auth.{UserRole, User}
 import com.blinkbox.books.spray.v2
 import com.blinkbox.books.test.MockitoSyrup
+import org.joda.time.DateTime
 import org.json4s.JsonAST.JObject
 import org.json4s._
 import org.scalatest.{BeforeAndAfter, FlatSpec}
@@ -25,7 +26,8 @@ import org.scalatest.junit.JUnitRunner
 class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService with MockitoSyrup with v2.JsonSupport with BeforeAndAfter {
 
   def actorRefFactory = system
-  val creditHistory = DefaultAdminService.dummy
+  val creditHistory = AdminApiTest.dummy
+
   val adminService = mock[AdminService]
   val authenticator = new StubAuthenticator
 
@@ -49,7 +51,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   "AdminApi" should "200 on credit history request for known user as CSR" in {
-    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
       assert(DummyData.expectedForCsr == responseAs[JValue])
       assert(status == StatusCodes.OK)
@@ -57,7 +59,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   it should "200 on credit history request for known user as CSM" in {
-    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csmAuth ~> route ~> check {
       assert(DummyData.expectedForCsm == responseAs[JValue])
       assert(status == StatusCodes.OK)
@@ -65,43 +67,43 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   it should "not show issuer information to CSRs" in {
-    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
       assert(!containsIssuerInformation(responseAs[JObject]))
     }
   }
 
   it should "show issuer information to CSMs" in {
-    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csmAuth ~> route ~> check {
       assert(containsIssuerInformation(responseAs[JObject]))
     }
   }
 
   it should "show issuer information to users with CSR /and/ CSM roles" in {
-    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csmAndCsrAuth ~> route ~> check {
       assert(containsIssuerInformation(responseAs[JObject]))
     }
   }
 
   it should "return v2 media type on credit history request" in {
-    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
     Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
       assert(status == StatusCodes.OK)
       assert(mediaType == `application/vnd.blinkbox.books.v2+json`)
     }
   }
 
-  it should "404 on credit history request for unknown user" in {
-    when(adminService.lookupCreditHistoryForUser(666)).thenReturn(None)
+  it should "200 on credit history request for unknown user" in {
+    when(adminService.lookupCreditHistoryForUser(666)).thenReturn(Future.successful(AdminApiTest.zeroCreditHistory))
     Get("/admin/users/666/accountcredit") ~> csrAuth ~> route ~> check {
-      assert(status == StatusCodes.NotFound)
+      assert(status == StatusCodes.OK)
     }
   }
 
   it should "401 on credit history request when passed incorrect credentials" in {
-    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Some(creditHistory))
+    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
     Get("/admin/users/123/accountcredit") ~> invalidAuth ~> route ~> check {
       assert(status == StatusCodes.Unauthorized)
     }
@@ -115,24 +117,24 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   it should "204 on add debit endpoint, as CSR" in {
     val amount = Money(BigDecimal.valueOf(90.01), "GBP")
-    when(adminService.debit(123, amount, "good")).thenReturn(true)
+    when(adminService.addDebit(123, amount, "good")).thenReturn(Future.successful(()))
     Post("/admin/users/123/accountcredit/debits", debitRequest) ~> csrAuth ~> route ~> check {
-      verify(adminService).debit(123, amount, "good")
+      verify(adminService).addDebit(123, amount, "good")
       assert(status == StatusCodes.NoContent)
     }
   }
 
   it should "204 on add debit endpoint, as CSM" in {
     val amount = Money(BigDecimal.valueOf(90.01), "GBP")
-    when(adminService.debit(123, amount, "good")).thenReturn(true)
+    when(adminService.addDebit(123, amount, "good")).thenReturn(Future.successful(()))
     Post("/admin/users/123/accountcredit/debits", debitRequest) ~> csmAuth ~> route ~> check {
-      verify(adminService).debit(123, amount, "good")
+      verify(adminService).addDebit(123, amount, "good")
       assert(status == StatusCodes.NoContent)
     }
   }
 
   it should "400 on add debit endpoint, if trying to debit more credit than they have" in {
-    when(adminService.debit(any[Int], any[Money], any[String])).thenReturn(false)
+    when(adminService.addDebit(any[Int], any[Money], any[String])).thenReturn(Future.failed(new InsufficientFundsException))
     Post("/admin/users/123/accountcredit/debits", debitRequest) ~> csrAuth ~> route ~> check {
       assert(status == StatusCodes.BadRequest)
       assert(responseAs[JObject] == errorMessage("InsufficientFunds"))
@@ -160,7 +162,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   it should "204 on add debit endpoint, if requestId has previously succeeded, even if the debit is more than currently available" in {
     when(adminService.hasRequestAlreadyBeenProcessed("good")).thenReturn(true)
     Post("/admin/users/123/accountcredit/debits", debitRequest) ~> csrAuth ~> route ~> check {
-      verify(adminService, never()).debit(any[Int], any[Money], any[String])
+      verify(adminService, never()).addDebit(any[Int], any[Money], any[String])
       assert(status == StatusCodes.NoContent)
     }
   }
@@ -227,6 +229,24 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     ("code" -> code)
   }
 
+}
+
+object AdminApiTest {
+  val dummy = {
+  val thePast = new DateTime(2012,1,2,3,4,5)
+  val cheap = Money(BigDecimal.valueOf(1000.53))
+  val requestId = "sdfnaksfniofgniaodoir84t839t"
+  val credits = List(Credit(requestId, thePast, cheap, CreditReason.CreditVoucherCode, CreditIssuer("James Bond", Set(UserRole.CustomerServicesRep))))
+  val debits = List(Debit(requestId, thePast, cheap))
+  implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isBefore _)
+  val eithers = (credits ++ debits).sortBy {
+    case Debit(rq, dt, _) => dt
+    case Credit(rq, dt, _, _, _) => dt
+  }
+  CreditHistory(cheap, eithers)
+}
+
+  val zeroCreditHistory = CreditHistory(Money(BigDecimal(0)), List())
 }
 
 class StubAuthenticator extends ContextAuthenticator[User] {

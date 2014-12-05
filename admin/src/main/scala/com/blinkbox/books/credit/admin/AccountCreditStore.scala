@@ -1,17 +1,19 @@
-package com.blinkbox.books.credit.db
+package com.blinkbox.books.credit.admin
 
 import com.blinkbox.books.config.DatabaseConfig
-import com.blinkbox.books.slick.{ DatabaseComponent, DatabaseSupport, MySQLDatabaseSupport, TablesContainer }
+import com.blinkbox.books.slick.{DatabaseComponent, DatabaseSupport, MySQLDatabaseSupport, TablesContainer}
 import com.typesafe.scalalogging.StrictLogging
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.ExecutionContext
 import scala.slick.driver.MySQLDriver
 import scala.slick.jdbc.JdbcBackend.Database
 
 trait AccountCreditStore {
   def addCredit(credit: CreditBalance): Int
+  def addDebitIfUserHasSufficientCredit(userId: Int, requestId: String, amount: Money): Unit
   def getCreditBalanceByRequestId(requestId: String): Option[CreditBalance]
   def getCreditBalanceById(creditBalanceId: Int): Option[CreditBalance]
+  def getCreditHistoryForUser(userId: Int): Seq[CreditBalance]
 }
 
 class DbAccountCreditStore[DB <: DatabaseSupport](db: DB#Database, tables: AccountCreditTables[DB#Profile], exceptionFilter: DB#ExceptionFilter, implicit val exc: ExecutionContext) extends AccountCreditStore with StrictLogging {
@@ -19,12 +21,29 @@ class DbAccountCreditStore[DB <: DatabaseSupport](db: DB#Database, tables: Accou
   import tables._
   import driver.simple._
 
+  override def getCreditHistoryForUser(userId: Int): Seq[CreditBalance] =
+    db.withSession { implicit session =>
+      creditBalance.filter { _.customerId === userId }.list.toSeq
+    }
+
   override def addCredit(credit: CreditBalance): Int =
     db.withSession { implicit session =>
       (creditBalance returning creditBalance.map(_.id)) insert credit
-
     }
 
+  override def addDebitIfUserHasSufficientCredit(userId: Int, requestId: String, amount: Money): Unit =
+    db.withSession { implicit session =>
+      val creditHistory = CreditHistory.buildFromCreditBalances(creditBalance.filter { _.customerId === userId }.list.toSeq)
+      val newBalance = creditHistory.netBalance.value - amount.value
+      val insufficientFunds = newBalance < 0
+      if (insufficientFunds)
+        throw new InsufficientFundsException
+      else
+        addDebit(CreditBalanceFactory.fromDebit(requestId, amount.value, userId))
+    }
+
+  private def addDebit(credit: CreditBalance): Int = addCredit(credit)
+  
   override def getCreditBalanceByRequestId(requestId: String): Option[CreditBalance] =
     db.withSession {
       implicit session =>

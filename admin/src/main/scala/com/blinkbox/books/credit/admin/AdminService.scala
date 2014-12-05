@@ -1,37 +1,29 @@
 package com.blinkbox.books.credit.admin
 
 import com.blinkbox.books.auth.User
-import com.blinkbox.books.credit.db._
-import org.joda.time.DateTime
 import scala.concurrent.Future
-import com.blinkbox.books.time.SystemClock
-import com.blinkbox.books.auth.UserRole
+import com.blinkbox.books.time.Clock
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait AdminService {
-  def debit(i: Int, money: Money, s: String): Boolean
+  def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit]
   def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[Unit]
-  def lookupCreditHistoryForUser(userId: Int): Option[CreditHistory]
+  def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory]
   def hasRequestAlreadyBeenProcessed(requestId: String): Boolean
 }
 
-class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminService {
+class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) extends AdminService {
 
-  val nowTime = SystemClock.now()
-
-  def debit(i: Int, money: Money, s: String): Boolean = money.value < lookupCreditBalanceForUser(i).value
-
-  private def lookupCreditBalanceForUser(i: Int): Money = Money(BigDecimal.valueOf(1000000))
-
-  def lookupCreditHistoryForUser(userId: Int): Option[CreditHistory] =
-    if (userId == 7)
-      Some(DefaultAdminService.dummy)
-    else
-      None
-
-  def hasRequestAlreadyBeenProcessed(requestId: String): Boolean = {
-    accountCreditStore.getCreditBalanceByRequestId(requestId).nonEmpty
+  override def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit] = Future {
+    accountCreditStore.addDebitIfUserHasSufficientCredit(userId, requestId, amount)
   }
+
+  override def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory] = Future {
+    CreditHistory.buildFromCreditBalances(accountCreditStore.getCreditHistoryForUser(userId))
+  }
+
+  override def hasRequestAlreadyBeenProcessed(requestId: String): Boolean =
+    accountCreditStore.getCreditBalanceByRequestId(requestId).nonEmpty
 
   override def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[Unit] = Future {
     accountCreditStore.addCredit(copyAddCreditReqToCreditBalance(req, customerId, adminUser))
@@ -43,18 +35,13 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
     value = req.amount.value,
     transactionType = TransactionType.Credit,
     reason = Some(creditReasonMapping(req.reason)),
-    createdAt = nowTime,
+    createdAt = clock.now(),
     updatedAt = None,
     customerId = customerId,
     adminUserId = Some(adminUser.id))
 
-  private def getAdminUserRoles(user: User): Set[String] = {
-    user.roles.map(r => r.toString())
-  }
+  private def getAdminUserRoles(user: User): Set[String] = user.roles.map(r => r.toString())
   
-  /**
-   * Maps Spray layer Credit reason Enum to Database layer Reason Enum
-   */
   private def creditReasonMapping(creditReason: CreditReason.Reason): Reason.Reason = {
     
     creditReason  match {
@@ -68,21 +55,5 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
       case CreditReason.StaffCredit => Reason.StaffCredit
       case _ => throw new Exception("Invalid Reason")
     }
-  }
-}
-
-object DefaultAdminService {
-  val dummy = {
-    val thePast = new DateTime(2012,1,2,3,4,5)
-    val cheap = Money(BigDecimal.valueOf(1000.53))
-    val requestId = "sdfnaksfniofgniaodoir84t839t"
-    val credits = List(Credit(requestId, thePast, cheap, CreditReason.CreditVoucherCode, CreditIssuer("James Bond", Set(UserRole.CustomerServicesRep))))
-    val debits = List(Debit(requestId, thePast, cheap))
-    implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isBefore _)
-    val eithers = (credits ++ debits).sortBy {
-      case Debit(rq, dt, _) => dt
-      case Credit(rq, dt, _, _, _) => dt
-    }
-    CreditHistory(cheap, eithers)
   }
 }
