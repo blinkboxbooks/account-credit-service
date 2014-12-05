@@ -73,7 +73,7 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
     val balance = credit
 
     db.withSession { implicit session =>
-      dao.addDebit(2387, "foo", Money(BigDecimal(credit - 1)))
+      dao.addDebitIfUserHasSufficientCredit(2387, "foo", Money(BigDecimal(credit - 1)))
     }
 
     db.withSession { implicit session =>
@@ -99,7 +99,7 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
 
     db.withSession { implicit session =>
       try {
-        dao.addDebit(2387, "foo", Money(BigDecimal(balance + 1)))
+        dao.addDebitIfUserHasSufficientCredit(2387, "foo", Money(BigDecimal(balance + 1)))
         fail("Expected to throw exception, but didn't.")
       } catch {
         case ex: InsufficientFundsException =>

@@ -15,7 +15,7 @@ trait AdminService {
 class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) extends AdminService {
 
   override def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit] = Future {
-    accountCreditStore.addDebit(userId, requestId, amount)
+    accountCreditStore.addDebitIfUserHasSufficientCredit(userId, requestId, amount)
   }
 
   override def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory] = Future {
