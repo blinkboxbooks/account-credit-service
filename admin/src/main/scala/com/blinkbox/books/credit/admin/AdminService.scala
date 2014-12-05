@@ -2,10 +2,8 @@ package com.blinkbox.books.credit.admin
 
 import com.blinkbox.books.auth.User
 import com.blinkbox.books.credit.db._
-import org.joda.time.DateTime
 import scala.concurrent.Future
-import com.blinkbox.books.time.SystemClock
-import com.blinkbox.books.auth.UserRole
+import com.blinkbox.books.time.Clock
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait AdminService {
@@ -15,9 +13,7 @@ trait AdminService {
   def hasRequestAlreadyBeenProcessed(requestId: String): Boolean
 }
 
-class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminService {
-
-  def nowTime = SystemClock.now()
+class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) extends AdminService {
 
   override def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit] =
     lookupCreditHistoryForUser(userId).map { creditHistory =>
@@ -58,7 +54,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore) extends AdminS
     value = req.amount.value,
     transactionType = TransactionType.Credit,
     reason = Some(creditReasonMapping(req.reason)),
-    createdAt = nowTime,
+    createdAt = clock.now(),
     updatedAt = None,
     customerId = customerId,
     adminUserId = Some(adminUser.id))

@@ -16,6 +16,7 @@ import com.blinkbox.books.slick.MySQLDatabaseSupport
 import com.blinkbox.books.config.{ DatabaseConfig, Configuration }
 import scala.concurrent.duration._
 import com.blinkbox.books.credit.db.DbAccountCreditStore
+import com.blinkbox.books.time.SystemClock
 
 object Main extends App with Configuration with Loggers with StrictLogging {
   logger.info("Starting Account-credit-service-v2-admin")
@@ -36,7 +37,7 @@ object Main extends App with Configuration with Loggers with StrictLogging {
 
   val accountCreditStore = new DbAccountCreditStore[MySQLDatabaseSupport](dbComponent.db, dbComponent.tables, dbComponent.exceptionFilter, ec)
 
-  val adminService = new DefaultAdminService(accountCreditStore)
+  val adminService = new DefaultAdminService(accountCreditStore, SystemClock)
 
   val service = system.actorOf(Props(classOf[AdminApiActor], new AdminApi(adminService, authenticator)))
 

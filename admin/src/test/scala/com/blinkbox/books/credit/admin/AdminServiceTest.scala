@@ -2,6 +2,7 @@ package com.blinkbox.books.credit.admin
 
 import com.blinkbox.books.credit.db.{InsufficientFundsException, TransactionType, CreditBalance, AccountCreditStore}
 import com.blinkbox.books.test.{FailHelper, MockitoSyrup}
+import com.blinkbox.books.time.SystemClock
 import org.joda.time.DateTime
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfter, FlatSpec}
@@ -17,7 +18,7 @@ class AdminServiceTest extends FlatSpec with BeforeAndAfter with MockitoSyrup wi
 
   before {
     accountCreditStore = mock[AccountCreditStore]
-    adminService = new DefaultAdminService(accountCreditStore)
+    adminService = new DefaultAdminService(accountCreditStore, SystemClock)
   }
 
   "getCreditHistoryForUser" should "correctly compute the net balance" in {
