@@ -1,7 +1,5 @@
 require 'jsonpath'
 
-@expected_credit_history
-
 Given(/^a user has the following credit history:$/) do | table |
   @expected_credit_history = table.hashes
   new_public_user
@@ -30,7 +28,6 @@ When(/^I request for the user's credit history$/) do
 end
 
 Then(/^the credit history contains the above events$/) do
-  pending
   response_hash = parse_response_data
   @expected_credit_history.reverse.each_with_index do | event, index | # expecting credit history response to order events by desc timestamp
     # checking common fields
@@ -69,7 +66,6 @@ def field_exists?(field_name, exists)
   elsif field_name == 'amount'
     path_to_field = JsonPath.new('$items[*].amount.currency')
     jsonpath_exists?(path_to_field, exists)
-
 
     path_to_field = JsonPath.new('$items[*].amount.value')
     jsonpath_exists?(path_to_field, exists)
