@@ -21,18 +21,17 @@ class DbAccountCreditStore[DB <: DatabaseSupport](db: DB#Database, tables: Accou
   import tables._
   import driver.simple._
 
-  override def getCreditHistoryForUser(userId: Int): Seq[CreditBalance] = {
+  override def getCreditHistoryForUser(userId: Int): Seq[CreditBalance] =
     db.withSession { implicit session =>
       creditBalance.filter { _.customerId === userId }.list.toSeq
     }
-  }
 
   override def addCredit(credit: CreditBalance): Int =
     db.withSession { implicit session =>
       (creditBalance returning creditBalance.map(_.id)) insert credit
     }
 
-  override def addDebit(userId: Int, requestId: String, amount: Money): Unit = {
+  override def addDebit(userId: Int, requestId: String, amount: Money): Unit =
     db.withSession { implicit session =>
       val creditHistory = CreditHistory.buildFromCreditBalances(creditBalance.filter { _.customerId === userId }.list.toSeq)
       val newBalance = creditHistory.netBalance.value - amount.value
@@ -42,7 +41,6 @@ class DbAccountCreditStore[DB <: DatabaseSupport](db: DB#Database, tables: Accou
       else
         addDebit(CreditBalanceFactory.fromDebit(requestId, amount.value, userId))
     }
-  }
 
   private def addDebit(credit: CreditBalance): Int = addCredit(credit)
   
