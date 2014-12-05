@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.13.1 ([#34](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/34) 2014-12-05 12:31:24)
+
+Fix broken test
+
+Fix broken test, that was causing builds to fail.
+
+patch
+
 ## 0.13.0 ([#33](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/33) 2014-12-05 12:22:42)
 
 CRED-38: Hook 'Add Debit' and 'Credit History' up to DB
