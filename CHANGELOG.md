@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.12.3 ([#28](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/28) 2014-12-05 12:17:01)
+
+adding credit history feature file and step defs
+
+Patch: Acceptance tests for credit history feature. They're marked as @in-progress at the moment as the functionality isn't available in dev-int yet. If you want to run them anyway then just remove the annotation.
+
 ## 0.12.2 ([#32](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/32) 2014-12-04 18:06:28)
 
 Refactoring
