@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.13.0 ([#33](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/33) 2014-12-05 12:22:42)
+
+CRED-38: Hook 'Add Debit' and 'Credit History' up to DB
+
+new feature
+
 ## 0.12.3 ([#28](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/28) 2014-12-05 12:17:01)
 
 adding credit history feature file and step defs
