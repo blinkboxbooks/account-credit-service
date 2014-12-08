@@ -7,7 +7,7 @@ module KnowsAboutAccountCreditRequests
 
   def get_admin_account_credit(admin_auth_token, user_id)
     @access_token = admin_auth_token
-    http_get :credit, "/admin/users/#{user_id}/accountcredit"
+    http_get :credit, "/admin/users/#{user_id}/accountcredit", headers
   end
 
   def post_admin_account_debit(admin_auth_token, amount_debit, user_id, transaction_id)
@@ -16,11 +16,11 @@ module KnowsAboutAccountCreditRequests
       :requestId => transaction_id,
       :amount => {
         :currency => "GBP",
-        :value => amount_debit
+        :value => amount_debit.to_f
       }
     }
 
-    http_post :credit, "/admin/users/#{user_id}/accountcredit/debits", request_body
+    http_post :credit, "/admin/users/#{user_id}/accountcredit/debits", request_body, headers
   end
 
   def post_admin_account_credit(admin_auth_token, amount, reason, user_id, transaction_id)
@@ -35,7 +35,11 @@ module KnowsAboutAccountCreditRequests
       :type => 'credit'
     }
 
-    http_post :credit, "/admin/users/#{user_id}/accountcredit/credits", request_body
+    http_post :credit, "/admin/users/#{user_id}/accountcredit/credits", request_body, headers
   end
+end
+
+def headers
+  {"Content-Type" => "application/vnd.blinkbox.books.v2+json", "Accept" => "application/vnd.blinkbox.books.v2+json"}
 end
 World(KnowsAboutAccountCreditRequests)
