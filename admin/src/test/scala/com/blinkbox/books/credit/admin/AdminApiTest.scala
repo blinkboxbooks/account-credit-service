@@ -238,7 +238,15 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
       verifyNoMoreInteractions(adminService)
     }
   }
-   
+
+  it should "200 on get credit reasons" in new TestFixture {
+    when(adminService.getCreditReasons()).thenReturn(List("foo", "bar"))
+    Get("/admin/accountcredit/reasons") ~> route ~> check {
+      assert(status == StatusCodes.OK)
+      assert(DummyData.expectedForCreditReasons == responseAs[JValue])
+    }
+  }
+
   def containsIssuerInformation(j: JValue): Boolean = {
     val issuerInfo: List[List[JField]] = for {
       JObject(child) <- j

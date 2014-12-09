@@ -6,6 +6,7 @@ import com.blinkbox.books.time.Clock
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait AdminService {
+  def getCreditReasons(): List[String]
   def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit]
   def addCredit(req: CreditRequest, customerId: Int)(implicit adminUser: User): Future[Unit]
   def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory]
@@ -13,6 +14,8 @@ trait AdminService {
 }
 
 class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) extends AdminService {
+
+  override def getCreditReasons(): List[String] = CreditReason.values.toList.map { _.toString }
 
   override def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit] = Future {
     accountCreditStore.addDebitIfUserHasSufficientCredit(userId, requestId, amount)
