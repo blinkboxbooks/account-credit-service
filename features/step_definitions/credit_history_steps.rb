@@ -28,7 +28,7 @@ When(/^I request for the user's credit history$/) do
 end
 
 Then(/^the credit history contains the above events$/) do
-  response_hash = parse_response_data
+  response_hash = parse_last_api_response
   @expected_credit_history.reverse.each_with_index do | event, index | # expecting credit history response to order events by desc timestamp
     # checking common fields
     expect(response_hash['items'][index]['amount']['amount'].to_f).to eq(event['amount'].to_f)
@@ -76,5 +76,5 @@ def field_exists?(field_name, exists)
 end
 
 def jsonpath_exists?(path_to_field, expected_is_present)
-  expect(!path_to_field.on(parse_response_data.to_s).empty?).to expected_is_present
+  expect(!path_to_field.on(last_response_as_string).empty?).to expected_is_present
 end

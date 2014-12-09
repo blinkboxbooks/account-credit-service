@@ -2,7 +2,7 @@ Given(/^a user with £(\d+(?:\.)?(?:\d*)) credit balance$/) do | credit_balance 
   user = new_public_user
 
   if credit_balance.to_i > 0
-    post_admin_account_credit(use_csr_user.access_token, credit_balance, 'Credit Promotions', user_id_of(user), request_id)
+    post_admin_account_credit(use_admin_user('csr').access_token, credit_balance, 'Credit Promotions', user_id_of(user), request_id)
   end
 end
 
@@ -19,11 +19,11 @@ end
 Then(/^the user has(?: overall)? credit balance of (\d+(?:\.)?(?:\d*)) in GBP$/) do | expected_credit |
   get_admin_account_credit(last_admin_user.access_token, user_id_of(last_public_user))
 
-  expect(parse_response_data['balance']['amount']).to eq(expected_credit.to_i)
-  expect(parse_response_data['balance']['currency']).to eq('GBP')
+  expect(parse_last_api_response['balance']['amount']).to eq(expected_credit.to_f)
+  expect(parse_last_api_response['balance']['currency']).to eq('GBP')
 end
 
 Then(/^the amount (?:credited|debited) is (\d+(?:\.)?(?:\d*)) in GBP$/) do | amount_credited |
-  expect(parse_response_data['amount']['value']).to eq(amount_credited.to_i)
-  expect(parse_response_data['amount']['currency']).to eq('GBP')
+  expect(parse_last_api_response['amount']['value']).to eq(amount_credited.to_i)
+  expect(parse_last_api_response['amount']['currency']).to eq('GBP')
 end
