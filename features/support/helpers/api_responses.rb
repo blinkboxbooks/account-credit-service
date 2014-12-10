@@ -11,4 +11,4 @@ module KnowsAboutAPIResponses
     HttpCapture::RESPONSES.last.body.to_s
   end
 end
-World(CanParseAPIResponses)
+World(KnowsAboutAPIResponses)

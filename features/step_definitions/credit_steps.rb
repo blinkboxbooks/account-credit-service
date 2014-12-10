@@ -2,13 +2,13 @@ Given(/^a user with £(\d+(?:\.)?(?:\d*)) credit balance$/) do | credit_balance 
   user = new_public_user
 
   if credit_balance.to_i > 0
-    post_admin_account_credit(use_admin_user('csr').access_token, credit_balance, 'Credit Promotions', user_id_of(user), request_id)
+    post_admin_account_credit(use_admin_user('csr').access_token, credit_balance, 'Credit Promotions', user_id_of(user), new_request_id)
   end
 end
 
 When(/^I credit the user (-?\d+(?:\.)?(?:\d*)) in GBP with the reason: (.*)$/) do | credit_amount, reason |
   post_admin_account_credit(last_admin_user.access_token, credit_amount, reason,
-                            user_id_of(last_public_user), request_id)
+                            user_id_of(last_public_user), new_request_id)
 end
 
 When(/^I try to credit the user (\d+(?:\.)?(?:\d*)) in GBP using the same requestId as before$/) do | credit_amount |
