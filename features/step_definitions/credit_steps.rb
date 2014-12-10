@@ -24,6 +24,6 @@ Then(/^the user has(?: overall)? credit balance of (\d+(?:\.)?(?:\d*)) in GBP$/)
 end
 
 Then(/^the amount (?:credited|debited) is (\d+(?:\.)?(?:\d*)) in GBP$/) do | amount_credited |
-  expect(parse_last_api_response['amount']['value']).to eq(amount_credited.to_i)
+  expect(parse_last_api_response['amount']['value']).to eq(amount_credited.to_f)
   expect(parse_last_api_response['amount']['currency']).to eq('GBP')
 end
