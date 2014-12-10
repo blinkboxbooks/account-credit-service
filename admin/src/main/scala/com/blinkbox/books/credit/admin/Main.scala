@@ -25,10 +25,8 @@ object Main extends App with Configuration with Loggers with StrictLogging {
     val keysFolder = appConfig.auth.keysDir.getAbsolutePath
     val sessionUri = appConfig.auth.sessionUrl.toString
     new BearerTokenAuthenticator(
-      new ZuulTokenDeserializer(
-        new ZuulTokenDecoder(keysFolder)),
-      new ZuulElevationChecker(sessionUri)(system),
-      Elevation.Unelevated)
+      new ZuulTokenDeserializer( new ZuulTokenDecoder(keysFolder)),
+      new ZuulElevationChecker(sessionUri)(system))
   }
 
   val dbComponent = new DefaultDatabaseComponent(appConfig.databaseConfig)
