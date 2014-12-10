@@ -1,6 +1,6 @@
 package com.blinkbox.books.credit.admin
 
-import com.blinkbox.books.auth.{UserRole, User}
+import com.blinkbox.books.auth.{UserRole, User,Elevation}
 import com.blinkbox.books.spray.v2
 import com.blinkbox.books.test.MockitoSyrup
 import org.joda.time.DateTime
@@ -16,6 +16,7 @@ import spray.routing.AuthenticationFailedRejection.CredentialsRejected
 import spray.routing.authentication.{ ContextAuthenticator, Authentication }
 import spray.routing.{ Route, AuthenticationFailedRejection, RequestContext, HttpService }
 import com.blinkbox.books.spray.v2.`application/vnd.blinkbox.books.v2+json`
+import com.blinkbox.books.spray.BearerTokenAuthenticator
 import spray.testkit.ScalatestRouteTest
 import scala.concurrent.Future
 import org.mockito.Matchers._
@@ -29,6 +30,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   val creditHistory = AdminApiTest.dummy
 
   val adminService = mock[AdminService]
+  
   val authenticator = new StubAuthenticator
 
   val api = new AdminApi(adminService, authenticator)
@@ -215,6 +217,51 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     }
   }
 
+  // add Credit tests 
+
+  it should "204 NoContent on add Credit endpoint, as CSR" in new TestFixture {
+    val amount = Money(BigDecimal.valueOf(90.01), "GBP")
+    val creditRequest = CreditRequest(amount, "tests125455")
+    val adminUser = User(1, Some(1), "foo", Map("bb/rol" -> List("csr")))
+
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
+    when(adminService.addCredit(creditRequest, 12)(authenticatedUserCSR)).thenReturn(Future.successful(()))
+    Post("/admin/users/12/accountcredit/credits", creditRequest) ~> csrAuth ~> route ~> check {
+      verify(adminService).addCredit(CreditRequest(amount, "tests125455"), 12)(authenticatedUserCSR)
+      assert(status == StatusCodes.NoContent)
+    }
+  }
+
+  it should "204 NoContent on add Credit endpoint, as CSM" in new TestFixture {
+    val amount = Money(BigDecimal.valueOf(90.01), "GBP")
+    val creditRequest = CreditRequest(amount, "tests125455")
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSM)))
+    when(adminService.addCredit(creditRequest, 12)(authenticatedUserCSM)).thenReturn(Future.successful(()))
+    Post("/admin/users/12/accountcredit/credits", creditRequest) ~> csmAuth ~> route ~> check {
+      verify(adminService).addCredit(CreditRequest(amount, "tests125455"), 12)(authenticatedUserCSM)
+      assert(status == StatusCodes.NoContent)
+    }
+  }
+
+  it should "403 Forbidden when adminUser adding credit does not have required roles" in new TestFixture {
+    val amount = Money(BigDecimal.valueOf(90.01), "GBP")
+    val creditRequest = CreditRequest(amount, "tests125455")
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserWithoutRequiredRoles)))
+    Post("/admin/users/12/accountcredit/credits", creditRequest) ~> csmAuth ~> route ~> check {
+      assert(status == StatusCodes.Forbidden)
+      verifyNoMoreInteractions(adminService)
+    }
+  }
+  it should "400 BadRequest when adding credit with negative amount" in new TestFixture {
+    val amount = Money(BigDecimal.valueOf(-15), "GBP")
+    val creditRequest = CreditRequest(amount, "tests125455")
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSM)))
+    Post("/admin/users/12/accountcredit/credits", creditRequest) ~> csmAuth ~> route ~> check {
+      assert(status == StatusCodes.BadRequest)
+      assert(responseAs[JObject] == errorMessage("InvalidAmount"))
+    }
+  }
+  
   def containsIssuerInformation(j: JValue): Boolean = {
     val issuerInfo: List[List[JField]] = for {
       JObject(child) <- j
@@ -249,7 +296,7 @@ object AdminApiTest {
   val zeroCreditHistory = CreditHistory(Money(BigDecimal(0)), List())
 }
 
-class StubAuthenticator extends ContextAuthenticator[User] {
+class StubAuthenticator extends BearerTokenAuthenticator(null, null)(null) {
   override def apply(v1: RequestContext): Future[Authentication[User]] = Future {
     v1.request.headers.filter(_.name == "Authorization") match {
       case List(authHeader) => {
@@ -265,4 +312,27 @@ class StubAuthenticator extends ContextAuthenticator[User] {
     }
 
   }(scala.concurrent.ExecutionContext.Implicits.global)
+}
+
+class TestFixture extends v2.JsonSupport with MockitoSyrup {
+
+  val adminService = mock[AdminService]
+  val authenticator = mock[BearerTokenAuthenticator]
+
+  val api = new AdminApi(adminService, authenticator)
+  val route = api.route
+
+  override implicit def jsonFormats = api.jsonFormats
+
+  val AccessToken = "accessToken123"
+
+  val authenticatedUserCSR = User("accessToken1234", claims = Map("sub" -> "urn:blinkbox:zuul:user:1", "bb/rol" -> Array(UserRole.CustomerServicesRep)))
+  val authenticatedUserCSM = User("accessToken1234", claims = Map("sub" -> "urn:blinkbox:zuul:user:1", "bb/rol" -> Array(UserRole.CustomerServicesManager)))
+  val authenticatedUserWithoutRequiredRoles = User(AccessToken, claims = Map("sub" -> "urn:blinkbox:zuul:user:2"))
+
+  
+  when(authenticator.withElevation(Elevation.Critical)).thenReturn(authenticator)
+
+  val appConfig = mock[AppConfig]
+  when(appConfig.interface).thenReturn("http://localhost")
 }
