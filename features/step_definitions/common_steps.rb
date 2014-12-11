@@ -1,9 +1,5 @@
-Given(/^I am logged in as an? (CSR|CSM|API) user$/) do | role |
-  if role == 'API'
-    use_api_user
-  else
+Given(/^I am logged in as an? (CSR|CSM) user$/) do | role |
     use_admin_user(role)
-  end
 end
 
 Given(/^an unknown user$/) do
