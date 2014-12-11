@@ -51,13 +51,13 @@ Feature: Admin account credit service
     Then the request fails because I am unauthorised
 
   Scenario: Credit user using a user without admin permissions
-    Given a user with 0.00 in GBP of credit
+    Given a user with 10.00 in GBP of credit
     And I am a logged in user without admin permissions
     When I credit the user 1.01 in GBP with the reason: Goodwill (Technical Issue)
     Then the request fails because I was forbidden
 
   Scenario: Credit user using a requestId that has already been used
-    Given a user with 0.00 in GBP of credit
+    Given a user with 10.00 in GBP of credit
     And I am logged in as a CSR user
     And I credit the user 1.00 in GBP with the reason: Goodwill (Book Issue)
     When I try to credit the user 2.00 in GBP using the same requestId as before
