@@ -5,20 +5,20 @@ Feature: Admin Account Credit
   So that I can charge credit for their book purchases
 
   Scenario: Debit user
-    Given a user with £10 credit balance
+    Given a user with 10.00 in GBP of credit
     And I am logged in as an API user
     When I debit the user 1.01 in GBP
     Then the user has overall credit balance of 8.99 in GBP
 
   Scenario: User does not have enough credit
-    Given a user with £10 credit balance
+    Given a user with 10.00 in GBP of credit
     And I am logged in as an API user
     When I debit the user 11.00 in GBP
     Then the request fails because it was invalid
     And the user has overall credit balance of 10.00 in GBP
 
   Scenario: Debit user using requestId that has already been used
-    Given a user with £10 credit balance
+    Given a user with 10.00 in GBP of credit
     And I am logged in as an API user
     And I debit the user 1.00 in GBP
     When I try to debit the user 2.00 in GBP using the same requestId as before
@@ -26,7 +26,7 @@ Feature: Admin Account Credit
     And the user has overall credit balance of 9 in GBP
 
   Scenario Outline: Debit user with invalid amount
-    Given a user with £10 credit balance
+    Given a user with 10.00 in GBP of credit
     And I am logged in as an API user
     When I debit the user <amount> in GBP
     Then the request fails because it was invalid

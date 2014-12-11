@@ -1,4 +1,4 @@
-Given(/^a user with £(\d+(?:\.)?(?:\d*)) credit balance$/) do | credit_balance |
+Given(/^a user with (\d+(?:\.)?(?:\d*)) in GBP of credit$/) do | credit_balance |
   user = new_public_user
 
   if credit_balance.to_i > 0

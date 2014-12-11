@@ -5,7 +5,7 @@ Feature: Admin account credit service
   So that I can make customers happy
 
   Scenario Outline: Credit user
-    Given a user with £0 credit balance
+    Given a user with 0.00 in GBP of credit
     And I am logged in as a <role> user
     When I credit the user 1.01 in GBP with the reason: Goodwill (Book Issue)
     Then the request is successful
@@ -28,7 +28,7 @@ Feature: Admin account credit service
     | CSR  |
 
   Scenario Outline: Credit user with invalid amount
-    Given a user with £0 credit balance
+    Given a user with 0.00 in GBP of credit
     And I am logged in as a CSR user
     When I credit the user <amount> in GBP with the reason: Goodwill (Book Issue)
     Then the request fails because it was invalid
@@ -39,25 +39,25 @@ Feature: Admin account credit service
     |-1    |
 
   Scenario: Credit user with invalid reason
-    Given a user with £0 credit balance
+    Given a user with 0.00 in GBP of credit
     And I am logged in as a CSR user
     When I credit the user 1 in GBP with the reason: Goodwill (Invalid Reason)
     Then the request fails because it was invalid
 
   Scenario: Credit user using a logged out user
-    Given a user with £0 credit balance
+    Given a user with 0.00 in GBP of credit
     And I am a logged out user
     When I credit the user 1.01 in GBP with the reason: Goodwill (Technical Issue)
     Then the request fails because I am unauthorised
 
   Scenario: Credit user using a user without admin permissions
-    Given a user with £0 credit balance
+    Given a user with 0.00 in GBP of credit
     And I am a logged in user without admin permissions
     When I credit the user 1.01 in GBP with the reason: Goodwill (Technical Issue)
     Then the request fails because I was forbidden
 
   Scenario: Credit user using a requestId that has already been used
-    Given a user with £0 credit balance
+    Given a user with 0.00 in GBP of credit
     And I am logged in as a CSR user
     And I credit the user 1.00 in GBP with the reason: Goodwill (Book Issue)
     When I try to credit the user 2.00 in GBP using the same requestId as before
