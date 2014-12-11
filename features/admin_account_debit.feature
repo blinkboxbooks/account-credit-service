@@ -43,13 +43,13 @@ Feature: Admin Account Credit
     Then the request fails because the user was not found
 
   Scenario: Debit user using a logged out user
-    Given a user with £0 credit balance
+    Given a user with 10.00 in GBP of credit
     And I am a logged out user
     When I debit the user 1.00 in GBP
     Then the request fails because I am unauthorised
 
   Scenario: Debit user using a user without admin permissions
-    Given a user with £0 credit balance
+    Given a user with 10.00 in GBP of credit
     And I am a logged in user without admin permissions
     When I debit the user 1.00 in GBP
     Then the request fails because my role is forbidden
