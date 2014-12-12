@@ -1,8 +1,8 @@
-Given(/^I am logged in as an? (CSR|CSM) user$/) do | role |
-    use_admin_user(role)
+Given(/^I am logged in as a (CSR|CSM) user$/) do |role|
+  use_admin_user(role)
 end
 
-Given(/^an unknown user$/) do
+Given(/^an unknown customer/) do
   use_unknown_user
 end
 

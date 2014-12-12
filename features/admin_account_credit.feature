@@ -5,9 +5,9 @@ Feature: Admin account credit service
   So that I can make customers happy
 
   Scenario Outline: Credit user
-    Given a user with 0.00 in GBP of credit
+    Given a customer with 0.00 in GBP of credit
     And I am logged in as a <role> user
-    When I credit the user 1.01 in GBP with the reason: Goodwill (Book Issue)
+    When I credit the customer 1.01 in GBP with the reason: Goodwill (Book Issue)
     Then the request is successful
     And the user has overall credit balance of 1.01 in GBP
 
@@ -17,9 +17,9 @@ Feature: Admin account credit service
     | CSR  |
 
   Scenario Outline: Credit unknown user
-    Given an unknown user
+    Given an unknown customer
     And I am logged in as a <role> user
-    When I credit the user 1.01 in GBP with the reason: Goodwill (Technical Issue)
+    When I credit the customer 1.01 in GBP with the reason: Goodwill (Technical Issue)
     Then the request fails because the user was not found
 
   Examples:
@@ -28,9 +28,9 @@ Feature: Admin account credit service
     | CSR  |
 
   Scenario Outline: Credit user with invalid amount
-    Given a user with 0.00 in GBP of credit
+    Given a customer with 0.00 in GBP of credit
     And I am logged in as a CSR user
-    When I credit the user <amount> in GBP with the reason: Goodwill (Book Issue)
+    When I credit the customer <amount> in GBP with the reason: Goodwill (Book Issue)
     Then the request fails because it was invalid
 
     Examples:
@@ -39,27 +39,27 @@ Feature: Admin account credit service
     |-1    |
 
   Scenario: Credit user with invalid reason
-    Given a user with 0.00 in GBP of credit
+    Given a customer with 0.00 in GBP of credit
     And I am logged in as a CSR user
-    When I credit the user 1 in GBP with the reason: Goodwill (Invalid Reason)
+    When I credit the customer 1 in GBP with the reason: Goodwill (Invalid Reason)
     Then the request fails because it was invalid
 
   Scenario: Credit user using a logged out user
-    Given a user with 0.00 in GBP of credit
+    Given a customer with 0.00 in GBP of credit
     And I am a logged out user
-    When I credit the user 1.01 in GBP with the reason: Goodwill (Technical Issue)
+    When I credit the customer 1.01 in GBP with the reason: Goodwill (Technical Issue)
     Then the request fails because I am unauthorised
 
   Scenario: Credit user using a user without admin permissions
-    Given a user with 10.00 in GBP of credit
+    Given a customer with 10.00 in GBP of credit
     And I am a logged in user without admin permissions
-    When I credit the user 1.01 in GBP with the reason: Goodwill (Technical Issue)
+    When I credit the customer 1.01 in GBP with the reason: Goodwill (Technical Issue)
     Then the request fails because I was forbidden
 
   Scenario: Credit user using a requestId that has already been used
-    Given a user with 10.00 in GBP of credit
+    Given a customer with 10.00 in GBP of credit
     And I am logged in as a CSR user
-    And I credit the user 1.00 in GBP with the reason: Goodwill (Book Issue)
-    When I try to credit the user 2.00 in GBP using the same requestId as before
+    And I credit the customer 1.00 in GBP with the reason: Goodwill (Book Issue)
+    When I try to credit the customer 2.00 in GBP using the same requestId as before
     Then the request is successful
     And the user has overall credit balance of 1.00 in GBP

@@ -1,4 +1,4 @@
-Given(/^I (?:try to )?debit the user (-?\d+(?:\.)?(?:\d*)) in GBP( using the same requestId as before)?$/) do | amount_debit, use_last_request_id |
+Given(/^I (?:try to )?debit the customer (-?\d+(?:\.)?(?:\d*)) in GBP( using the same requestId as before)?$/) do |amount_debit, use_last_request_id|
   if use_last_request_id
     request_id = last_request_id
   else
