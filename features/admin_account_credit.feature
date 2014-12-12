@@ -9,7 +9,7 @@ Feature: Admin account credit service
     And I am logged in as a <role> user
     When I credit the customer 1.01 in GBP with the reason: Goodwill (Book Issue)
     Then the request is successful
-    And the user has overall credit balance of 1.01 in GBP
+    And the customer has overall credit balance of 1.01 in GBP
 
   Examples:
     | role |
@@ -62,4 +62,4 @@ Feature: Admin account credit service
     And I credit the customer 1.00 in GBP with the reason: Goodwill (Book Issue)
     When I try to credit the customer 2.00 in GBP using the same requestId as before
     Then the request is successful
-    And the user has overall credit balance of 1.00 in GBP
+    And the customer has overall credit balance of 1.00 in GBP

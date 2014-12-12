@@ -8,14 +8,14 @@ Feature: Admin Account Credit
     Given a customer with 10.00 in GBP of credit
     And I am logged in as a CSM user
     When I debit the customer 1.01 in GBP
-    Then the user has overall credit balance of 8.99 in GBP
+    Then the customer has overall credit balance of 8.99 in GBP
 
   Scenario: User does not have enough credit
     Given a customer with 10.00 in GBP of credit
     And I am logged in as a CSM user
     When I debit the customer 11.00 in GBP
     Then the request fails because it was invalid
-    And the user has overall credit balance of 10.00 in GBP
+    And the customer has overall credit balance of 10.00 in GBP
 
   Scenario: Debit user using requestId that has already been used
     Given a customer with 10.00 in GBP of credit
@@ -23,7 +23,7 @@ Feature: Admin Account Credit
     And I debit the customer 1.00 in GBP
     When I try to debit the customer 2.00 in GBP using the same requestId as before
     Then the request was successful
-    And the user has overall credit balance of 9 in GBP
+    And the customer has overall credit balance of 9 in GBP
 
   Scenario Outline: Debit user with invalid amount
     Given a customer with 10.00 in GBP of credit
