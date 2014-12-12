@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.13.3 ([#38](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/38) 2014-12-12 13:31:17)
+
+Add credit acceptance improvements
+
+Test Improvement: Now that the Credit endpoint is available and working I have executed the acceptance tests against it and have made some corrections to them.
+
 ## 0.13.2 ([#36](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/36) 2014-12-12 12:05:58)
 
 Debit acceptance tests
