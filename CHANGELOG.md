@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.13.2 ([#36](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/36) 2014-12-12 12:05:58)
+
+Debit acceptance tests
+
+Test Improvement: Adding admin account debit acceptance tests.
+http://jira.blinkbox.local/jira/browse/CRED-19
+
 ## 0.13.1 ([#34](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/34) 2014-12-05 12:31:24)
 
 Fix broken test
