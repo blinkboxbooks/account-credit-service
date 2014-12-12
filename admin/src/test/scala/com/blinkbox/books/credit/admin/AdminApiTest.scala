@@ -110,7 +110,8 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
         verify(adminService).addDebit(123, amount, "good")
         assert(status == StatusCodes.NoContent)
       }
-    }¬
+      reset(adminService)
+    }
   }
 
   it should "400 on add debit endpoint, if trying to debit more credit than they have" in new TestFixture {
