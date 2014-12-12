@@ -3,7 +3,7 @@ Given(/^I am logged in as a (CSR|CSM) user$/) do |role|
 end
 
 Given(/^an unknown customer/) do
-  use_unknown_user
+  use_unknown_customer
 end
 
 Given(/^I am a logged in user without admin permissions$/) do
