@@ -6,7 +6,7 @@ Feature: Admin Credit History
 # CREDIT-52
   @in-progress
   Scenario: Credit reasons in credit history
-    Given a user has the following credit history:
+    Given a customer has the following credit history:
       | event_type | amount | reason                    |
       | credit     | 1.00   | GoodwillBookIssue         |
       | credit     | 1.01   | GoodwillTechnicalIssue    |
@@ -22,7 +22,7 @@ Feature: Admin Credit History
     And the credit history contains the above events
 
   Scenario: Requesting credit history as CSR user and checking which fields returned
-    Given a user with credit history
+    Given a customer with credit history
     And I am logged in as a CSM user
     When I request for the user's credit history
     Then the event items in the history response contains the following attributes:
@@ -33,7 +33,7 @@ Feature: Admin Credit History
 #      | issuer   | # removing check for issuer until functionality is developed (CREDIT-60)
 
   Scenario: Requesting credit history as CSM user and checking which fields returned
-    Given a user with credit history
+    Given a customer with credit history
     And I am logged in as a CSR user
     When I request for the user's credit history
     Then the event items in the history response contains the following attributes:
@@ -45,13 +45,13 @@ Feature: Admin Credit History
       | issuer   |
 
   Scenario: Requesting credit history as unknown user
-    Given a user with credit history
+    Given a customer with credit history
     And I am a logged out user
     When I request for the user's credit history
     Then the request fails because was I am unauthorised
 
   Scenario: Requesting credit history as user without admin permissions
-    Given a user with credit history
+    Given a customer with credit history
     And I am a logged in user without admin permissions
     When I request for the user's credit history
     Then the request fails because my role is forbidden

@@ -1,6 +1,6 @@
 require 'jsonpath'
 
-Given(/^a user has the following credit history:$/) do | table |
+Given(/^a customer has the following credit history:$/) do |table|
   @expected_credit_history = table.hashes
   new_public_user
   table.hashes.each do | event |
@@ -17,7 +17,7 @@ Given(/^a user has the following credit history:$/) do | table |
   end
 end
 
-Given(/^a user with credit history$/) do
+Given(/^a customer with credit history$/) do
   # creating new user with default credit history
   post_admin_account_credit(use_admin_user('csm').access_token, '9.99', 'Credit Refund',
                             user_id_of(new_public_user), new_request_id)
@@ -49,7 +49,7 @@ Then(/^the credit history contains the above events$/) do
   end
 end
 
-Then(/^the event items in the history response (does not )?contains? the following attributes:$/) do | does_not_contain, table |
+Then(/^the event items in the history response (does not )?contains? the following attributes:$/) do |does_not_contain, table|
   attr_list = table.transpose.raw[0]
   attr_list.each do | attr |
     field_exists?(attr, !does_not_contain)
