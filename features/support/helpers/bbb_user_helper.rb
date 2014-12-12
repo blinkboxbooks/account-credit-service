@@ -18,7 +18,7 @@ module KnowsAboutBbbUsers
     @last_public_user = public_user
   end
 
-  def use_unknown_user
+  def use_unknown_customer
     @last_public_user = Blinkbox::User.new(:username => 'unknown-user@bbb.com', :password => 'abc123')
     @last_public_user.instance_eval %Q"
       def user_id
