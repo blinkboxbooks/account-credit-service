@@ -102,7 +102,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   it should "204 on add debit endpoint, as Customer Service Manager and Customer Service Representative" in new TestFixture {
-    Set(authenticatedUserCSR, authenticatedUserCSR).foreach { adminUser =>
+    Set(authenticatedUserCSR, authenticatedUserCSM).foreach { adminUser =>
       when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(adminUser)))
       val amount = Money(BigDecimal.valueOf(90.01), "GBP")
       when(adminService.addDebit(123, amount, "good")).thenReturn(Future.successful(()))
@@ -110,7 +110,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
         verify(adminService).addDebit(123, amount, "good")
         assert(status == StatusCodes.NoContent)
       }
-    }
+    }¬
   }
 
   it should "400 on add debit endpoint, if trying to debit more credit than they have" in new TestFixture {
@@ -199,7 +199,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   it should "400 on add debit endpoint, if missing body" in new TestFixture {
-     when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
     Post("/admin/users/123/accountcredit/debits") ~> route ~> check {
       assert(status == StatusCodes.BadRequest)
     }
@@ -208,7 +208,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   // add Credit tests 
 
   it should "204 NoContent on add Credit endpoint, as Customer Service Manager and Customer Service Representative" in new TestFixture {
-    Set(authenticatedUserCSR, authenticatedUserCSR).foreach { adminUser =>
+    Set(authenticatedUserCSR, authenticatedUserCSM).foreach { adminUser =>
       val amount = Money(BigDecimal.valueOf(90.01), "GBP")
       val creditRequest = CreditRequest(amount, "tests125455")
 
