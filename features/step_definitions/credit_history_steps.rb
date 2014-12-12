@@ -76,6 +76,5 @@ def field_exists?(field_name, exists)
 end
 
 def jsonpath_exists?(path_to_field, expected_is_present)
-  p 'JSON PATH IS: ' + path_to_field.on(last_response_as_string).to_s
   expect(!path_to_field.on(last_response_as_string).empty?).to eq(expected_is_present)
 end
