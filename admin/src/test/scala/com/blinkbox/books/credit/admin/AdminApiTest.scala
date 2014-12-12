@@ -17,7 +17,6 @@ import spray.routing.authentication.{ ContextAuthenticator, Authentication }
 import spray.routing.{ Route, AuthenticationFailedRejection, RequestContext, HttpService }
 import com.blinkbox.books.spray.v2.`application/vnd.blinkbox.books.v2+json`
 import com.blinkbox.books.spray.BearerTokenAuthenticator
-import com.blinkbox.books.spray.BearerTokenAuthenticator.unverifiedIdentityHeaders
 import spray.testkit.ScalatestRouteTest
 import scala.concurrent.Future
 import org.mockito.Matchers._
