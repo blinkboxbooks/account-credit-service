@@ -1,9 +1,9 @@
-@in-progress
 Feature: Admin Credit History
   As a Customer Service person
   I want view a user's credit history
   So that I can verify their credit history when dealing with customer service issues
 
+  @in-progress
   Scenario: Credit reasons in credit history
     Given a user has the following credit history:
       | event_type | amount | reason                    |
@@ -28,9 +28,8 @@ Feature: Admin Credit History
       | type     |
       | dateTime |
       | reason   |
-      | name     |
-      | issuer   |
       | amount   |
+#      | issuer   | # removing check for issuer until functionality is developed (CREDIT-60)
 
   Scenario: Requesting credit history as CSM user and checking which fields returned
     Given a user with credit history
@@ -40,7 +39,6 @@ Feature: Admin Credit History
       | type     |
       | dateTime |
       | reason   |
-      | name     |
       | amount   |
     And the event items in the history response does not contain the following attributes:
       | issuer   |
@@ -57,8 +55,10 @@ Feature: Admin Credit History
     When I request for the user's credit history
     Then the request fails because my role is forbidden
 
+# CREDIT-55
+  @in-progress
   Scenario Outline: Requesting credit history of unknown user
-    Given an unknown user
+    Given an unknown customer
     And I am logged in as a <role> user
     When I request for the user's credit history
     Then the request fails because the user was not found
