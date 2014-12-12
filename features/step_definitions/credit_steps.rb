@@ -19,7 +19,7 @@ end
 Then(/^the customer has(?: overall)? credit balance of ([\d.-]+) in GBP$/) do |expected_credit|
   get_admin_account_credit(last_admin_user.access_token, user_id_of(last_public_user))
 
-  expect(parse_last_api_response['balance']['amount']).to eq(expected_credit.to_f)
+  expect(parse_last_api_response['balance']['value']).to eq(expected_credit.to_f)
   expect(parse_last_api_response['balance']['currency']).to eq('GBP')
 end
 
