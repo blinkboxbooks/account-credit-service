@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.13.4 ([#37](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/37) 2014-12-12 18:26:15)
+
+Cred 54 addredit error400
+
+#### Bugfix
+- AddCredit endpoint working with Critical elevation
+- Added unittests with TestFixture 
+- Changed the request Object  
+
 ## 0.13.3 ([#38](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/38) 2014-12-12 13:31:17)
 
 Add credit acceptance improvements
