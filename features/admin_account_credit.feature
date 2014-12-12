@@ -1,4 +1,3 @@
-@in-progress
 Feature: Admin account credit service
   As a Customer Service person
   I want to be able to credit a user's account
@@ -16,6 +15,7 @@ Feature: Admin account credit service
     | CSM  |
     | CSR  |
 
+  @in-progress
   Scenario Outline: Credit unknown user
     Given an unknown customer
     And I am logged in as a <role> user
@@ -29,7 +29,7 @@ Feature: Admin account credit service
 
   Scenario Outline: Credit user with invalid amount
     Given a customer with 0.00 in GBP of credit
-    And I am logged in as a CSR user
+    And I am logged in as a CSM user
     When I credit the customer <amount> in GBP with the reason: Goodwill (Book Issue)
     Then the request fails because it was invalid
 
@@ -38,9 +38,10 @@ Feature: Admin account credit service
     |0     |
     |-1    |
 
+  @in-progress
   Scenario: Credit user with invalid reason
     Given a customer with 0.00 in GBP of credit
-    And I am logged in as a CSR user
+    And I am logged in as a CSM user
     When I credit the customer 1 in GBP with the reason: Goodwill (Invalid Reason)
     Then the request fails because it was invalid
 
@@ -56,9 +57,10 @@ Feature: Admin account credit service
     When I credit the customer 1.01 in GBP with the reason: Goodwill (Technical Issue)
     Then the request fails because I was forbidden
 
+  @in-progress
   Scenario: Credit user using a requestId that has already been used
     Given a customer with 10.00 in GBP of credit
-    And I am logged in as a CSR user
+    And I am logged in as a CSM user
     And I credit the customer 1.00 in GBP with the reason: Goodwill (Book Issue)
     When I try to credit the customer 2.00 in GBP using the same requestId as before
     Then the request is successful
