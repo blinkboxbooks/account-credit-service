@@ -7,4 +7,5 @@ Then(/^the reasons returned are:$/) do |table|
   actual_reasons = parse_last_api_response['reasons']
 
   expect(expected_reasons & actual_reasons).to eq(expected_reasons)
+  expect(expected_reasons.size).to eq(actual_reasons.size)
 end
