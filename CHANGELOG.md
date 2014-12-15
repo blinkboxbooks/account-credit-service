@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.13.6 ([#40](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/40) 2014-12-15 13:55:55)
+
+switching on Debit acceptance tests
+
+Test Improvement
+Switching on Debit acceptance tests - Credit functionality is now developed and in dev-int which unblocks these tests.
+
 ## 0.13.5 ([#39](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/39) 2014-12-15 11:56:01)
 
 Credit history acceptance enhancements
