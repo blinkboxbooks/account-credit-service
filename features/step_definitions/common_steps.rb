@@ -1,13 +1,9 @@
-Given(/^I am logged in as an? (CSR|CSM|API) user$/) do | role |
-  if role == 'API'
-    use_api_user
-  else
-    use_admin_user(role)
-  end
+Given(/^I am logged in as a (CSR|CSM) user$/) do |role|
+  use_admin_user(role)
 end
 
-Given(/^an unknown user$/) do
-  use_unknown_user
+Given(/^an unknown customer/) do
+  use_unknown_customer
 end
 
 Given(/^I am a logged in user without admin permissions$/) do

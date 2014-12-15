@@ -1,6 +1,6 @@
 package com.blinkbox.books.credit.admin
 
-import com.blinkbox.books.auth.{UserRole, User}
+import com.blinkbox.books.auth.{ UserRole, User, Elevation }
 import com.blinkbox.books.spray.v2
 import com.blinkbox.books.test.MockitoSyrup
 import org.joda.time.DateTime
@@ -16,6 +16,7 @@ import spray.routing.AuthenticationFailedRejection.CredentialsRejected
 import spray.routing.authentication.{ ContextAuthenticator, Authentication }
 import spray.routing.{ Route, AuthenticationFailedRejection, RequestContext, HttpService }
 import com.blinkbox.books.spray.v2.`application/vnd.blinkbox.books.v2+json`
+import com.blinkbox.books.spray.BearerTokenAuthenticator
 import spray.testkit.ScalatestRouteTest
 import scala.concurrent.Future
 import org.mockito.Matchers._
@@ -26,116 +27,97 @@ import org.scalatest.junit.JUnitRunner
 class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService with MockitoSyrup with v2.JsonSupport with BeforeAndAfter {
 
   def actorRefFactory = system
-  val creditHistory = AdminApiTest.dummy
-
-  val adminService = mock[AdminService]
-  val authenticator = new StubAuthenticator
-
-  val api = new AdminApi(adminService, authenticator)
-  val route = api.route
-
-  override implicit def jsonFormats = api.jsonFormats
-
-  val debitRequest = DebitRequest(Money(BigDecimal.valueOf(90.01), "GBP"), "good")
-  val nonGbpDebitRequest = DebitRequest(Money(BigDecimal.valueOf(90.01), "USD"), "good")
-
-  val csrAuth: Authorization = Authorization(OAuth2BearerToken("csr"))
-  val csmAuth: Authorization = Authorization(OAuth2BearerToken("csm"))
-  var csmAndCsrAuth: Authorization = Authorization(OAuth2BearerToken("csr,csm"))
-  val invalidAuth: RequestTransformer = Authorization(OAuth2BearerToken("invalid"))
-
-  val oneMillionPounds = Money(BigDecimal.valueOf(1000000))
-
-  before {
-    reset(adminService)
-  }
-
-  "AdminApi" should "200 on credit history request for known user as CSR" in {
+  
+  "AdminApi" should "200 on credit history request for known user as Customer Service Representative" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
     when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
-    Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
+    Get("/admin/users/123/accountcredit") ~> route ~> check {
       assert(DummyData.expectedForCsr == responseAs[JValue])
       assert(status == StatusCodes.OK)
     }
   }
 
-  it should "200 on credit history request for known user as CSM" in {
+  it should "200 on credit history request for known user as Customer Service Manager" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSM)))
     when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
-    Get("/admin/users/123/accountcredit") ~> csmAuth ~> route ~> check {
+    Get("/admin/users/123/accountcredit") ~> route ~> check {
       assert(DummyData.expectedForCsm == responseAs[JValue])
       assert(status == StatusCodes.OK)
     }
   }
 
-  it should "not show issuer information to CSRs" in {
+  it should "not show issuer information to Customer Service Representatives" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
     when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
-    Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
+    Get("/admin/users/123/accountcredit") ~> route ~> check {
       assert(!containsIssuerInformation(responseAs[JObject]))
     }
   }
 
-  it should "show issuer information to CSMs" in {
+  it should "show issuer information to Customer Service Managers" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSM)))
     when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
-    Get("/admin/users/123/accountcredit") ~> csmAuth ~> route ~> check {
+    Get("/admin/users/123/accountcredit") ~> route ~> check {
       assert(containsIssuerInformation(responseAs[JObject]))
     }
   }
 
-  it should "show issuer information to users with CSR /and/ CSM roles" in {
+  it should "show issuer information to users with Customer Service Representative /and/ Customer Service Manager roles" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCsmAndCsr)))
     when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
-    Get("/admin/users/123/accountcredit") ~> csmAndCsrAuth ~> route ~> check {
+    Get("/admin/users/123/accountcredit") ~> route ~> check {
       assert(containsIssuerInformation(responseAs[JObject]))
     }
   }
 
-  it should "return v2 media type on credit history request" in {
+  it should "return v2 media type on credit history request" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
     when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
-    Get("/admin/users/123/accountcredit") ~> csrAuth ~> route ~> check {
+    Get("/admin/users/123/accountcredit") ~> route ~> check {
       assert(status == StatusCodes.OK)
       assert(mediaType == `application/vnd.blinkbox.books.v2+json`)
     }
   }
 
-  it should "200 on credit history request for unknown user" in {
+  it should "200 on credit history request for unknown user" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
     when(adminService.lookupCreditHistoryForUser(666)).thenReturn(Future.successful(AdminApiTest.zeroCreditHistory))
-    Get("/admin/users/666/accountcredit") ~> csrAuth ~> route ~> check {
+    Get("/admin/users/666/accountcredit") ~> route ~> check {
       assert(status == StatusCodes.OK)
     }
   }
 
-  it should "401 on credit history request when passed incorrect credentials" in {
-    when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
-    Get("/admin/users/123/accountcredit") ~> invalidAuth ~> route ~> check {
+  it should "401 on credit history request when passed incorrect credentials" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, List()))))
+    Get("/admin/users/123/accountcredit") ~> route ~> check {
       assert(status == StatusCodes.Unauthorized)
+      verifyNoMoreInteractions(adminService)
     }
   }
 
-  it should "404 on unexpected path" in {
+  it should "404 on unexpected path" in new TestFixture {
     Get("/nope") ~> route ~> check {
       assert(status == StatusCodes.NotFound)
     }
   }
 
-  it should "204 on add debit endpoint, as CSR" in {
-    val amount = Money(BigDecimal.valueOf(90.01), "GBP")
-    when(adminService.addDebit(123, amount, "good")).thenReturn(Future.successful(()))
-    Post("/admin/users/123/accountcredit/debits", debitRequest) ~> csrAuth ~> route ~> check {
-      verify(adminService).addDebit(123, amount, "good")
-      assert(status == StatusCodes.NoContent)
+  it should "204 on add debit endpoint, as Customer Service Manager and Customer Service Representative" in new TestFixture {
+    Set(authenticatedUserCSR, authenticatedUserCSM).foreach { adminUser =>
+      when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(adminUser)))
+      val amount = Money(BigDecimal.valueOf(90.01), "GBP")
+      when(adminService.addDebit(123, amount, "good")).thenReturn(Future.successful(()))
+      Post("/admin/users/123/accountcredit/debits", debitRequest) ~> route ~> check {
+        verify(adminService).addDebit(123, amount, "good")
+        assert(status == StatusCodes.NoContent)
+      }
+      reset(adminService)
     }
   }
 
-  it should "204 on add debit endpoint, as CSM" in {
-    val amount = Money(BigDecimal.valueOf(90.01), "GBP")
-    when(adminService.addDebit(123, amount, "good")).thenReturn(Future.successful(()))
-    Post("/admin/users/123/accountcredit/debits", debitRequest) ~> csmAuth ~> route ~> check {
-      verify(adminService).addDebit(123, amount, "good")
-      assert(status == StatusCodes.NoContent)
-    }
-  }
-
-  it should "400 on add debit endpoint, if trying to debit more credit than they have" in {
+  it should "400 on add debit endpoint, if trying to debit more credit than they have" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
     when(adminService.addDebit(any[Int], any[Money], any[String])).thenReturn(Future.failed(new InsufficientFundsException))
-    Post("/admin/users/123/accountcredit/debits", debitRequest) ~> csrAuth ~> route ~> check {
+    Post("/admin/users/123/accountcredit/debits", debitRequest) ~> route ~> check {
       assert(status == StatusCodes.BadRequest)
       assert(responseAs[JObject] == errorMessage("InsufficientFunds"))
     }
@@ -159,62 +141,104 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
    *    * whenever we notice that particular debit (uniquely identified by the requestId) has already been applied
    *
    */
-  it should "204 on add debit endpoint, if requestId has previously succeeded, even if the debit is more than currently available" in {
+  it should "204 on add debit endpoint, if requestId has previously succeeded, even if the debit is more than currently available" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
     when(adminService.hasRequestAlreadyBeenProcessed("good")).thenReturn(true)
-    Post("/admin/users/123/accountcredit/debits", debitRequest) ~> csrAuth ~> route ~> check {
+    Post("/admin/users/123/accountcredit/debits", debitRequest) ~> route ~> check {
       verify(adminService, never()).addDebit(any[Int], any[Money], any[String])
       assert(status == StatusCodes.NoContent)
     }
   }
 
-  it should "400 on add debit endpoint, if trying to debit non-GBP" in {
-    Post("/admin/users/123/accountcredit/debits", nonGbpDebitRequest) ~> csrAuth ~> route ~> check {
+  it should "400 on add debit endpoint, if trying to debit non-GBP" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
+    Post("/admin/users/123/accountcredit/debits", nonGbpDebitRequest) ~> route ~> check {
       assert(status == StatusCodes.BadRequest)
       assert(responseAs[JObject] == errorMessage("UnsupportedCurrency"))
     }
   }
 
-  it should "400 on add debit endpoint, if trying to debit a zero amount" in {
+  it should "400 on add debit endpoint, if trying to debit a zero amount" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
     val zeroCreditRequest = DebitRequest(Money(BigDecimal.valueOf(0), "GBP"), "good")
-    Post("/admin/users/123/accountcredit/debits", zeroCreditRequest) ~> csrAuth ~> route ~> check {
+    Post("/admin/users/123/accountcredit/debits", zeroCreditRequest) ~> route ~> check {
       assert(status == StatusCodes.BadRequest)
       assert(responseAs[JObject] == errorMessage("InvalidAmount"))
     }
   }
 
-  it should "400 on add debit endpoint, if trying to debit a negative amount" in {
+  it should "400 on add debit endpoint, if trying to debit a negative amount" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
     val negativeCreditRequest = DebitRequest(Money(BigDecimal.valueOf(-1), "GBP"), "good")
-    Post("/admin/users/123/accountcredit/debits", negativeCreditRequest) ~> csrAuth ~> route ~> check {
+    Post("/admin/users/123/accountcredit/debits", negativeCreditRequest) ~> route ~> check {
       assert(status == StatusCodes.BadRequest)
       assert(responseAs[JObject] == errorMessage("InvalidAmount"))
     }
   }
 
-  it should "401 on add debit endpoint, with no auth" in {
+  it should "401 on add debit endpoint, with no auth" in new TestFixture  {
+   when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsMissing, List()))))
     Post("/admin/users/123/accountcredit/debits") ~> route ~> check {
       assert(status == StatusCodes.Unauthorized)
     }
   }
 
-  it should "401 on add debit endpoint, with invalid credentials" in {
-    Post("/admin/users/123/accountcredit/debits") ~> invalidAuth ~> route ~> check {
+  it should "401 on add debit endpoint, with invalid credentials" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, List()))))
+    Post("/admin/users/123/accountcredit/debits") ~> route ~> check {
       assert(status == StatusCodes.Unauthorized)
+      verifyNoMoreInteractions(adminService)
     }
   }
 
-  it should "403 on add debit endpoint, with unauthorised credentials" in {
-    val unauthorisedAuth: Authorization = Authorization(OAuth2BearerToken("unauthorised"))
-    Post("/admin/users/123/accountcredit/debits") ~> unauthorisedAuth ~> route ~> check {
+  it should "403 on add debit endpoint, with unauthorised credentials" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserWithoutRequiredRoles)))
+    Post("/admin/users/123/accountcredit/debits") ~> route ~> check {
       assert(status == StatusCodes.Forbidden)
+      verifyNoMoreInteractions(adminService)
     }
   }
 
-  it should "400 on add debit endpoint, if missing body" in {
-    Post("/admin/users/123/accountcredit/debits") ~> csrAuth ~> route ~> check {
+  it should "400 on add debit endpoint, if missing body" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
+    Post("/admin/users/123/accountcredit/debits") ~> route ~> check {
       assert(status == StatusCodes.BadRequest)
     }
   }
 
+  // add Credit tests 
+
+  it should "204 NoContent on add Credit endpoint, as Customer Service Manager and Customer Service Representative" in new TestFixture {
+    Set(authenticatedUserCSR, authenticatedUserCSM).foreach { adminUser =>
+      val amount = Money(BigDecimal.valueOf(90.01), "GBP")
+      val creditRequest = CreditRequest(amount, "tests125455")
+
+      when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(adminUser)))
+      when(adminService.addCredit(creditRequest, 12)(adminUser)).thenReturn(Future.successful(()))
+
+      Post("/admin/users/12/accountcredit/credits", creditRequest) ~> route ~> check {
+        verify(adminService).addCredit(CreditRequest(amount, "tests125455"), 12)(adminUser)
+        assert(status == StatusCodes.NoContent)
+      }
+    }
+  }
+
+  it should "401 when add credit request with incorrect credentials" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, List()))))
+    Post("/admin/users/12/accountcredit/credits") ~> route ~> check {
+      assert(status == StatusCodes.Unauthorized)
+      verifyNoMoreInteractions(adminService)
+    }
+  }
+
+  it should "403 on add credit request, without the required roles" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserWithoutRequiredRoles)))
+    Post("/admin/users/123/accountcredit/credits") ~> route ~> check {
+      assert(status == StatusCodes.Forbidden)
+      verifyNoMoreInteractions(adminService)
+    }
+  }
+   
   def containsIssuerInformation(j: JValue): Boolean = {
     val issuerInfo: List[List[JField]] = for {
       JObject(child) <- j
@@ -249,20 +273,26 @@ object AdminApiTest {
   val zeroCreditHistory = CreditHistory(Money(BigDecimal(0)), List())
 }
 
-class StubAuthenticator extends ContextAuthenticator[User] {
-  override def apply(v1: RequestContext): Future[Authentication[User]] = Future {
-    v1.request.headers.filter(_.name == "Authorization") match {
-      case List(authHeader) => {
-        val rolesInRequest: Set[String] = authHeader.value.substring("Bearer ".length).split(',').toSet
-        val allowedRoles = Set("csr", "csm", "unauthorised")
-        val validAuthentication = allowedRoles.intersect(rolesInRequest).nonEmpty
-        if (validAuthentication)
-          Right(User(1, Some(1), "foo", Map("bb/rol" -> rolesInRequest.toList)))
-        else
-          Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, List()))
-      }
-      case List() => Left(AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsMissing, List()))
-    }
+class TestFixture extends v2.JsonSupport with MockitoSyrup {
 
-  }(scala.concurrent.ExecutionContext.Implicits.global)
+  val adminService = mock[AdminService]
+  val authenticator: BearerTokenAuthenticator = mock[BearerTokenAuthenticator]
+  val creditHistory = AdminApiTest.dummy
+
+  val api = new AdminApi(adminService, authenticator)
+  val route = api.route
+
+  override implicit def jsonFormats = api.jsonFormats
+
+  val accessToken = "accessToken123"
+
+  val authenticatedUserCSR = User(accessToken, claims = Map("sub" -> "urn:blinkbox:zuul:user:1", "bb/rol" -> Array(UserRole.CustomerServicesRep)))
+  val authenticatedUserCSM = User(accessToken, claims = Map("sub" -> "urn:blinkbox:zuul:user:1", "bb/rol" -> Array(UserRole.CustomerServicesManager)))
+  val authenticatedUserCsmAndCsr = User(accessToken, claims = Map("sub" -> "urn:blinkbox:zuul:user:1", "bb/rol" -> Array(UserRole.CustomerServicesManager, UserRole.CustomerServicesRep)))
+  val authenticatedUserWithoutRequiredRoles = User(accessToken, claims = Map("sub" -> "urn:blinkbox:zuul:user:2"))
+
+  when(authenticator.withElevation(Elevation.Critical)).thenReturn(authenticator)
+
+  val debitRequest = DebitRequest(Money(BigDecimal.valueOf(90.01), "GBP"), "good")
+  val nonGbpDebitRequest = DebitRequest(Money(BigDecimal.valueOf(90.01), "USD"), "good")
 }

@@ -10,17 +10,19 @@ import spray.routing._
 import Directives._
 import com.blinkbox.books.auth.{ UserRole, User }
 import com.blinkbox.books.spray.AuthDirectives._
-import spray.routing.authentication.ContextAuthenticator
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.blinkbox.books.auth.UserRole._
 import com.blinkbox.books.auth.Constraints._
 import com.blinkbox.books.credit.admin.RenderingFunctions._
 import com.blinkbox.books.spray.MonitoringDirectives.monitor
+import com.blinkbox.books.spray.BearerTokenAuthenticator
 import com.blinkbox.books.spray.v2.Implicits.throwableMarshaller
+import com.blinkbox.books.auth.Elevation.Critical
+import spray.routing.authentication.ContextAuthenticator
 import scala.util.Success
 import scala.util.Failure
 
-class AdminApi(adminService: AdminService, authenticator: ContextAuthenticator[User]) extends v2.JsonSupport with StrictLogging {
+class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticator) extends v2.JsonSupport with StrictLogging {
 
   override implicit def jsonFormats = {
     val typeHints =
@@ -62,27 +64,24 @@ class AdminApi(adminService: AdminService, authenticator: ContextAuthenticator[U
               }
             }
           } ~
-          path("credits") {
-            authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { implicit adminUser =>
-              entity(as[Credit]) { credit =>
-                if (credit.amount.value <= BigDecimal(0)) {
-                  complete(StatusCodes.BadRequest)
-                } else if (credit.amount.currency != "GBP") {
-                  complete(StatusCodes.BadRequest)
-                } else if (adminService.hasRequestAlreadyBeenProcessed(credit.requestId)) {
-                  complete(StatusCodes.Created)
-                } else {
-                  onSuccess(adminService.addCredit(credit, userId)) { resp =>
-                    complete(StatusCodes.Created)
+              path("credits") {
+                authenticateAndAuthorize(authenticator.withElevation(Critical), hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { implicit adminUser =>
+                  entity(as[CreditRequest]) { credit =>
+                    if (credit.amount.value <= BigDecimal(0)) {
+                      complete(StatusCodes.BadRequest, v2.Error("InvalidAmount", None))
+                    } else {
+                      onSuccess(adminService.addCredit(credit, userId)) { resp =>
+                        complete(StatusCodes.NoContent)
+                      }
+                    }
                   }
                 }
               }
-            }
           }
-        }
       }
     }
   }
 }
 
 case class DebitRequest(amount: Money, requestId: String)
+case class CreditRequest(amount: Money, requestId: String)

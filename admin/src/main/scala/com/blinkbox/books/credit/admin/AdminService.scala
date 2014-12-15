@@ -7,7 +7,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 trait AdminService {
   def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit]
-  def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[Unit]
+  def addCredit(req: CreditRequest, customerId: Int)(implicit adminUser: User): Future[Unit]
   def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory]
   def hasRequestAlreadyBeenProcessed(requestId: String): Boolean
 }
@@ -25,16 +25,16 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) 
   override def hasRequestAlreadyBeenProcessed(requestId: String): Boolean =
     accountCreditStore.getCreditBalanceByRequestId(requestId).nonEmpty
 
-  override def addCredit(req: Credit, customerId: Int)(implicit adminUser: User): Future[Unit] = Future {
+  override def addCredit(req: CreditRequest, customerId: Int)(implicit adminUser: User): Future[Unit] = Future {
     accountCreditStore.addCredit(copyAddCreditReqToCreditBalance(req, customerId, adminUser))
   }
 
-  private def copyAddCreditReqToCreditBalance(req: Credit, customerId: Int, adminUser: User): CreditBalance = CreditBalance(
+  private def copyAddCreditReqToCreditBalance(req: CreditRequest, customerId: Int, adminUser: User): CreditBalance = CreditBalance(
     id = None,
     requestId = req.requestId,
     value = req.amount.value,
     transactionType = TransactionType.Credit,
-    reason = Some(creditReasonMapping(req.reason)),
+    reason = Some(Reason.CreditVoucherCode),
     createdAt = clock.now(),
     updatedAt = None,
     customerId = customerId,

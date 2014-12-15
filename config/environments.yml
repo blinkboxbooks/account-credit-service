@@ -2,8 +2,10 @@ dev_int:
   servers:
     credit: https://api.dev.bbbtest2.com/
     health: http://harris.blinkbox.local:7011/
+    auth: https://auth.dev.bbbtest2.com
 
 local:
   servers:
     credit: http://127.0.0.1:9877/
     health: http://127.0.0.1:9877/
+    auth: http://localhost:9393/

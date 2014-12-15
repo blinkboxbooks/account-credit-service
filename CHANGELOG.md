@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.13.6 ([#40](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/40) 2014-12-15 13:55:55)
+
+switching on Debit acceptance tests
+
+Test Improvement
+Switching on Debit acceptance tests - Credit functionality is now developed and in dev-int which unblocks these tests.
+
+## 0.13.5 ([#39](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/39) 2014-12-15 11:56:01)
+
+Credit history acceptance enhancements
+
+Test Improvement: Credit-history tests have been unblocked from running locally now that Credit functionality is available. I've executed this tests and have made some corrections to them.
+
+## 0.13.4 ([#37](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/37) 2014-12-12 18:26:15)
+
+Cred 54 addredit error400
+
+#### Bugfix
+- AddCredit endpoint working with Critical elevation
+- Added unittests with TestFixture 
+- Changed the request Object  
+
+## 0.13.3 ([#38](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/38) 2014-12-12 13:31:17)
+
+Add credit acceptance improvements
+
+Test Improvement: Now that the Credit endpoint is available and working I have executed the acceptance tests against it and have made some corrections to them.
+
+## 0.13.2 ([#36](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/36) 2014-12-12 12:05:58)
+
+Debit acceptance tests
+
+Test Improvement: Adding admin account debit acceptance tests.
+http://jira.blinkbox.local/jira/browse/CRED-19
+
 ## 0.13.1 ([#34](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/34) 2014-12-05 12:31:24)
 
 Fix broken test

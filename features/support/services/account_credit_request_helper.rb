@@ -29,10 +29,9 @@ module KnowsAboutAccountCreditRequests
       :requestId => transaction_id,
       :amount => {
         :currency => "GBP",
-        :value => amount
+        :value => amount.to_f
       },
       :reason => reason,
-      :type => 'credit'
     }
 
     http_post :credit, "/admin/users/#{user_id}/accountcredit/credits", request_body, headers
