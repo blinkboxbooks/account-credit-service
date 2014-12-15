@@ -1,4 +1,3 @@
-@in-progress
 Feature: Admin Account Credit
   As a client of account-credit-service
   I want to debit from a user's credit balance
@@ -17,6 +16,7 @@ Feature: Admin Account Credit
     Then the request fails because it was invalid
     And the customer has overall credit balance of 10.00 in GBP
 
+  @in-progress
   Scenario: Debit user using requestId that has already been used
     Given a customer with 10.00 in GBP of credit
     And I am logged in as a CSM user
@@ -36,6 +36,7 @@ Feature: Admin Account Credit
     |0     |
     |-1    |
 
+  @in-progress
   Scenario: Debit unknown user
     Given an unknown customer
     And I am logged in as a CSM user

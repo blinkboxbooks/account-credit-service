@@ -2,7 +2,7 @@ Given(/^a customer with ([\d.-]+) in GBP of credit$/) do |credit_balance|
   user = new_public_user
 
   if credit_balance.to_i > 0
-    post_admin_account_credit(use_admin_user('csr').access_token, credit_balance, 'Credit Promotions', user_id_of(user), new_request_id)
+    post_admin_account_credit(use_admin_user('csm').access_token, credit_balance, 'Credit Promotions', user_id_of(user), new_request_id)
   end
 end
 
