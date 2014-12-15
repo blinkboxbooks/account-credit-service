@@ -1,6 +1,6 @@
 require 'jsonpath'
 
-Given(/^a user has the following credit history:$/) do | table |
+Given(/^a customer has the following credit history:$/) do |table|
   @expected_credit_history = table.hashes
   new_public_user
   table.hashes.each do | event |
@@ -17,7 +17,7 @@ Given(/^a user has the following credit history:$/) do | table |
   end
 end
 
-Given(/^a user with credit history$/) do
+Given(/^a customer with credit history$/) do
   # creating new user with default credit history
   post_admin_account_credit(use_admin_user('csm').access_token, '9.99', 'Credit Refund',
                             user_id_of(new_public_user), new_request_id)
@@ -29,9 +29,9 @@ end
 
 Then(/^the credit history contains the above events$/) do
   response_hash = parse_last_api_response
-  @expected_credit_history.reverse.each_with_index do | event, index | # expecting credit history response to order events by desc timestamp
+  @expected_credit_history.reverse.each_with_index do |event, index| # expecting credit history response to order events by desc timestamp
     # checking common fields
-    expect(response_hash['items'][index]['amount']['amount'].to_f).to eq(event['amount'].to_f)
+    expect(response_hash['items'][index]['amount']['value'].to_f).to eq(event['amount'].to_f)
     expect(response_hash['items'][index]['amount']['currency']).to eq('GBP')
     expect(Time.parse(response_hash['items'][index]['dateTime'])).to be_truthy
 
@@ -49,7 +49,7 @@ Then(/^the credit history contains the above events$/) do
   end
 end
 
-Then(/^the event items in the history response (does not )?contains? the following attributes:$/) do | does_not_contain, table |
+Then(/^the event items in the history response (does not )?contains? the following attributes:$/) do |does_not_contain, table|
   attr_list = table.transpose.raw[0]
   attr_list.each do | attr |
     field_exists?(attr, !does_not_contain)
@@ -76,5 +76,5 @@ def field_exists?(field_name, exists)
 end
 
 def jsonpath_exists?(path_to_field, expected_is_present)
-  expect(!path_to_field.on(last_response_as_string).empty?).to expected_is_present
+  expect(!path_to_field.on(last_response_as_string).empty?).to eq(expected_is_present)
 end
