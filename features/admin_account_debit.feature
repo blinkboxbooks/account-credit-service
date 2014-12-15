@@ -1,4 +1,4 @@
-Feature: Admin Account Credit
+Feature: Admin Account Debit
   As a client of account-credit-service
   I want to debit from a user's credit balance
   So that I can charge credit for their book purchases
