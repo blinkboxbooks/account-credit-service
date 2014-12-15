@@ -19,6 +19,16 @@ Feature: Reasons List Endpoint
       | Hudl2Promotion            |
 
   Examples:
-    | role |
-    | CSM  |
-    | CSR  |
+  | role |
+  | CSM  |
+  | CSR  |
+
+  Scenario: Request reasons list as a logged out user
+    Given I am a logged out user
+    When I make a request for the reasons list
+    Then the request fails because I am unauthorised
+
+  Scenario: Request reasons list as a user without admin permissions
+    Given I am a logged in user without admin permissions
+    When I make a request for the reasons list
+    Then the request fails because my role is forbidden
