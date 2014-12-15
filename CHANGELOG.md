@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.13.5 ([#39](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/39) 2014-12-15 11:56:01)
+
+Credit history acceptance enhancements
+
+Test Improvement: Credit-history tests have been unblocked from running locally now that Credit functionality is available. I've executed this tests and have made some corrections to them.
+
 ## 0.13.4 ([#37](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/37) 2014-12-12 18:26:15)
 
 Cred 54 addredit error400
