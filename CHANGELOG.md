@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.1 ([#44](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/44) 2014-12-16 17:50:27)
+
+Add postman collection
+
+patch
+
 ## 0.14.0 ([#42](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/42) 2014-12-16 17:06:54)
 
 CRED-63 Add 'get credit reasons' endpoint.
