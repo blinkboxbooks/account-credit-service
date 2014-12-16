@@ -22,12 +22,14 @@ import scala.concurrent.Future
 import org.mockito.Matchers._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import scala.concurrent.duration._
 
 @RunWith(classOf[JUnitRunner])
 class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService with MockitoSyrup with v2.JsonSupport with BeforeAndAfter {
 
   def actorRefFactory = system
-  
+  implicit val routeTestTimeout = RouteTestTimeout(5.second)
+
   "AdminApi" should "200 on credit history request for known user as Customer Service Representative" in new TestFixture {
     when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
     when(adminService.lookupCreditHistoryForUser(123)).thenReturn(Future.successful(creditHistory))
