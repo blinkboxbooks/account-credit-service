@@ -22,6 +22,7 @@ import scala.concurrent.Future
 import org.mockito.Matchers._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import com.blinkbox.books.time.StoppedClock
 
 @RunWith(classOf[JUnitRunner])
 class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService with MockitoSyrup with v2.JsonSupport with BeforeAndAfter {
@@ -208,18 +209,19 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   // add Credit tests 
 
-  it should "204 NoContent on add Credit endpoint, as Customer Service Manager and Customer Service Representative" in new TestFixture {
+  it should "204 NoContent on add Credit with Reason, as Customer Service Manager and Customer Service Representative" in new TestFixture {
     Set(authenticatedUserCSR, authenticatedUserCSM).foreach { adminUser =>
       val amount = Money(BigDecimal.valueOf(90.01), "GBP")
-      val creditRequest = CreditRequest(amount, "tests125455")
+      val creditRequest = CreditRequest(amount, "tests125455", "CreditRefund")
 
       when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(adminUser)))
       when(adminService.addCredit(creditRequest, 12)(adminUser)).thenReturn(Future.successful(()))
 
       Post("/admin/users/12/accountcredit/credits", creditRequest) ~> route ~> check {
-        verify(adminService).addCredit(CreditRequest(amount, "tests125455"), 12)(adminUser)
+        verify(adminService).addCredit(CreditRequest(amount, "tests125455", "CreditRefund"), 12)(adminUser)
         assert(status == StatusCodes.NoContent)
       }
+      reset(adminService)
     }
   }
 
@@ -238,7 +240,36 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
       verifyNoMoreInteractions(adminService)
     }
   }
-   
+
+  it should "400 on add credit request, with invalid request fields" in new TestFixture {
+    Set("invalid_reason", "invalid_credit_amount").foreach { invalidRequestMsg =>
+
+      when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
+      when(adminService.addCredit(any[CreditRequest], any[Int])(eql(authenticatedUserCSR))).thenReturn(Future.failed(new InvalidRequestException(invalidRequestMsg)))
+
+      Post("/admin/users/12/accountcredit/credits", CreditRequest(null, null, null)) ~> route ~> check {
+        assert(responseAs[JObject] == errorMessage(invalidRequestMsg))
+      }
+    }
+  }
+
+  it should "should throw InvalidRequestException on invalid reason" in new TestFixture {
+    val e = intercept[InvalidRequestException] {
+      defaultAdminService.creditReasonMapping("noReason")
+    }
+    assert(e.message == "invalid_reason")
+  }
+
+  it should "should throw InvalidRequestException on invalid credit amount" in new TestFixture {
+    Set(0, -1).foreach { wrongValue =>
+      val creditRequest = CreditRequest(Money(BigDecimal(wrongValue), "GBP"), "tests125455", "CreditRefund")
+      val e = intercept[InvalidRequestException] {
+        defaultAdminService.validateRequest(creditRequest)
+      }
+      assert(e.message == "invalid_credit_amount")
+    }
+  }
+  
   def containsIssuerInformation(j: JValue): Boolean = {
     val issuerInfo: List[List[JField]] = for {
       JObject(child) <- j
@@ -273,9 +304,9 @@ object AdminApiTest {
   val zeroCreditHistory = CreditHistory(Money(BigDecimal(0)), List())
 }
 
-class TestFixture extends v2.JsonSupport with MockitoSyrup {
-
-  val adminService = mock[AdminService]
+class TestFixture extends v2.JsonSupport with MockitoSyrup  {
+  
+  val adminService = mock[AdminService]  
   val authenticator: BearerTokenAuthenticator = mock[BearerTokenAuthenticator]
   val creditHistory = AdminApiTest.dummy
 
@@ -295,4 +326,8 @@ class TestFixture extends v2.JsonSupport with MockitoSyrup {
 
   val debitRequest = DebitRequest(Money(BigDecimal.valueOf(90.01), "GBP"), "good")
   val nonGbpDebitRequest = DebitRequest(Money(BigDecimal.valueOf(90.01), "USD"), "good")
+  
+  val accountCreditStore = mock[AccountCreditStore]
+  val clock = StoppedClock()
+  val defaultAdminService = new DefaultAdminService(accountCreditStore, clock)
 }

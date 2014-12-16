@@ -29,31 +29,39 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) 
     accountCreditStore.addCredit(copyAddCreditReqToCreditBalance(req, customerId, adminUser))
   }
 
-  private def copyAddCreditReqToCreditBalance(req: CreditRequest, customerId: Int, adminUser: User): CreditBalance = CreditBalance(
+  private def copyAddCreditReqToCreditBalance(req: CreditRequest, customerId: Int, adminUser: User): CreditBalance = {
+    validateRequest(req)
+    CreditBalance(     
     id = None,
     requestId = req.requestId,
     value = req.amount.value,
     transactionType = TransactionType.Credit,
-    reason = Some(Reason.CreditVoucherCode),
+    reason = Some(creditReasonMapping(req.reason)),
     createdAt = clock.now(),
     updatedAt = None,
     customerId = customerId,
     adminUserId = Some(adminUser.id))
+  }
 
   private def getAdminUserRoles(user: User): Set[String] = user.roles.map(r => r.toString())
-  
-  private def creditReasonMapping(creditReason: CreditReason.Reason): Reason.Reason = {
-    
-    creditReason  match {
-      case CreditReason.CreditRefund => Reason.CreditRefund
-      case CreditReason.CreditVoucherCode => Reason.CreditVoucherCode
-      case CreditReason.GoodwillBookIssue => Reason.GoodwillBookIssue
-      case CreditReason.GoodwillCustomerRetention => Reason.GoodwillCustomerRetention
-      case CreditReason.GoodwillServiceIssue => Reason.GoodwillServiceIssue
-      case CreditReason.GoodwillTechnicalIssue => Reason.GoodwillTechnicalIssue
-      case CreditReason.Hudl2Promotion => Reason.Hudl2Promotion
-      case CreditReason.StaffCredit => Reason.StaffCredit
-      case _ => throw new Exception("Invalid Reason")
+
+  def creditReasonMapping(creditReason: String): Reason.Reason = {
+
+    creditReason match {
+      case "CreditRefund"              => Reason.CreditRefund
+      case "CreditVoucherCode"         => Reason.CreditVoucherCode
+      case "GoodwillBookIssue"         => Reason.GoodwillBookIssue
+      case "GoodwillCustomerRetention" => Reason.GoodwillCustomerRetention
+      case "GoodwillServiceIssue"      => Reason.GoodwillServiceIssue
+      case "GoodwillTechnicalIssue"    => Reason.GoodwillTechnicalIssue
+      case "Hudl2Promotion"            => Reason.Hudl2Promotion
+      case "StaffCredit"               => Reason.StaffCredit
+      case _                           => throw new InvalidRequestException("invalid_reason")
     }
+  }
+
+  def validateRequest(req: CreditRequest) = {
+    val amountValue = req.amount.value
+    if (amountValue <= BigDecimal(0)) throw new InvalidRequestException("invalid_credit_amount")
   }
 }
