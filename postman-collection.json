@@ -1,0 +1,99 @@
+{
+  "id": "bafba4af-2371-f2bc-271d-20abd8b3c9ee",
+  "name": "Account Credit Service v2",
+  "timestamp": 1415811422721,
+  "order": [
+    "697efbc8-fc31-6bc4-7795-c081d9380be4",
+    "5233837e-dba9-3eb2-5cb1-478c09e40f57",
+    "f3b9ac5f-ecf3-5d22-f9f3-340ac37b3d1d",
+    "a8409d02-3aab-d392-b8ad-2f8a7cc8cd09",
+    "cd9962d4-77a7-c2d5-0711-9ac4023ca7e3",
+    "539e9d49-eef9-c733-e1f4-80fe913e5e75"
+  ],
+  "requests": [
+    {
+      "collectionId": "bafba4af-2371-f2bc-271d-20abd8b3c9ee",
+      "id": "5233837e-dba9-3eb2-5cb1-478c09e40f57",
+      "name": "/admin/users/7/accountcredit/debits",
+      "description": "",
+      "url": "{{scheme}}://{{host}}:{{port}}/admin/users/7/accountcredit/debits",
+      "method": "POST",
+      "headers": "Authorization: Bearer {{access_token}}\nContent-Type: application/vnd.blinkbox.books.v2+json\n",
+      "data": "{\n  \"requestId\": \"efacc252-dcb4-4f77-a191-c0f50db9c7bf\",\n  \"amount\": {\n    \"value\": 10.01,\n    \"currency\": \"GBP\"\n  }\n}",
+      "dataMode": "raw",
+      "timestamp": 0,
+      "version": 2,
+      "time": 1418751917396
+    },
+    {
+      "collectionId": "bafba4af-2371-f2bc-271d-20abd8b3c9ee",
+      "id": "539e9d49-eef9-c733-e1f4-80fe913e5e75",
+      "name": "/health/report",
+      "description": "",
+      "url": "{{healthscheme}}://{{healthhost}}:{{healthport}}/health/report",
+      "method": "GET",
+      "headers": "Authorization: Bearer {{access_token}}\n",
+      "data": "{ \"requestId\": \"fsdfsdfdsfsdfs\",\n \"amount\": { \"value\": 90.01, \"currency\": \"GBP\" },\n \"dateTime\": \"2014-01-01T01:01:01Z\"\n}",
+      "dataMode": "raw",
+      "timestamp": 0,
+      "version": 2,
+      "time": 1418751692192
+    },
+    {
+      "collectionId": "bafba4af-2371-f2bc-271d-20abd8b3c9ee",
+      "id": "697efbc8-fc31-6bc4-7795-c081d9380be4",
+      "name": "/admin/users/7/accountcredit",
+      "description": "",
+      "url": "{{scheme}}://{{host}}:{{port}}/admin/users/7/accountcredit",
+      "method": "GET",
+      "headers": "Authorization: Bearer {{access_token}}\n",
+      "data": "{ \"requestId\": \"fsdfsdfdsfsdfs\",\n \"amount\": { \"value\": 90.01, \"currency\": \"GBP\" },\n \"dateTime\": \"2014-01-01T01:01:01Z\"\n}",
+      "dataMode": "raw",
+      "timestamp": 0,
+      "responses": [],
+      "version": 2
+    },
+    {
+      "collectionId": "bafba4af-2371-f2bc-271d-20abd8b3c9ee",
+      "id": "a8409d02-3aab-d392-b8ad-2f8a7cc8cd09",
+      "name": "/admin/accountcredit/reasons",
+      "description": "",
+      "url": "{{scheme}}://{{host}}:{{port}}/admin/accountcredit/reasons",
+      "method": "GET",
+      "headers": "Authorization: Bearer {{access_token}}\nContent-Type: application/vnd.blinkbox.books.v2+json\n",
+      "data": "{ \"requestId\": \"fsdfsdfdsfsdfs\",\n \"amount\": { \"value\": 90.01, \"currency\": \"GBP\" },\n \"dateTime\": \"2014-01-01T01:01:01Z\"\n}",
+      "dataMode": "raw",
+      "timestamp": 0,
+      "responses": [],
+      "version": 2
+    },
+    {
+      "collectionId": "bafba4af-2371-f2bc-271d-20abd8b3c9ee",
+      "id": "cd9962d4-77a7-c2d5-0711-9ac4023ca7e3",
+      "name": "/health/ping",
+      "description": "",
+      "url": "{{healthscheme}}://{{healthhost}}:{{healthport}}/health/ping",
+      "method": "GET",
+      "headers": "Authorization: Bearer {{access_token}}\n",
+      "data": "{ \"requestId\": \"fsdfsdfdsfsdfs\",\n \"amount\": { \"value\": 90.01, \"currency\": \"GBP\" },\n \"dateTime\": \"2014-01-01T01:01:01Z\"\n}",
+      "dataMode": "raw",
+      "timestamp": 0,
+      "version": 2,
+      "time": 1418751673953
+    },
+    {
+      "collectionId": "bafba4af-2371-f2bc-271d-20abd8b3c9ee",
+      "id": "f3b9ac5f-ecf3-5d22-f9f3-340ac37b3d1d",
+      "name": "/admin/users/7/accountcredit/credits",
+      "description": "",
+      "url": "{{scheme}}://{{host}}:{{port}}/admin/users/7/accountcredit/credits",
+      "method": "POST",
+      "headers": "Authorization: Bearer {{access_token}}\nContent-Type: application/vnd.blinkbox.books.v2+json\n",
+      "data": "{\n  \"requestId\": \"c4a2274a-7445-4779-b051-550e393d87de\",\n  \"amount\": {\n    \"value\": 90.01,\n    \"currency\": \"GBP\"\n  }\n}",
+      "dataMode": "raw",
+      "timestamp": 0,
+      "version": 2,
+      "time": 1418751903468
+    }
+  ]
+}
