@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.14.0 ([#42](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/42) 2014-12-16 17:06:54)
+
+CRED-63 Add 'get credit reasons' endpoint.
+
+new feature
+
+No DB yet. Not sure if I'll even bother with the DB.
+
 ## 0.13.6 ([#40](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/40) 2014-12-15 13:55:55)
 
 switching on Debit acceptance tests
