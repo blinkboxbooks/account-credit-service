@@ -99,7 +99,18 @@ paths:
           description: User not authorised (needs CSR/CSM role)
         404:
           description: User not found
-              
+
+  /admin/accountcredit/reasons:
+    get:
+      summary: Get the list of credit reasons
+      consume:
+       - application/vnd.blinkbox.books.v2+json
+      responses:
+        200:
+          description: List of credit reasons
+          schema:
+            $ref: CreditReasons
+
 definitions:
   CreditHistory:
     title: Credit history (ordered by `dateTime` descendingly)
@@ -175,6 +186,15 @@ definitions:
         readOnly: true
       amount:
         $ref: PositiveAmount
+
+  CreditReason:
+    title: Credit Reasons
+    properties:
+      reasons:
+        type: array
+        uniqueItems: true
+          items:
+          type: string
 
   Amount:
     title: Amount

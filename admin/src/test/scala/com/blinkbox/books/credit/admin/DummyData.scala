@@ -47,4 +47,6 @@ object DummyData {
       ("amount" ->
         ("value" -> JDecimal(1000.53)) ~
         ("currency" -> "GBP"))))
+
+  val expectedForCreditReasons: JObject = "reasons" -> List("foo", "bar")
 }
