@@ -36,6 +36,10 @@ module KnowsAboutAccountCreditRequests
 
     http_post :credit, "/admin/users/#{user_id}/accountcredit/credits", request_body, headers
   end
+
+  def get_reasons_list
+    http_get :credit, '/admin/accountcredit/reasons', headers
+  end
 end
 
 def headers
