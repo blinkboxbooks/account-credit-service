@@ -15,12 +15,12 @@ Feature: Admin account credit service
     | CSM  |
     | CSR  |
 
-  @in-progress
   Scenario Outline: Credit unknown user
     Given an unknown customer
     And I am logged in as a <role> user
     When I credit the customer 1.01 in GBP with the reason: Goodwill (Technical Issue)
-    Then the request fails because the user was not found
+    Then the request is successful
+    And the customer has overall credit balance of 1.01 in GBP
 
   Examples:
     | role |
@@ -38,7 +38,6 @@ Feature: Admin account credit service
     |0     |
     |-1    |
 
-  @in-progress
   Scenario: Credit user with invalid reason
     Given a customer with 0.00 in GBP of credit
     And I am logged in as a CSM user
