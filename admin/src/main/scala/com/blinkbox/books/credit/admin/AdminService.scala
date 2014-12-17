@@ -51,7 +51,6 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) 
   def creditReasonMapping(creditReason: String): Reason.Reason = {
 
     creditReason match {
-      case "CreditRefund"              => Reason.CreditRefund
       case "CreditVoucherCode"         => Reason.CreditVoucherCode
       case "GoodwillBookIssue"         => Reason.GoodwillBookIssue
       case "GoodwillCustomerRetention" => Reason.GoodwillCustomerRetention

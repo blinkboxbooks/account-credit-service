@@ -214,13 +214,13 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   it should "204 NoContent on add Credit with Reason, as Customer Service Manager and Customer Service Representative" in new TestFixture {
     Set(authenticatedUserCSR, authenticatedUserCSM).foreach { adminUser =>
       val amount = Money(BigDecimal.valueOf(90.01), "GBP")
-      val creditRequest = CreditRequest(amount, "tests125455", "CreditRefund")
+      val creditRequest = CreditRequest(amount, "tests125455", "CreditVoucherCode")
 
       when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(adminUser)))
       when(adminService.addCredit(creditRequest, 12)(adminUser)).thenReturn(Future.successful(()))
 
       Post("/admin/users/12/accountcredit/credits", creditRequest) ~> route ~> check {
-        verify(adminService).addCredit(CreditRequest(amount, "tests125455", "CreditRefund"), 12)(adminUser)
+        verify(adminService).addCredit(CreditRequest(amount, "tests125455", "CreditVoucherCode"), 12)(adminUser)
         assert(status == StatusCodes.NoContent)
       }
       reset(adminService)
@@ -257,14 +257,14 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   it should "should throw InvalidRequestException on invalid reason" in new TestFixture {
     val e = intercept[InvalidRequestException] {
-      defaultAdminService.creditReasonMapping("noReason")
+      defaultAdminService.creditReasonMapping("SomeCrazyReason")
     }
     assert(e.message == "invalid_reason")
   }
 
   it should "should throw InvalidRequestException on invalid credit amount" in new TestFixture {
     Set(0, -1).foreach { wrongValue =>
-      val creditRequest = CreditRequest(Money(BigDecimal(wrongValue), "GBP"), "tests125455", "CreditRefund")
+      val creditRequest = CreditRequest(Money(BigDecimal(wrongValue), "GBP"), "tests125455", "CreditVoucherCode")
       val e = intercept[InvalidRequestException] {
         defaultAdminService.validateRequest(creditRequest)
       }

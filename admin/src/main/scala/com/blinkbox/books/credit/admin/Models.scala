@@ -29,7 +29,7 @@ object TransactionType extends Enumeration {
 
 object Reason extends Enumeration {
   type Reason = Value
-  val GoodwillBookIssue, GoodwillTechnicalIssue, GoodwillServiceIssue, GoodwillCustomerRetention, CreditRefund, StaffCredit, CreditVoucherCode, Hudl2Promotion = Value
+  val GoodwillBookIssue, GoodwillTechnicalIssue, GoodwillServiceIssue, GoodwillCustomerRetention, StaffCredit, CreditVoucherCode, Hudl2Promotion = Value
 }
 
 class InsufficientFundsException extends Exception
