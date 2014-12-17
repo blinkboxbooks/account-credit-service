@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.14.2 ([#41](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/41) 2014-12-17 15:11:38)
+
+Reasons list acceptance tests
+
+Test Improvement: Adding acceptance tests for Reasons List endpoint
+http://jira.blinkbox.local/jira/browse/CRED-61
+
+
 ## 0.14.1 ([#44](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/44) 2014-12-16 17:50:27)
 
 Add postman collection
