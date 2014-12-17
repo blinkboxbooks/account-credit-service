@@ -153,29 +153,16 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     }
   }
 
-  it should "400 on add debit endpoint, if trying to debit non-GBP" in new TestFixture {
-    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
-    Post("/admin/users/123/accountcredit/debits", nonGbpDebitRequest) ~> route ~> check {
-      assert(status == StatusCodes.BadRequest)
-      assert(responseAs[JObject] == errorMessage("UnsupportedCurrency"))
-    }
-  }
+  it should "400 on add debit endpoint, with invalid request fields" in new TestFixture {
+    Set("unsupported_currency", "invalid_amount").foreach { invalidRequestMsg =>
 
-  it should "400 on add debit endpoint, if trying to debit a zero amount" in new TestFixture {
-    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
-    val zeroCreditRequest = DebitRequest(Money(BigDecimal.valueOf(0), "GBP"), "good")
-    Post("/admin/users/123/accountcredit/debits", zeroCreditRequest) ~> route ~> check {
-      assert(status == StatusCodes.BadRequest)
-      assert(responseAs[JObject] == errorMessage("InvalidAmount"))
-    }
-  }
+      when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
+      when(adminService.addDebit(any[Int], any[Money], any[String])).thenReturn(Future.failed(new InvalidRequestException(invalidRequestMsg)))
 
-  it should "400 on add debit endpoint, if trying to debit a negative amount" in new TestFixture {
-    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
-    val negativeCreditRequest = DebitRequest(Money(BigDecimal.valueOf(-1), "GBP"), "good")
-    Post("/admin/users/123/accountcredit/debits", negativeCreditRequest) ~> route ~> check {
-      assert(status == StatusCodes.BadRequest)
-      assert(responseAs[JObject] == errorMessage("InvalidAmount"))
+      Post("/admin/users/12/accountcredit/debits", DebitRequest(null, "")) ~> route ~> check {
+        assert(status == StatusCodes.BadRequest)
+        assert(responseAs[JObject] == errorMessage(invalidRequestMsg))
+      }
     }
   }
 
@@ -244,12 +231,13 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
   }
 
   it should "400 on add credit request, with invalid request fields" in new TestFixture {
-    Set("invalid_reason", "invalid_credit_amount").foreach { invalidRequestMsg =>
+    Set("invalid_reason", "invalid_amount").foreach { invalidRequestMsg =>
 
       when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
       when(adminService.addCredit(any[CreditRequest], any[Int])(eql(authenticatedUserCSR))).thenReturn(Future.failed(new InvalidRequestException(invalidRequestMsg)))
 
       Post("/admin/users/12/accountcredit/credits", CreditRequest(null, null, null)) ~> route ~> check {
+         assert(status == StatusCodes.BadRequest)
         assert(responseAs[JObject] == errorMessage(invalidRequestMsg))
       }
     }
@@ -262,14 +250,20 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     assert(e.message == "invalid_reason")
   }
 
-  it should "should throw InvalidRequestException on invalid credit amount" in new TestFixture {
+  it should "should throw InvalidRequestException on invalid amount" in new TestFixture {
     Set(0, -1).foreach { wrongValue =>
-      val creditRequest = CreditRequest(Money(BigDecimal(wrongValue), "GBP"), "tests125455", "CreditVoucherCode")
       val e = intercept[InvalidRequestException] {
-        defaultAdminService.validateRequest(creditRequest)
+        defaultAdminService.validateAmount(Money(BigDecimal(wrongValue), "GBP"))
       }
-      assert(e.message == "invalid_credit_amount")
+      assert(e.message == "invalid_amount")
     }
+  }
+
+  it should "should throw InvalidRequestException on unsupported currency" in new TestFixture {
+    val e = intercept[InvalidRequestException] {
+      defaultAdminService.validateAmount(Money(BigDecimal(1), "USD"))
+    }
+    assert(e.message == "unsupported_currency")
   }
 
   it should "200 on get credit reasons" in new TestFixture {

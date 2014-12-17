@@ -18,6 +18,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) 
   override def getCreditReasons(): List[String] = CreditReason.values.toList.map(_.toString)
 
   override def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit] = Future {
+    validateAmount(amount)
     accountCreditStore.addDebitIfUserHasSufficientCredit(userId, requestId, amount)
   }
 
@@ -33,7 +34,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) 
   }
 
   private def copyAddCreditReqToCreditBalance(req: CreditRequest, customerId: Int, adminUser: User): CreditBalance = {
-    validateRequest(req)
+    validateAmount(req.amount)
     CreditBalance(     
     id = None,
     requestId = req.requestId,
@@ -62,8 +63,8 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) 
     }
   }
 
-  def validateRequest(req: CreditRequest) = {
-    val amountValue = req.amount.value
-    if (amountValue <= BigDecimal(0)) throw new InvalidRequestException("invalid_credit_amount")
+  def validateAmount(amount : Money) = {
+    if (amount.value <= BigDecimal(0)) throw new InvalidRequestException("invalid_amount")
+    if (amount.currency != "GBP") throw new InvalidRequestException("unsupported_currency")
   }
 }

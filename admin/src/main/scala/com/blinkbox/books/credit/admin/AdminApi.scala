@@ -34,6 +34,7 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
 
   val exceptionHandler: ExceptionHandler = ExceptionHandler {
     case e: InvalidRequestException => complete(StatusCodes.BadRequest, v2.Error(e.message, None))
+    case e: InsufficientFundsException => complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))
     case NonFatal(e) =>
       logger.warn("an unknown exception occurred", e)
       complete(StatusCodes.ServerError, v2.Error("server_error", None))
@@ -58,17 +59,11 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
                 path("debits") {
                   authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
                     entity(as[DebitRequest]) { debitRequest =>
-                      if (debitRequest.amount.value <= BigDecimal(0)) {
-                        complete(StatusCodes.BadRequest, v2.Error("InvalidAmount", None))
-                      } else if (debitRequest.amount.currency != "GBP") {
-                        complete(StatusCodes.BadRequest, v2.Error("UnsupportedCurrency", None))
-                      } else if (adminService.hasRequestAlreadyBeenProcessed(debitRequest.requestId)) {
+                      if (adminService.hasRequestAlreadyBeenProcessed(debitRequest.requestId)) {
                         complete(StatusCodes.NoContent)
                       } else {
-                        onComplete(adminService.addDebit(userId, debitRequest.amount, debitRequest.requestId)) {
-                          case Success(_) => complete(StatusCodes.NoContent)
-                          case Failure(ex: InsufficientFundsException) => complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))
-                          case Failure(ex) => complete(StatusCodes.InternalServerError)
+                        onSuccess(adminService.addDebit(userId, debitRequest.amount, debitRequest.requestId)) { resp =>
+                           complete(StatusCodes.NoContent)
                         }
                       }
                     }

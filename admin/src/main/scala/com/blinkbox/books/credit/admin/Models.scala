@@ -32,4 +32,3 @@ object Reason extends Enumeration {
   val GoodwillBookIssue, GoodwillTechnicalIssue, GoodwillServiceIssue, GoodwillCustomerRetention, StaffCredit, CreditVoucherCode, Hudl2Promotion = Value
 }
 
-class InsufficientFundsException extends Exception
