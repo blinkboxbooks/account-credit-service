@@ -89,7 +89,7 @@
       "url": "{{scheme}}://{{host}}:{{port}}/admin/users/7/accountcredit/credits",
       "method": "POST",
       "headers": "Authorization: Bearer {{access_token}}\nContent-Type: application/vnd.blinkbox.books.v2+json\n",
-      "data": "{\n  \"requestId\": \"c4a2274a-7445-4779-b051-550e393d87de\",\n  \"amount\": {\n    \"value\": 90.01,\n    \"currency\": \"GBP\"\n  }\n}",
+      "data":"{\n  \"requestId\": \"c4a2274a-7445-4779-b051-550e393d87de\",\n  \"amount\": {\n    \"value\": 90.01,\n    \"currency\": \"GBP\"\n  },\n  \"reason\": \"GoodwillBookIssue\"\n}",
       "dataMode": "raw",
       "timestamp": 0,
       "version": 2,
