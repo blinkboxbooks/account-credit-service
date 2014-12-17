@@ -39,51 +39,58 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
       complete(StatusCodes.ServerError, v2.Error("server_error", None))
   }
 
-  val route = monitor(logger, throwableMarshaller) {
-    handleExceptions(exceptionHandler) {
-      pathPrefix("admin" / "users" / IntNumber) { userId =>
-        pathPrefix("accountcredit") {
-          pathEnd {
-            get {
-              authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
-                val issuerBehaviour = if (adminUser.isInRole(UserRole.CustomerServicesManager)) keepIssuer _ else removeIssuer _
-                complete(adminService.lookupCreditHistoryForUser(userId).map {
-                  case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(issuerBehaviour))
-                })
-              }
-            }
-          } ~
-            post {
-              path("debits") {
+   val route = monitor(logger, throwableMarshaller) {
+     handleExceptions(exceptionHandler) {
+      pathPrefix("admin") {
+        pathPrefix("users" / IntNumber) { userId =>
+          pathPrefix("accountcredit") {
+            pathEnd {
+              get {
                 authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
-                  entity(as[DebitRequest]) { debitRequest =>
-                    if (debitRequest.amount.value <= BigDecimal(0)) {
-                      complete(StatusCodes.BadRequest, v2.Error("InvalidAmount", None))
-                    } else if (debitRequest.amount.currency != "GBP") {
-                      complete(StatusCodes.BadRequest, v2.Error("UnsupportedCurrency", None))
-                    } else if (adminService.hasRequestAlreadyBeenProcessed(debitRequest.requestId)) {
-                      complete(StatusCodes.NoContent)
-                    } else {
-                      onComplete(adminService.addDebit(userId, debitRequest.amount, debitRequest.requestId)) {
-                        case Success(_)                              => complete(StatusCodes.NoContent)
-                        case Failure(ex: InsufficientFundsException) => complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))
-                        case Failure(ex)                             => complete(StatusCodes.InternalServerError)
-                      }
-                    }
-                  }
+                  val issuerBehaviour = if (adminUser.isInRole(UserRole.CustomerServicesManager)) keepIssuer _ else removeIssuer _
+                  complete(adminService.lookupCreditHistoryForUser(userId).map {
+                    case CreditHistory(m, h) => CreditHistoryForRendering(m, h.map(issuerBehaviour))
+                  })
                 }
-              } ~
-                path("credits") {
-                  authenticateAndAuthorize(authenticator.withElevation(Critical), hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { implicit adminUser =>
-                    entity(as[CreditRequest]) { credit =>
-                      onSuccess(adminService.addCredit(credit, userId)) { resp =>
+              }
+            } ~
+              post {
+                path("debits") {
+                  authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
+                    entity(as[DebitRequest]) { debitRequest =>
+                      if (debitRequest.amount.value <= BigDecimal(0)) {
+                        complete(StatusCodes.BadRequest, v2.Error("InvalidAmount", None))
+                      } else if (debitRequest.amount.currency != "GBP") {
+                        complete(StatusCodes.BadRequest, v2.Error("UnsupportedCurrency", None))
+                      } else if (adminService.hasRequestAlreadyBeenProcessed(debitRequest.requestId)) {
                         complete(StatusCodes.NoContent)
+                      } else {
+                        onComplete(adminService.addDebit(userId, debitRequest.amount, debitRequest.requestId)) {
+                          case Success(_) => complete(StatusCodes.NoContent)
+                          case Failure(ex: InsufficientFundsException) => complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))
+                          case Failure(ex) => complete(StatusCodes.InternalServerError)
+                        }
                       }
                     }
                   }
-                }
+                } ~
+                  path("credits") {
+                    authenticateAndAuthorize(authenticator.withElevation(Critical), hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { implicit adminUser =>
+                      entity(as[CreditRequest]) { credit =>
+                          onSuccess(adminService.addCredit(credit, userId)) { resp =>
+                            complete(StatusCodes.NoContent)
+                        }
+                      }
+                    }
+                  }
+              }
+          }
+        } ~
+          path("accountcredit" / "reasons") {
+            get {
+              complete(StatusCodes.OK, ReasonResponse(adminService.getCreditReasons()))
             }
-        }
+          }
       }
     }
   }
@@ -91,3 +98,4 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
 
 case class DebitRequest(amount: Money, requestId: String)
 case class CreditRequest(amount: Money, requestId: String, reason: String)
+case class ReasonResponse(reasons: List[String])

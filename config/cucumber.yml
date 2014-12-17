@@ -3,4 +3,4 @@ default: -p ci-regression-dev-int
 ci-smoke-dev-int: --tags @smoke SERVER=dev_int --strict
 ci-regression-dev-int: --tags ~@in-progress SERVER=dev_int --strict
 
-dev: SERVER=local --strict --format pretty
+dev: --tags ~@in-progress SERVER=local --strict --format pretty
