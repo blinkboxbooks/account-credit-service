@@ -16,7 +16,7 @@ object CreditHistory {
       if (cb.transactionType == TransactionType.Debit)
         Debit(cb.requestId, cb.createdAt, Money(cb.value))
       else
-        Credit(cb.requestId, cb.createdAt, Money(cb.value), CreditReason.CreditRefund, CreditIssuer(cb.adminUserId.get.toString, Set()))
+        Credit(cb.requestId, cb.createdAt, Money(cb.value), CreditReason.CreditVoucherCode, CreditIssuer(cb.adminUserId.get.toString, Set()))
     }
 
     val netBalance = history.foldLeft(BigDecimal(0))((cumulativeAmount, creditOrDebit) => creditOrDebit match {
@@ -30,5 +30,5 @@ object CreditHistory {
 
 object CreditReason extends Enumeration {
   type Reason = Value
-  val GoodwillBookIssue, GoodwillTechnicalIssue, GoodwillServiceIssue, GoodwillCustomerRetention, CreditRefund, StaffCredit, CreditVoucherCode, Hudl2Promotion = Value
+  val GoodwillBookIssue, GoodwillTechnicalIssue, GoodwillServiceIssue, GoodwillCustomerRetention, StaffCredit, CreditVoucherCode, Hudl2Promotion = Value
 }

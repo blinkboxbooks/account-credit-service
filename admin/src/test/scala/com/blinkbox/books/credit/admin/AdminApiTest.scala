@@ -22,6 +22,7 @@ import scala.concurrent.Future
 import org.mockito.Matchers._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import com.blinkbox.books.time.StoppedClock
 import scala.concurrent.duration._
 
 @RunWith(classOf[JUnitRunner])
@@ -152,29 +153,16 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     }
   }
 
-  it should "400 on add debit endpoint, if trying to debit non-GBP" in new TestFixture {
-    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
-    Post("/admin/users/123/accountcredit/debits", nonGbpDebitRequest) ~> route ~> check {
-      assert(status == StatusCodes.BadRequest)
-      assert(responseAs[JObject] == errorMessage("UnsupportedCurrency"))
-    }
-  }
+  it should "400 on add debit endpoint, with invalid request fields" in new TestFixture {
+    Set("unsupported_currency", "invalid_amount").foreach { invalidRequestMsg =>
 
-  it should "400 on add debit endpoint, if trying to debit a zero amount" in new TestFixture {
-    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
-    val zeroCreditRequest = DebitRequest(Money(BigDecimal.valueOf(0), "GBP"), "good")
-    Post("/admin/users/123/accountcredit/debits", zeroCreditRequest) ~> route ~> check {
-      assert(status == StatusCodes.BadRequest)
-      assert(responseAs[JObject] == errorMessage("InvalidAmount"))
-    }
-  }
+      when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
+      when(adminService.addDebit(any[Int], any[Money], any[String])).thenReturn(Future.failed(new InvalidRequestException(invalidRequestMsg)))
 
-  it should "400 on add debit endpoint, if trying to debit a negative amount" in new TestFixture {
-    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
-    val negativeCreditRequest = DebitRequest(Money(BigDecimal.valueOf(-1), "GBP"), "good")
-    Post("/admin/users/123/accountcredit/debits", negativeCreditRequest) ~> route ~> check {
-      assert(status == StatusCodes.BadRequest)
-      assert(responseAs[JObject] == errorMessage("InvalidAmount"))
+      Post("/admin/users/12/accountcredit/debits", DebitRequest(null, "")) ~> route ~> check {
+        assert(status == StatusCodes.BadRequest)
+        assert(responseAs[JObject] == errorMessage(invalidRequestMsg))
+      }
     }
   }
 
@@ -210,18 +198,19 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
 
   // add Credit tests 
 
-  it should "204 NoContent on add Credit endpoint, as Customer Service Manager and Customer Service Representative" in new TestFixture {
+  it should "204 NoContent on add Credit with Reason, as Customer Service Manager and Customer Service Representative" in new TestFixture {
     Set(authenticatedUserCSR, authenticatedUserCSM).foreach { adminUser =>
       val amount = Money(BigDecimal.valueOf(90.01), "GBP")
-      val creditRequest = CreditRequest(amount, "tests125455")
+      val creditRequest = CreditRequest(amount, "tests125455", "CreditVoucherCode")
 
       when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(adminUser)))
       when(adminService.addCredit(creditRequest, 12)(adminUser)).thenReturn(Future.successful(()))
 
       Post("/admin/users/12/accountcredit/credits", creditRequest) ~> route ~> check {
-        verify(adminService).addCredit(CreditRequest(amount, "tests125455"), 12)(adminUser)
+        verify(adminService).addCredit(CreditRequest(amount, "tests125455", "CreditVoucherCode"), 12)(adminUser)
         assert(status == StatusCodes.NoContent)
       }
+      reset(adminService)
     }
   }
 
@@ -241,6 +230,42 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     }
   }
 
+  it should "400 on add credit request, with invalid request fields" in new TestFixture {
+    Set("invalid_reason", "invalid_amount").foreach { invalidRequestMsg =>
+
+      when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
+      when(adminService.addCredit(any[CreditRequest], any[Int])(eql(authenticatedUserCSR))).thenReturn(Future.failed(new InvalidRequestException(invalidRequestMsg)))
+
+      Post("/admin/users/12/accountcredit/credits", CreditRequest(null, null, null)) ~> route ~> check {
+         assert(status == StatusCodes.BadRequest)
+        assert(responseAs[JObject] == errorMessage(invalidRequestMsg))
+      }
+    }
+  }
+
+  it should "should throw InvalidRequestException on invalid reason" in new TestFixture {
+    val e = intercept[InvalidRequestException] {
+      defaultAdminService.creditReasonMapping("SomeCrazyReason")
+    }
+    assert(e.message == "invalid_reason")
+  }
+
+  it should "should throw InvalidRequestException on invalid amount" in new TestFixture {
+    Set(0, -1).foreach { wrongValue =>
+      val e = intercept[InvalidRequestException] {
+        defaultAdminService.validateAmount(Money(BigDecimal(wrongValue), "GBP"))
+      }
+      assert(e.message == "invalid_amount")
+    }
+  }
+
+  it should "should throw InvalidRequestException on unsupported currency" in new TestFixture {
+    val e = intercept[InvalidRequestException] {
+      defaultAdminService.validateAmount(Money(BigDecimal(1), "USD"))
+    }
+    assert(e.message == "unsupported_currency")
+  }
+
   it should "200 on get credit reasons" in new TestFixture {
     when(adminService.getCreditReasons()).thenReturn(List("foo", "bar"))
     Get("/admin/accountcredit/reasons") ~> route ~> check {
@@ -248,7 +273,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
       assert(DummyData.expectedForCreditReasons == responseAs[JValue])
     }
   }
-
+  
   def containsIssuerInformation(j: JValue): Boolean = {
     val issuerInfo: List[List[JField]] = for {
       JObject(child) <- j
@@ -283,9 +308,9 @@ object AdminApiTest {
   val zeroCreditHistory = CreditHistory(Money(BigDecimal(0)), List())
 }
 
-class TestFixture extends v2.JsonSupport with MockitoSyrup {
-
-  val adminService = mock[AdminService]
+class TestFixture extends v2.JsonSupport with MockitoSyrup  {
+  
+  val adminService = mock[AdminService]  
   val authenticator: BearerTokenAuthenticator = mock[BearerTokenAuthenticator]
   val creditHistory = AdminApiTest.dummy
 
@@ -305,4 +330,8 @@ class TestFixture extends v2.JsonSupport with MockitoSyrup {
 
   val debitRequest = DebitRequest(Money(BigDecimal.valueOf(90.01), "GBP"), "good")
   val nonGbpDebitRequest = DebitRequest(Money(BigDecimal.valueOf(90.01), "USD"), "good")
+  
+  val accountCreditStore = mock[AccountCreditStore]
+  val clock = StoppedClock()
+  val defaultAdminService = new DefaultAdminService(accountCreditStore, clock)
 }
