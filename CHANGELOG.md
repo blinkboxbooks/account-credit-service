@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.15.0 ([#43](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/43) 2014-12-18 14:30:03)
+
+CRED-62 add credit with reason
+
+#### new feature
+- add credit with reason
+- implemented exception handling
+- moved request validation to service implementation
+
 ## 0.14.2 ([#41](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/41) 2014-12-17 15:11:38)
 
 Reasons list acceptance tests
