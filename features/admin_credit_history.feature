@@ -3,8 +3,6 @@ Feature: Admin Credit History
   I want view a user's credit history
   So that I can verify their credit history when dealing with customer service issues
 
-# CREDIT-52
-  @in-progress
   Scenario: Credit reasons in credit history
     Given a customer has the following credit history:
       | event_type | amount | reason                    |
