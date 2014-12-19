@@ -22,7 +22,7 @@ module KnowsAboutBbbUsers
     @last_public_user = Blinkbox::User.new(:username => 'unknown-user@bbb.com', :password => 'abc123', :server_uri => test_env.servers['auth'])
     @last_public_user.instance_eval %Q"
       def user_id
-        '999999'
+        '99999999999'
       end
     "
   end
