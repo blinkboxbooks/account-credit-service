@@ -72,8 +72,12 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
                   path("credits") {
                     authenticateAndAuthorize(authenticator.withElevation(Critical), hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { implicit adminUser =>
                       entity(as[CreditRequest]) { credit =>
+                        if (adminService.hasRequestAlreadyBeenProcessed(credit.requestId)) {
+                          complete(StatusCodes.NoContent)
+                        } else {
                           onSuccess(adminService.addCredit(credit, userId)) { resp =>
                             complete(StatusCodes.NoContent)
+                          }
                         }
                       }
                     }

@@ -243,6 +243,18 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     }
   }
 
+  it should "204 and ingore already existing request Id" in new TestFixture {
+    val amount = Money(BigDecimal.valueOf(90.01), "GBP")
+    val creditRequest = CreditRequest(amount, "alreadyExitRequestId", "CreditVoucherCode")
+
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
+    when(adminService.hasRequestAlreadyBeenProcessed("alreadyExitRequestId")).thenReturn(true)
+
+    Post("/admin/users/123/accountcredit/credits", creditRequest) ~> route ~> check {
+      assert(status == StatusCodes.NoContent)
+    }
+  }
+
   it should "should throw InvalidRequestException on invalid reason" in new TestFixture {
     val e = intercept[InvalidRequestException] {
       defaultAdminService.creditReasonMapping("SomeCrazyReason")
