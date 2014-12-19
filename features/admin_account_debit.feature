@@ -35,6 +35,7 @@ Feature: Admin Account Debit
     |0     |
     |-1    |
 
+  # CRED-74
   Scenario: Debit unknown user
     Given an unknown customer
     And I am logged in as a CSM user

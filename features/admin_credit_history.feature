@@ -53,6 +53,7 @@ Feature: Admin Credit History
     When I request for the user's credit history
     Then the request fails because my role is forbidden
 
+  # CRED-74
   Scenario Outline: Requesting credit history of unknown user
     Given an unknown customer
     And I am logged in as a <role> user
