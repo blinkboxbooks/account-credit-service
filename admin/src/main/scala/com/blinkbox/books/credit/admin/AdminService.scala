@@ -15,7 +15,7 @@ trait AdminService {
 
 class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) extends AdminService {
 
-  override def getCreditReasons(): List[String] = CreditReason.values.toList.map(_.toString)
+  override def getCreditReasons(): List[String] = Reason.values.toList.map(_.toString)
 
   override def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit] = Future {
     validateAmount(amount)
@@ -30,7 +30,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) 
     accountCreditStore.getCreditBalanceByRequestId(requestId).nonEmpty
 
   override def addCredit(req: CreditRequest, customerId: Int)(implicit adminUser: User): Future[Unit] = Future {
-    accountCreditStore.addCredit(copyAddCreditReqToCreditBalance(req, customerId, adminUser))
+    if (!hasRequestAlreadyBeenProcessed(req.requestId)) accountCreditStore.addCredit(copyAddCreditReqToCreditBalance(req, customerId, adminUser))
   }
 
   private def copyAddCreditReqToCreditBalance(req: CreditRequest, customerId: Int, adminUser: User): CreditBalance = {

@@ -6,7 +6,7 @@ import org.joda.time.DateTime
 case class Money(value: BigDecimal, currency: String = "GBP")
 sealed trait CreditOrDebit
 case class Debit(requestId: String, dateTime: DateTime, amount: Money) extends CreditOrDebit
-case class Credit(requestId: String, dateTime: DateTime, amount: Money, reason: CreditReason.Reason, issuer: CreditIssuer) extends CreditOrDebit
+case class Credit(requestId: String, dateTime: DateTime, amount: Money, reason: String, issuer: CreditIssuer) extends CreditOrDebit
 case class CreditIssuer(name: String, roles: Set[UserRole])
 case class CreditHistory(netBalance: Money, history: List[CreditOrDebit])
 
@@ -16,7 +16,7 @@ object CreditHistory {
       if (cb.transactionType == TransactionType.Debit)
         Debit(cb.requestId, cb.createdAt, Money(cb.value))
       else
-        Credit(cb.requestId, cb.createdAt, Money(cb.value), CreditReason.CreditVoucherCode, CreditIssuer(cb.adminUserId.get.toString, Set()))
+        Credit(cb.requestId, cb.createdAt, Money(cb.value), cb.reason.get.toString(), CreditIssuer(cb.adminUserId.get.toString, Set()))
     }
 
     val netBalance = history.foldLeft(BigDecimal(0))((cumulativeAmount, creditOrDebit) => creditOrDebit match {
@@ -26,9 +26,4 @@ object CreditHistory {
 
     CreditHistory(Money(netBalance), history.toList)
   }
-}
-
-object CreditReason extends Enumeration {
-  type Reason = Value
-  val GoodwillBookIssue, GoodwillTechnicalIssue, GoodwillServiceIssue, GoodwillCustomerRetention, StaffCredit, CreditVoucherCode, Hudl2Promotion = Value
 }
