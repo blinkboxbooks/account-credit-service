@@ -38,7 +38,7 @@ Then(/^the credit history contains the above events$/) do
     event_type = event['event_type']
     if event_type == 'credit'
       expect(response_hash['items'][index]['type']).to eq('credit')
-      expect(response_hash['items'][index]['reason']).to eq(event['reason']) # not yet implemented CRED-62
+      expect(response_hash['items'][index]['reason']).to eq(event['reason'])
       expect(response_hash['items'][index]['issuer']['name']).to be_truthy
       #expect(response_hash['items'][index]['issuer']['roles'][0]).to be_truthy # not yet implemented CRED-60
     elsif event_type == 'debit'
