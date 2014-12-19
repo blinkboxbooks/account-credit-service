@@ -19,7 +19,7 @@ end
 
 Given(/^a customer with credit history$/) do
   # creating new user with default credit history
-  post_admin_account_credit(use_admin_user('csm').access_token, '9.99', 'Credit Refund',
+  post_admin_account_credit(use_admin_user('csm').access_token, '9.99', 'GoodwillServiceIssue',
                             user_id_of(new_public_user), new_request_id)
 end
 
