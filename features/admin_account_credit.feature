@@ -15,8 +15,7 @@ Feature: Admin account credit service
     | CSM  |
     | CSR  |
 
-  # cannot run in dev-int as tests won't be able to clean up data created
-  @in-progress
+  @manual @data-dependent
   Scenario Outline: Credit unknown user
     Given an unknown customer
     And I am logged in as a <role> user
