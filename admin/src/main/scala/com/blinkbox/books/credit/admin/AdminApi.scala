@@ -40,8 +40,8 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
       complete(StatusCodes.ServerError, v2.Error("server_error", None))
   }
 
-   val route = monitor(logger, throwableMarshaller) {
-     handleExceptions(exceptionHandler) {
+  val route = monitor(logger, throwableMarshaller) {
+    handleExceptions(exceptionHandler) {
       pathPrefix("admin") {
         pathPrefix("users" / IntNumber) { userId =>
           pathPrefix("accountcredit") {
@@ -59,11 +59,13 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
                 path("debits") {
                   authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
                     entity(as[DebitRequest]) { debitRequest =>
-                      if (adminService.hasRequestAlreadyBeenProcessed(debitRequest.requestId)) {
-                        complete(StatusCodes.NoContent)
-                      } else {
-                        onSuccess(adminService.addDebit(userId, debitRequest.amount, debitRequest.requestId)) { resp =>
-                           complete(StatusCodes.NoContent)
+                      onSuccess(adminService.hasRequestAlreadyBeenProcessed(debitRequest.requestId)) { alreadyProcessed =>
+                        if (alreadyProcessed) {
+                          complete(StatusCodes.NoContent)
+                        } else {
+                          onSuccess(adminService.addDebit(userId, debitRequest.amount, debitRequest.requestId)) { resp =>
+                            complete(StatusCodes.NoContent)
+                          }
                         }
                       }
                     }
@@ -72,11 +74,13 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
                   path("credits") {
                     authenticateAndAuthorize(authenticator.withElevation(Critical), hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { implicit adminUser =>
                       entity(as[CreditRequest]) { credit =>
-                        if (adminService.hasRequestAlreadyBeenProcessed(credit.requestId)) {
-                          complete(StatusCodes.NoContent)
-                        } else {
-                          onSuccess(adminService.addCredit(credit, userId)) { resp =>
+                        onSuccess(adminService.hasRequestAlreadyBeenProcessed(credit.requestId)) { alreadyProcessed =>
+                          if (alreadyProcessed) {
                             complete(StatusCodes.NoContent)
+                          } else {
+                            onSuccess(adminService.addCredit(credit, userId)) { resp =>
+                              complete(StatusCodes.NoContent)
+                            }
                           }
                         }
                       }

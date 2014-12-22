@@ -109,12 +109,11 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
       when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(adminUser)))
       val amount = Money(BigDecimal.valueOf(90.01), "GBP")
       when(adminService.addDebit(123, amount, "good")).thenReturn(Future.successful(()))
-      Post("/admin/users/123/accountcredit/debits", debitRequest) ~> route ~> check {
-        verify(adminService).addDebit(123, amount, "good")
+      Post("/admin/users/123/accountcredit/debits", debitRequest) ~> route ~> check {       
         assert(status == StatusCodes.NoContent)
-      }
-      reset(adminService)
+      }      
     }
+    verify(adminService, atLeast(2)).addDebit(123, Money(BigDecimal.valueOf(90.01), "GBP"), "good")
   }
 
   it should "400 on add debit endpoint, if trying to debit more credit than they have" in new TestFixture {
@@ -146,7 +145,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
    */
   it should "204 on add debit endpoint, if requestId has previously succeeded, even if the debit is more than currently available" in new TestFixture {
     when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
-    when(adminService.hasRequestAlreadyBeenProcessed("good")).thenReturn(true)
+    when(adminService.hasRequestAlreadyBeenProcessed("good")).thenReturn(Future.successful(true))
     Post("/admin/users/123/accountcredit/debits", debitRequest) ~> route ~> check {
       verify(adminService, never()).addDebit(any[Int], any[Money], any[String])
       assert(status == StatusCodes.NoContent)
@@ -210,7 +209,6 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
         verify(adminService).addCredit(CreditRequest(amount, "tests125455", "CreditVoucherCode"), 12)(adminUser)
         assert(status == StatusCodes.NoContent)
       }
-      reset(adminService)
     }
   }
 
@@ -248,7 +246,7 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     val creditRequest = CreditRequest(amount, "alreadyExitRequestId", "CreditVoucherCode")
 
     when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSR)))
-    when(adminService.hasRequestAlreadyBeenProcessed("alreadyExitRequestId")).thenReturn(true)
+    when(adminService.hasRequestAlreadyBeenProcessed("alreadyExitRequestId")).thenReturn(Future.successful(true))
 
     Post("/admin/users/123/accountcredit/credits", creditRequest) ~> route ~> check {
       assert(status == StatusCodes.NoContent)
@@ -321,8 +319,9 @@ object AdminApiTest {
 }
 
 class TestFixture extends v2.JsonSupport with MockitoSyrup  {
-  
-  val adminService = mock[AdminService]  
+
+  val adminService = mock[AdminService]
+  when(adminService.hasRequestAlreadyBeenProcessed(any[String])).thenReturn(Future.successful(false))
   val authenticator: BearerTokenAuthenticator = mock[BearerTokenAuthenticator]
   val creditHistory = AdminApiTest.dummy
 
