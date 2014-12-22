@@ -10,12 +10,12 @@ trait AdminService {
   def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit]
   def addCredit(req: CreditRequest, customerId: Int)(implicit adminUser: User): Future[Unit]
   def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory]
-  def hasRequestAlreadyBeenProcessed(requestId: String): Boolean
+  def hasRequestAlreadyBeenProcessed(requestId: String): Future[Boolean]
 }
 
 class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) extends AdminService {
 
-  override def getCreditReasons(): List[String] = CreditReason.values.toList.map(_.toString)
+  override def getCreditReasons(): List[String] = Reason.values.toList.map(_.toString)
 
   override def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit] = Future {
     validateAmount(amount)
@@ -26,8 +26,9 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) 
     CreditHistory.buildFromCreditBalances(accountCreditStore.getCreditHistoryForUser(userId))
   }
 
-  override def hasRequestAlreadyBeenProcessed(requestId: String): Boolean =
+  override def hasRequestAlreadyBeenProcessed(requestId: String): Future[Boolean] = Future {
     accountCreditStore.getCreditBalanceByRequestId(requestId).nonEmpty
+  }
 
   override def addCredit(req: CreditRequest, customerId: Int)(implicit adminUser: User): Future[Unit] = Future {
     accountCreditStore.addCredit(copyAddCreditReqToCreditBalance(req, customerId, adminUser))
