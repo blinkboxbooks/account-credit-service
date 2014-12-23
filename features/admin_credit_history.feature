@@ -3,8 +3,7 @@ Feature: Admin Credit History
   I want view a user's credit history
   So that I can verify their credit history when dealing with customer service issues
 
-# CREDIT-52
-  @in-progress
+  # CRED-73 bug
   Scenario: Credit reasons in credit history
     Given a customer has the following credit history:
       | event_type | amount | reason                    |
@@ -12,7 +11,6 @@ Feature: Admin Credit History
       | credit     | 1.01   | GoodwillTechnicalIssue    |
       | credit     | 0.99   | GoodwillServiceIssue      |
       | credit     | 1.99   | GoodwillCustomerRetention |
-      | credit     | 10.00  | CreditRefund              |
       | credit     | 11.00  | StaffCredit               |
       | credit     | 100.00 | CreditVoucherCode         |
       | credit     | 999.00 | Hudl2Promotion            |
@@ -56,13 +54,13 @@ Feature: Admin Credit History
     When I request for the user's credit history
     Then the request fails because my role is forbidden
 
-# CREDIT-55
-  @in-progress
+  # CRED-74
   Scenario Outline: Requesting credit history of unknown user
     Given an unknown customer
     And I am logged in as a <role> user
     When I request for the user's credit history
-    Then the request fails because the user was not found
+    Then the request is successful
+    And the customer has overall credit balance of 0.00 in GBP
 
   Examples:
     | role |

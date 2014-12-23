@@ -15,12 +15,13 @@ Feature: Admin account credit service
     | CSM  |
     | CSR  |
 
-  @in-progress
+  @manual @data-dependent
   Scenario Outline: Credit unknown user
     Given an unknown customer
     And I am logged in as a <role> user
     When I credit the customer 1.01 in GBP with the reason: Goodwill (Technical Issue)
-    Then the request fails because the user was not found
+    Then the request is successful
+    And the customer has overall credit balance of 1.01 in GBP
 
   Examples:
     | role |
@@ -38,7 +39,6 @@ Feature: Admin account credit service
     |0     |
     |-1    |
 
-  @in-progress
   Scenario: Credit user with invalid reason
     Given a customer with 0.00 in GBP of credit
     And I am logged in as a CSM user
@@ -57,9 +57,8 @@ Feature: Admin account credit service
     When I credit the customer 1.01 in GBP with the reason: Goodwill (Technical Issue)
     Then the request fails because I was forbidden
 
-  @in-progress
   Scenario: Credit user using a requestId that has already been used
-    Given a customer with 10.00 in GBP of credit
+    Given a customer with 0.00 in GBP of credit
     And I am logged in as a CSM user
     And I credit the customer 1.00 in GBP with the reason: Goodwill (Book Issue)
     When I try to credit the customer 2.00 in GBP using the same requestId as before

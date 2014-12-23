@@ -16,7 +16,6 @@ Feature: Admin Account Debit
     Then the request fails because it was invalid
     And the customer has overall credit balance of 10.00 in GBP
 
-  @in-progress
   Scenario: Debit user using requestId that has already been used
     Given a customer with 10.00 in GBP of credit
     And I am logged in as a CSM user
@@ -36,12 +35,13 @@ Feature: Admin Account Debit
     |0     |
     |-1    |
 
-  @in-progress
+  # CRED-74
   Scenario: Debit unknown user
     Given an unknown customer
     And I am logged in as a CSM user
     When I debit the customer 1.01 in GBP
-    Then the request fails because the user was not found
+    Then the request fails because it was invalid
+    And the customer has overall credit balance of 0.00 in GBP
 
   Scenario: Debit user using a logged out user
     Given a customer with 10.00 in GBP of credit
