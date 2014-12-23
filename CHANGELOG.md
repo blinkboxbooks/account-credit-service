@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.15.2 ([#46](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/46) 2014-12-23 09:59:52)
+
+Credit with reason acceptance
+
+Test Improvement: Updating tests for "Credit with reason" functionality, CRED-62.
+
+
 ## 0.15.1 ([#45](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/45) 2014-12-22 14:41:56)
 
 CRED-73 correct reason from get request
