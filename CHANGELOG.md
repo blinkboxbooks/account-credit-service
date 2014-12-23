@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.3 ([#47](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/47) 2014-12-23 12:11:34)
+
+fix cucumber profiles
+
+Test improvement: Fixing cucumber profile
+
 ## 0.15.2 ([#46](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/46) 2014-12-23 09:59:52)
 
 Credit with reason acceptance
