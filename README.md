@@ -1,4 +1,4 @@
-# account-credit-service-v2
+# account-credit-service-v2 [![Build Status](http://grisham:8111/app/rest/builds/buildType:%28id:Books_Platform_Agora_AccountCreditServiceV2_Build%29/statusIcon)](http://grisham.blinkbox.local:8111/project.html?projectId=Books_Platform_Agora_AccountCreditServiceV2)
 
 [Spec](http://jira.blinkbox.local/confluence/pages/viewpage.action?pageId=21436336) ||
 [JIRA](http://jira.blinkbox.local/jira/secure/RapidBoard.jspa?rapidView=107) ||
