@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.15.4 ([#48](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/48) 2015-01-05 15:55:19)
+
+Add teamcity icon
+
+patch
+
+Copying Egis's idea!
+
 ## 0.15.3 ([#47](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/47) 2014-12-23 12:11:34)
 
 fix cucumber profiles
