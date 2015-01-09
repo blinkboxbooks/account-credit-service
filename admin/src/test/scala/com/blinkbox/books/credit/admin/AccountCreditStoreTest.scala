@@ -10,6 +10,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.math.BigDecimal.double2bigDecimal
 import scala.slick.driver.H2Driver
 import scala.slick.jdbc.JdbcBackend.Database
+import scala.util.Random
 
 trait TestDatabase extends DatabaseComponent {
   override val DB = new H2DatabaseSupport
@@ -118,14 +119,13 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
   }
 
   test("credit history is sorted by descending createdAt time") {
-    for (i <- 1 to 100) yield {
-      dao.addCredit(CreditBalance(None, s"request-$i", BigDecimal(1), TransactionType.Credit,
-        Some(Reason.GoodwillBookIssue), nowTime.plusDays(i), None, customerId, Some(adminId)))
-    }
+    val credits = for (i <- 1 to 100) yield CreditBalance(None, s"request-$i", BigDecimal(1), TransactionType.Credit,
+        Some(Reason.GoodwillBookIssue), nowTime.plusDays(i), None, customerId, Some(adminId))
+    Random.shuffle(credits).foreach(dao.addCredit)
     val creditList = dao.getCreditHistoryForUser(customerId)
-    creditList.fold(creditList.head){(previous, next) =>
-      assert(next.createdAt.isBefore(previous.createdAt) || previous.createdAt == next.createdAt)
-      next
+    creditList.zip(creditList.drop(1)).foreach { tuple =>
+      val (firstCredit, secondCredit) = tuple
+      assert(firstCredit.createdAt.isAfter(secondCredit.createdAt))
     }
   }
 
