@@ -59,11 +59,11 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
                 path("debits") {
                   authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
                     entity(as[DebitRequest]) { debitRequest =>
-                      onSuccess(adminService.hasRequestAlreadyBeenProcessed(debitRequest.requestId)) { alreadyProcessed =>
+                      onSuccess(adminService.hasRequestAlreadyBeenProcessed(debitRequest.transactionId)) { alreadyProcessed =>
                         if (alreadyProcessed) {
                           complete(StatusCodes.NoContent)
                         } else {
-                          onSuccess(adminService.addDebit(userId, debitRequest.amount, debitRequest.requestId)) { resp =>
+                          onSuccess(adminService.addDebit(userId, debitRequest.amount, debitRequest.transactionId)) { resp =>
                             complete(StatusCodes.NoContent)
                           }
                         }
@@ -74,7 +74,7 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
                   path("credits") {
                     authenticateAndAuthorize(authenticator.withElevation(Critical), hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { implicit adminUser =>
                       entity(as[CreditRequest]) { credit =>
-                        onSuccess(adminService.hasRequestAlreadyBeenProcessed(credit.requestId)) { alreadyProcessed =>
+                        onSuccess(adminService.hasRequestAlreadyBeenProcessed(credit.transactionId)) { alreadyProcessed =>
                           if (alreadyProcessed) {
                             complete(StatusCodes.NoContent)
                           } else {
@@ -99,6 +99,6 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
   }
 }
 
-case class DebitRequest(amount: Money, requestId: String)
-case class CreditRequest(amount: Money, requestId: String, reason: String)
+case class DebitRequest(amount: Money, transactionId: String)
+case class CreditRequest(amount: Money, transactionId: String, reason: String)
 case class ReasonResponse(reasons: List[String])

@@ -38,7 +38,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) 
     validateAmount(req.amount)
     CreditBalance(     
     id = None,
-    requestId = req.requestId,
+    transactionId = req.transactionId,
     value = req.amount.value,
     transactionType = TransactionType.Credit,
     reason = Some(creditReasonMapping(req.reason)),

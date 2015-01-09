@@ -44,10 +44,10 @@ class DbAccountCreditStore[DB <: DatabaseSupport](db: DB#Database, tables: Accou
 
   private def addDebit(credit: CreditBalance): Int = addCredit(credit)
   
-  override def getCreditBalanceByRequestId(requestId: String): Option[CreditBalance] =
+  override def getCreditBalanceByRequestId(transactionId: String): Option[CreditBalance] =
     db.withSession {
       implicit session =>
-        creditBalance.filter { _.requestId === requestId }.firstOption
+        creditBalance.filter { _.transactionId === transactionId }.firstOption
     }
 
   override def getCreditBalanceById(creditBalanceId: Int): Option[CreditBalance] =

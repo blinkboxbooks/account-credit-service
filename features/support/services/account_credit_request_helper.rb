@@ -13,7 +13,7 @@ module KnowsAboutAccountCreditRequests
   def post_admin_account_debit(admin_auth_token, amount_debit, user_id, transaction_id)
     @access_token = admin_auth_token
     request_body = {
-      :requestId => transaction_id,
+      :transactionId => transaction_id,
       :amount => {
         :currency => "GBP",
         :value => amount_debit.to_f
@@ -26,7 +26,7 @@ module KnowsAboutAccountCreditRequests
   def post_admin_account_credit(admin_auth_token, amount, reason, user_id, transaction_id)
     @access_token = admin_auth_token
     request_body = {
-      :requestId => transaction_id,
+      :transactionId => transaction_id,
       :amount => {
         :currency => "GBP",
         :value => amount.to_f
