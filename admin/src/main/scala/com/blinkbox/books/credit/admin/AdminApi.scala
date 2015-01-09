@@ -58,7 +58,7 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
               post {
                 path("debits") {
                   authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
-                    entity(as[DebitRequest]) { debitRequest =>
+                    entity(as[NewDebit]) { debitRequest =>
                       onSuccess(adminService.hasRequestAlreadyBeenProcessed(debitRequest.transactionId)) { alreadyProcessed =>
                         if (alreadyProcessed) {
                           complete(StatusCodes.NoContent)
@@ -73,7 +73,7 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
                 } ~
                   path("credits") {
                     authenticateAndAuthorize(authenticator.withElevation(Critical), hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { implicit adminUser =>
-                      entity(as[CreditRequest]) { credit =>
+                      entity(as[NewCredit]) { credit =>
                         onSuccess(adminService.hasRequestAlreadyBeenProcessed(credit.transactionId)) { alreadyProcessed =>
                           if (alreadyProcessed) {
                             complete(StatusCodes.NoContent)
@@ -99,6 +99,6 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
   }
 }
 
-case class DebitRequest(amount: Money, transactionId: String)
-case class CreditRequest(amount: Money, transactionId: String, reason: String)
+case class NewDebit(amount: Money, transactionId: String)
+case class NewCredit(amount: Money, transactionId: String, reason: String)
 case class ReasonResponse(reasons: List[String])

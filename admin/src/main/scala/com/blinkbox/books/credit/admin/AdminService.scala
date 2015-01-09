@@ -8,7 +8,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 trait AdminService {
   def getCreditReasons(): List[String]
   def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit]
-  def addCredit(req: CreditRequest, customerId: Int)(implicit adminUser: User): Future[Unit]
+  def addCredit(req: NewCredit, customerId: Int)(implicit adminUser: User): Future[Unit]
   def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory]
   def hasRequestAlreadyBeenProcessed(requestId: String): Future[Boolean]
 }
@@ -30,11 +30,11 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) 
     accountCreditStore.getCreditBalanceByRequestId(requestId).nonEmpty
   }
 
-  override def addCredit(req: CreditRequest, customerId: Int)(implicit adminUser: User): Future[Unit] = Future {
+  override def addCredit(req: NewCredit, customerId: Int)(implicit adminUser: User): Future[Unit] = Future {
     accountCreditStore.addCredit(copyAddCreditReqToCreditBalance(req, customerId, adminUser))
   }
 
-  private def copyAddCreditReqToCreditBalance(req: CreditRequest, customerId: Int, adminUser: User): CreditBalance = {
+  private def copyAddCreditReqToCreditBalance(req: NewCredit, customerId: Int, adminUser: User): CreditBalance = {
     validateAmount(req.amount)
     CreditBalance(     
     id = None,
