@@ -53,7 +53,7 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
       val creditBalance = newCredit(1)
       dao.addCredit(creditBalance)
       assert(dao.getCreditBalanceById(1).map(_.id) == Some(creditBalance.id))
-      assert(dao.getCreditBalanceById(1).map(_.requestId) == Some(creditBalance.requestId))
+      assert(dao.getCreditBalanceById(1).map(_.transactionId) == Some(creditBalance.transactionId))
     }
   }
 

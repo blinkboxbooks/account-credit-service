@@ -18,7 +18,7 @@ trait AccountCreditTables[Profile <: JdbcProfile] extends TablesContainer[Profil
 
   class CreditBalanceTable(tag: Tag) extends Table[CreditBalance](tag, "credit_balance") {
     def id = column[Int]("credit_balance_id", O.PrimaryKey, O.AutoInc)
-    def requestId = column[String]("request_id")
+    def transactionId = column[String]("transaction_id")
     def value = column[BigDecimal]("value", O.DBType("decimal(7, 2)"))
     def transactionType = column[TransactionType]("transaction_type_id")
     def reason = column[Option[Reason]]("reason_id")
@@ -26,7 +26,7 @@ trait AccountCreditTables[Profile <: JdbcProfile] extends TablesContainer[Profil
     def updatedAt = column[Option[DateTime]]("updated_at")
     def customerId = column[Int]("customer_id", O.NotNull)
     def adminUserId = column[Option[Int]]("admin_user_id")
-    def * = (id.?, requestId, value, transactionType, reason, createdAt, updatedAt, customerId, adminUserId) <> (CreditBalance.tupled, CreditBalance.unapply _)
+    def * = (id.?, transactionId, value, transactionType, reason, createdAt, updatedAt, customerId, adminUserId) <> (CreditBalance.tupled, CreditBalance.unapply _)
   }
 }
 

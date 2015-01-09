@@ -58,12 +58,12 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
               post {
                 path("debits") {
                   authenticateAndAuthorize(authenticator, hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { adminUser =>
-                    entity(as[DebitRequest]) { debitRequest =>
-                      onSuccess(adminService.hasRequestAlreadyBeenProcessed(debitRequest.requestId)) { alreadyProcessed =>
+                    entity(as[NewDebit]) { debitRequest =>
+                      onSuccess(adminService.hasRequestAlreadyBeenProcessed(debitRequest.transactionId)) { alreadyProcessed =>
                         if (alreadyProcessed) {
                           complete(StatusCodes.NoContent)
                         } else {
-                          onSuccess(adminService.addDebit(userId, debitRequest.amount, debitRequest.requestId)) { resp =>
+                          onSuccess(adminService.addDebit(userId, debitRequest.amount, debitRequest.transactionId)) { resp =>
                             complete(StatusCodes.NoContent)
                           }
                         }
@@ -73,8 +73,8 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
                 } ~
                   path("credits") {
                     authenticateAndAuthorize(authenticator.withElevation(Critical), hasAnyRole(CustomerServicesRep, CustomerServicesManager)) { implicit adminUser =>
-                      entity(as[CreditRequest]) { credit =>
-                        onSuccess(adminService.hasRequestAlreadyBeenProcessed(credit.requestId)) { alreadyProcessed =>
+                      entity(as[NewCredit]) { credit =>
+                        onSuccess(adminService.hasRequestAlreadyBeenProcessed(credit.transactionId)) { alreadyProcessed =>
                           if (alreadyProcessed) {
                             complete(StatusCodes.NoContent)
                           } else {
@@ -99,6 +99,6 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
   }
 }
 
-case class DebitRequest(amount: Amount, requestId: String)
-case class CreditRequest(amount: Amount, requestId: String, reason: String)
+case class NewDebit(amount: Amount, transactionId: String)
+case class NewCredit(amount: Amount, transactionId: String, reason: String)
 case class ReasonResponse(reasons: List[String])

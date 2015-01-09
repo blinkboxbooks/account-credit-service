@@ -11,7 +11,7 @@ object DummyData {
       ("currency" -> "GBP")) ~
     ("items" -> List(
       ("type" -> "credit") ~
-      ("requestId" -> "sdfnaksfniofgniaodoir84t839t") ~
+      ("transactionId" -> "sdfnaksfniofgniaodoir84t839t") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
         ("value" -> JDecimal(1000.53)) ~
@@ -22,7 +22,7 @@ object DummyData {
         ("roles" -> List("csr"))),
 
       ("type" -> "debit") ~
-      ("requestId" -> "sdfnaksfniofgniaodoir84t839t") ~
+      ("transactionId" -> "sdfnaksfniofgniaodoir84t839t") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
         ("value" -> JDecimal(1000.53)) ~
@@ -34,7 +34,7 @@ object DummyData {
       ("currency" -> "GBP")) ~
     ("items" -> List(
       ("type" -> "credit") ~
-      ("requestId" -> "sdfnaksfniofgniaodoir84t839t") ~
+      ("transactionId" -> "sdfnaksfniofgniaodoir84t839t") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
         ("value" -> JDecimal(1000.53)) ~
@@ -42,7 +42,7 @@ object DummyData {
       ("reason" -> "CreditVoucherCode"),
 
       ("type" -> "debit") ~
-      ("requestId" -> "sdfnaksfniofgniaodoir84t839t") ~
+      ("transactionId" -> "sdfnaksfniofgniaodoir84t839t") ~
       ("dateTime" -> "2012-01-02T03:04:05.000Z") ~
       ("amount" ->
         ("value" -> JDecimal(1000.53)) ~

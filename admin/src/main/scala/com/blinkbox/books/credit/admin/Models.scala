@@ -4,7 +4,7 @@ import org.joda.time.DateTime
 
 case class CreditBalance (
   id: Option[Int],
-  requestId : String,
+  transactionId : String,
   value: BigDecimal,
   transactionType: TransactionType.TransactionType,
   reason: Option[Reason.Reason],

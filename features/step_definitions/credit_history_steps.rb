@@ -29,6 +29,7 @@ end
 
 Then(/^the credit history contains the above events$/) do
   response_hash = parse_last_api_response
+  @expected_credit_history = @expected_credit_history.reverse
   @expected_credit_history.each_with_index do |event, index| # expecting credit history response to order events by desc timestamp
     # checking common fields
     expect(response_hash['items'][index]['amount']['value'].to_f).to eq(event['amount'].to_f)

@@ -4,8 +4,8 @@ import org.joda.time.DateTime
 
 sealed trait RenderingCreditOrDebit
 case class CreditIssuerForRendering(name: String, roles: Set[String])
-case class CreditForRendering(requestId: String,dateTime: DateTime, amount: Amount, reason: String, issuer: Option[CreditIssuerForRendering]) extends RenderingCreditOrDebit
-case class DebitForRendering(requestId: String, dateTime: DateTime, amount: Amount) extends RenderingCreditOrDebit
+case class CreditForRendering(transactionId: String,dateTime: DateTime, amount: Amount, reason: String, issuer: Option[CreditIssuerForRendering]) extends RenderingCreditOrDebit
+case class DebitForRendering(transactionId: String, dateTime: DateTime, amount: Amount) extends RenderingCreditOrDebit
 case class CreditHistoryForRendering(balance: Amount, items: List[RenderingCreditOrDebit])
 
 object RenderingFunctions {
