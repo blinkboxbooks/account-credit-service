@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.15.5 ([#49](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/49) 2015-01-09 12:04:06)
+
+PT-261: Credits should be sorted in descending order
+
+patch 
+
+- PT-261: Credits should be sorted by descending createdAt time. 
+- misc dev improvements: added simple console pattern to application.conf, increase logger startup timeout because of failing TC build. 
+
 ## 0.15.4 ([#48](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/48) 2015-01-05 15:55:19)
 
 Add teamcity icon
