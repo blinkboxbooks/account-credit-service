@@ -123,9 +123,8 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
         Some(Reason.GoodwillBookIssue), nowTime.plusDays(i), None, customerId, Some(adminId))
     Random.shuffle(credits).foreach(dao.addCredit)
     val creditList = dao.getCreditHistoryForUser(customerId)
-    creditList.zip(creditList.drop(1)).foreach { tuple =>
-      val (firstCredit, secondCredit) = tuple
-      assert(firstCredit.createdAt.isAfter(secondCredit.createdAt))
+    creditList.zip(creditList.drop(1)).foreach {
+      case (first, second) => assert(first.createdAt.isAfter(second.createdAt))
     }
   }
 
