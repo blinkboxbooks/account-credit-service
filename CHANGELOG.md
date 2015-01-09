@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.15.7 ([#51](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/51) 2015-01-09 16:45:13)
+
+PT-258: Rename requestId to transactionId
+
+patch
+
+- PT-258: Rename requestId to transactionId
+- Requires schema updates `002_rename_request_id.sql` & `003_millisecond_precision_for_datetime.sql`
+- fixed cucumber tests by introducing millisecond precision to database `DATETIME` columns. 
+
 ## 0.15.6 ([#50](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/50) 2015-01-09 16:03:41)
 
 PT-251 refactored the code to use Joda Money
