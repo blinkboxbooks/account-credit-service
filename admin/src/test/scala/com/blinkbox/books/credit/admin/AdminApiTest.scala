@@ -340,7 +340,6 @@ class TestFixture extends v2.JsonSupport with MockitoSyrup  {
   when(authenticator.withElevation(Elevation.Critical)).thenReturn(authenticator)
 
   val debitRequest = DebitRequest(Amount(BigDecimal.valueOf(90.01), "GBP"), "good")
-  //val nonGbpDebitRequest = DebitRequest(Amount(BigDecimal.valueOf(90.01), "USD"), "good")
   
   val accountCreditStore = mock[AccountCreditStore]
   val clock = StoppedClock()
