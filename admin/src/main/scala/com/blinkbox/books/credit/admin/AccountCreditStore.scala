@@ -23,7 +23,7 @@ class DbAccountCreditStore[DB <: DatabaseSupport](db: DB#Database, tables: Accou
 
   override def getCreditHistoryForUser(userId: Int): Seq[CreditBalance] =
     db.withSession { implicit session =>
-      creditBalance.filter { _.customerId === userId }.list.toSeq
+      creditBalance.filter { _.customerId === userId }.sortBy(_.createdAt.desc).list.toSeq
     }
 
   override def addCredit(credit: CreditBalance): Int =

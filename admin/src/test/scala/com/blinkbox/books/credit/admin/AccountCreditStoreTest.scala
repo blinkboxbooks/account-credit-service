@@ -117,6 +117,18 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
     }
   }
 
+  test("credit history is sorted by descending createdAt time") {
+    for (i <- 1 to 100) yield {
+      dao.addCredit(CreditBalance(None, s"request-$i", BigDecimal(1), TransactionType.Credit,
+        Some(Reason.GoodwillBookIssue), nowTime.plusDays(i), None, customerId, Some(adminId)))
+    }
+    val creditList = dao.getCreditHistoryForUser(customerId)
+    creditList.fold(creditList.head){(previous, next) =>
+      assert(next.createdAt.isBefore(previous.createdAt) || previous.createdAt == next.createdAt)
+      next
+    }
+  }
+
   private def newCredit(id: Int): CreditBalance = new CreditBalance(
     Some(id),
     "377d0f7a57a9c41edsgdsfgf290f169254ed2f6d4",
