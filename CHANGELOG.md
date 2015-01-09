@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.15.6 ([#50](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/50) 2015-01-09 16:03:41)
+
+PT-251 refactored the code to use Joda Money
+
+#### improvement
+- refactored the code to use Joda Money
+
 ## 0.15.5 ([#49](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/49) 2015-01-09 12:04:06)
 
 PT-261: Credits should be sorted in descending order

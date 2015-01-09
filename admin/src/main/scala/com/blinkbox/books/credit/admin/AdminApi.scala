@@ -99,6 +99,6 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
   }
 }
 
-case class NewDebit(amount: Money, transactionId: String)
-case class NewCredit(amount: Money, transactionId: String, reason: String)
+case class NewDebit(amount: Amount, transactionId: String)
+case class NewCredit(amount: Amount, transactionId: String, reason: String)
 case class ReasonResponse(reasons: List[String])
