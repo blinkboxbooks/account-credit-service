@@ -7,9 +7,9 @@ import scala.util.Try
 
 sealed trait CreditOrDebit
 
-case class Amount( value: BigDecimal, currency: String = "GBP") {
+case class Amount(value: BigDecimal, currency: String = "GBP") {
   val jodaCurrency = Try(CurrencyUnit.of(currency)).filter(_.getCurrencyCode == "GBP").getOrElse(throw InvalidRequestException("unsupported_currency"))
-   val asJodaMoney = Money.of(jodaCurrency, value.bigDecimal)
+  val asJodaMoney = Money.of(jodaCurrency, value.bigDecimal)
 }
 
 case class Debit(requestId: String, dateTime: DateTime, amount: Amount) extends CreditOrDebit 
