@@ -7,7 +7,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 trait AdminService {
   def getCreditReasons(): List[String]
-  def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit]
+  def addDebit(userId: Int, amount: Amount, requestId: String): Future[Unit]
   def addCredit(req: CreditRequest, customerId: Int)(implicit adminUser: User): Future[Unit]
   def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory]
   def hasRequestAlreadyBeenProcessed(requestId: String): Future[Boolean]
@@ -17,7 +17,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) 
 
   override def getCreditReasons(): List[String] = Reason.values.toList.map(_.toString)
 
-  override def addDebit(userId: Int, amount: Money, requestId: String): Future[Unit] = Future {
+  override def addDebit(userId: Int, amount: Amount, requestId: String): Future[Unit] = Future {
     validateAmount(amount)
     accountCreditStore.addDebitIfUserHasSufficientCredit(userId, requestId, amount)
   }
@@ -64,8 +64,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) 
     }
   }
 
-  def validateAmount(amount : Money) = {
-    if (amount.value <= BigDecimal(0)) throw new InvalidRequestException("invalid_amount")
-    if (amount.currency != "GBP") throw new InvalidRequestException("unsupported_currency")
+  def validateAmount(amount: Amount) = {
+    if (amount.asJodaMoney.isNegativeOrZero) throw new InvalidRequestException("invalid_amount")
   }
 }

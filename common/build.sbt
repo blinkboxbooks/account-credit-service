@@ -13,6 +13,7 @@ libraryDependencies ++= {
     "mysql"                        % "mysql-connector-java"     % "5.1.34",
     "org.apache.commons"           % "commons-dbcp2"            % "2.0.1",
     "joda-time"                    % "joda-time"                % "2.5",
+    "org.joda"                     % "joda-money"               % "0.10.0",
     "com.h2database"               % "h2"                       % "1.4.182" % Test
   )
 }
