@@ -64,7 +64,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) 
     }
   }
 
-  def validateAmount(amount : Amount) = {
-   if (amount.asJodaMoney.isNegativeOrZero) throw new InvalidRequestException("invalid_amount")
+  def validateAmount(amount: Amount) = {
+    if (amount.asJodaMoney.isNegativeOrZero) throw new InvalidRequestException("invalid_amount")
   }
 }
