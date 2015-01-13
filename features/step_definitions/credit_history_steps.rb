@@ -27,7 +27,7 @@ When(/^I request for the user's credit history$/) do
   get_admin_account_credit(last_admin_user.access_token, user_id_of(last_public_user))
 end
 
-Then(/^the credit history contains the above events$/) do
+Then(/^the credit history contains the above events in reverse chronological order$/) do
   response_hash = parse_last_api_response
   @expected_credit_history = @expected_credit_history.reverse
   @expected_credit_history.each_with_index do |event, index| # expecting credit history response to order events by desc timestamp

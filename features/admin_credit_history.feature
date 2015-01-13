@@ -4,6 +4,8 @@ Feature: Admin Credit History
   So that I can verify their credit history when dealing with customer service issues
 
   # CRED-73 bug
+  # There is marginal potential for this test to fail if
+  # the service runs on multiple hosts whose clocks have diverged. See PT-604.
   Scenario: Credit reasons in credit history
     Given a customer has the following credit history:
       | event_type | amount | reason                    |
@@ -17,7 +19,7 @@ Feature: Admin Credit History
     And I am logged in as a CSM user
     When I request for the user's credit history
     Then the request is successful
-    And the credit history contains the above events
+    And the credit history contains the above events in reverse chronological order
 
   Scenario: Requesting credit history as CSR user and checking which fields returned
     Given a customer with credit history
