@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.15.8 ([#52](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/52) 2015-01-13 11:11:54)
+
+PT-261: added link to PT-604
+
+patch 
+
+- PT-261: Added a link to PT-604 in the acceptance test at the request of @timothyc 
+
 ## 0.15.7 ([#51](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/51) 2015-01-09 16:45:13)
 
 PT-258: Rename requestId to transactionId
