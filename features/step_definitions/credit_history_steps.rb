@@ -17,13 +17,17 @@ Given(/^a customer has the following credit history:$/) do |table|
   end
 end
 
-Given(/^a customer with credit history$/) do
-  # creating new user with default credit history
-  post_admin_account_credit(use_admin_user('csm').access_token, '9.99', 'GoodwillServiceIssue',
-                            user_id_of(new_public_user), new_request_id)
+Given(/^a customer with (no )?credit history$/) do |no_history|
+  if no_history
+    new_public_user
+  else
+    # creating new user with default credit history
+    post_admin_account_credit(use_admin_user('csm').access_token, '9.99', 'GoodwillServiceIssue',
+                              user_id_of(new_public_user), new_request_id)
+  end
 end
 
-When(/^I request for the user's credit history$/) do
+When(/^I request the user's credit history$/) do
   get_admin_account_credit(last_admin_user.access_token, user_id_of(last_public_user))
 end
 
@@ -55,6 +59,11 @@ Then(/^the event items in the history response (does not )?contains? the followi
   attr_list.each do | attr |
     field_exists?(attr, !does_not_contain)
   end
+end
+
+Then(/^the credit history contains ([\d.-]+) events$/) do |num_items|
+  expect(parse_last_api_response['items'].size).to eq(num_items.to_i)
+  expect(parse_last_api_response['balance']['value']).to eq(0)
 end
 
 def field_exists?(field_name, exists)
