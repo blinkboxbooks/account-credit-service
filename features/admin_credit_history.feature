@@ -68,3 +68,14 @@ Feature: Admin Credit History
     | role |
     | CSM  |
     | CSR  |
+
+  Scenario Outline: Requesting credit history for a user without history
+    Given a customer with no credit history
+    And I am logged in as a <role> user
+    When I request for the user's credit history
+    Then the request is successful
+    And the credit history contains 0 events
+  Examples:
+    | role |
+    | CSM  |
+    | CSR  |
