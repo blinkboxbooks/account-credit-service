@@ -19,7 +19,7 @@ end
 
 Given(/^a customer with (no )?credit history$/) do |no_history|
   if no_history
-      new_public_user
+    new_public_user
   else
     # creating new user with default credit history
     post_admin_account_credit(use_admin_user('csm').access_token, '9.99', 'GoodwillServiceIssue',
@@ -27,7 +27,7 @@ Given(/^a customer with (no )?credit history$/) do |no_history|
   end
 end
 
-When(/^I request for the user's credit history$/) do
+When(/^I request the user's credit history$/) do
   get_admin_account_credit(last_admin_user.access_token, user_id_of(last_public_user))
 end
 
