@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.15.9 ([#53](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/53) 2015-01-14 12:24:18)
+
+Trivial change to get a bump
+
+patch 
+
+- Trivial change to get a version bump & diagnose TC RPM build failure. 
+
 ## 0.15.8 ([#52](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/52) 2015-01-13 11:11:54)
 
 PT-261: added link to PT-604
