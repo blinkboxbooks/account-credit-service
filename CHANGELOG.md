@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.10 ([#54](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/54) 2015-01-14 16:38:56)
+
+PT-256: Added outstanding scenario
+
+- PT-256: Test improvements. Added `Requesting credit history for a user without history` scenario.
+
 ## 0.15.9 ([#53](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/53) 2015-01-14 12:24:18)
 
 Trivial change to get a bump
