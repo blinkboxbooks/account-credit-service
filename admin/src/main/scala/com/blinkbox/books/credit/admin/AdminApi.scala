@@ -2,13 +2,12 @@ package com.blinkbox.books.credit.admin
 
 import com.blinkbox.books.json.ExplicitTypeHints
 import com.blinkbox.books.spray.v2
-import spray.http.StatusCodes
 import com.typesafe.scalalogging.StrictLogging
 import org.json4s.ShortTypeHints
 import spray.http.StatusCodes
 import spray.routing._
 import Directives._
-import com.blinkbox.books.auth.{ UserRole, User }
+import com.blinkbox.books.auth.UserRole
 import com.blinkbox.books.spray.AuthDirectives._
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.blinkbox.books.auth.UserRole._
@@ -18,9 +17,6 @@ import com.blinkbox.books.spray.MonitoringDirectives.monitor
 import com.blinkbox.books.spray.BearerTokenAuthenticator
 import com.blinkbox.books.spray.v2.Implicits.throwableMarshaller
 import com.blinkbox.books.auth.Elevation.Critical
-import spray.routing.authentication.ContextAuthenticator
-import scala.util.Success
-import scala.util.Failure
 import scala.util.control.NonFatal
 
 class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticator) extends v2.JsonSupport with StrictLogging {

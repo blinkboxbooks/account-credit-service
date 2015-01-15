@@ -26,24 +26,10 @@ Then(/^the amount (?:credited|debited) is ([\d.-]+) in GBP$/) do |amount|
   expect(parse_last_api_response['amount']['currency']).to eq('GBP')
 end
 
-Given(/^(\d+) users with one of the following roles are logged in$/) do |concurrent_users, table|
-  roles = table.hashes.map {|hash| hash['role']}
-  @cs_users = 1.upto(concurrent_users.to_i).map {use_admin_user(roles.shuffle.first)}
-end
-
-When(/^all the users credit the customer ([\d.-]+) in GBP$/) do |amount|
-  @concurrent_responses = []
-  # Naively Simulate concurrent users.
-  # It seems to work OK: DB rows show credits with identical millisecond timestamps.
-  threads = @cs_users.map do |user|
-    Thread.new {@concurrent_responses << post_admin_account_credit(user.access_token, amount, 'GBP', 'GoodwillServiceIssue',
-                                          user_id_of(last_public_user), new_request_id)}
-  end
-  threads.each {|thr| thr.join}
-end
-
-Then(/^all the requests are successful$/) do
-  @concurrent_responses.each do |response|
-    expect(response.status_code).to eq(204)
-  end
+Then(/^the request fails because the ([\w.-]+) was invalid$/) do |the_invalid|
+  to_contain =
+    case the_invalid
+      when 'currency' then 'unsupported_currency'
+    end
+  expect(HttpCapture::RESPONSES.last.body.include?(to_contain)).to eq(true)
 end

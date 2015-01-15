@@ -35,9 +35,9 @@ Feature: Admin account credit service
     Then the request fails because it was invalid
 
     Examples:
-    |amount|
-    |0     |
-    |-1    |
+    | amount |
+    | 0      |
+    | -1     |
 
   Scenario: Credit user with invalid reason
     Given a customer with 0.00 in GBP of credit
@@ -69,27 +69,11 @@ Feature: Admin account credit service
     Given a customer with 0.00 in GBP of credit
     And I am logged in as a CSM user
     When I credit the customer <amount> in <currency> with the reason: Goodwill (Book Issue)
-    Then the request fails because it was invalid
+    Then the request fails because the currency was invalid
 
   Examples:
-    |amount|currency|
-    | 1000 | HKD    |
-    | 9001 | JPY    |
-    | 4    | BLZ    |
-    | .20  | IT     |
-
-  Scenario Outline: Multiple credit requests at the same time
-    Given a customer with 0.00 in GBP of credit
-    And <concurrent_users> users with one of the following roles are logged in
-      |role|
-      |CSM |
-      |CSR |
-    When all the users credit the customer <credit_amount> in GBP
-    Then all the requests are successful
-    And the customer has an overall credit balance of <total_amount> in GBP
-
-  Examples:
-    | concurrent_users | credit_amount | total_amount |
-    | 5                | 0.69          | 3.45         |
-    | 10               | 0.50          | 5.00         |
-    | 3                | 12.50         | 37.50        |
+    | amount | currency |
+    | 1000   | HKD      |
+    | 9001   | JPY      |
+    | 4      | BLZ      |
+    | .20    | IT       |
