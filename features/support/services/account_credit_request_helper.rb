@@ -23,12 +23,12 @@ module KnowsAboutAccountCreditRequests
     http_post :credit, "/admin/users/#{user_id}/accountcredit/debits", request_body, headers
   end
 
-  def post_admin_account_credit(admin_auth_token, amount, reason, user_id, transaction_id)
+  def post_admin_account_credit(admin_auth_token, amount, currency, reason, user_id, transaction_id)
     @access_token = admin_auth_token
     request_body = {
       :transactionId => transaction_id,
       :amount => {
-        :currency => "GBP",
+        :currency => currency,
         :value => amount.to_f
       },
       :reason => reason,

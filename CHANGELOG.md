@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.15.11 ([#56](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/56) 2015-01-15 11:33:39)
+
+PT-262: Add correct currency & multi-users scenarios
+
+patch 
+
+- PT-262: Added outstanding scenarios. 
+
 ## 0.15.10 ([#54](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/54) 2015-01-14 16:38:56)
 
 PT-256: Added outstanding scenario
