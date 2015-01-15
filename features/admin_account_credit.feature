@@ -8,7 +8,7 @@ Feature: Admin account credit service
     And I am logged in as a <role> user
     When I credit the customer 1.01 in GBP with the reason: Goodwill (Book Issue)
     Then the request is successful
-    And the customer has overall credit balance of 1.01 in GBP
+    And the customer has an overall credit balance of 1.01 in GBP
 
   Examples:
     | role |
@@ -21,7 +21,7 @@ Feature: Admin account credit service
     And I am logged in as a <role> user
     When I credit the customer 1.01 in GBP with the reason: Goodwill (Technical Issue)
     Then the request is successful
-    And the customer has overall credit balance of 1.01 in GBP
+    And the customer has an overall credit balance of 1.01 in GBP
 
   Examples:
     | role |
@@ -63,4 +63,33 @@ Feature: Admin account credit service
     And I credit the customer 1.00 in GBP with the reason: Goodwill (Book Issue)
     When I try to credit the customer 2.00 in GBP using the same requestId as before
     Then the request is successful
-    And the customer has overall credit balance of 1.00 in GBP
+    And the customer has an overall credit balance of 1.00 in GBP
+
+  Scenario Outline: Credit user with invalid currency
+    Given a customer with 0.00 in GBP of credit
+    And I am logged in as a CSM user
+    When I credit the customer <amount> in <currency> with the reason: Goodwill (Book Issue)
+    Then the request fails because it was invalid
+
+  Examples:
+    |amount|currency|
+    | 1000 | HKD    |
+    | 9001 | JPY    |
+    | 4    | BLZ    |
+    | .20  | IT     |
+
+  Scenario Outline: Multiple credit requests at the same time
+    Given a customer with 0.00 in GBP of credit
+    And <concurrent_users> users with one of the following roles are logged in
+      |role|
+      |CSM |
+      |CSR |
+    When all the users credit the customer <credit_amount> in GBP
+    Then all the requests are successful
+    And the customer has an overall credit balance of <total_amount> in GBP
+
+  Examples:
+    | concurrent_users | credit_amount | total_amount |
+    | 5                | 0.69          | 3.45         |
+    | 10               | 0.50          | 5.00         |
+    | 3                | 12.50         | 37.50        |

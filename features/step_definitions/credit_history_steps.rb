@@ -6,7 +6,7 @@ Given(/^a customer has the following credit history:$/) do |table|
   table.hashes.each do | event |
     event_type = event['event_type']
     if event_type == 'credit'
-      post_admin_account_credit(use_admin_user('csm').access_token, event['amount'], event['reason'],
+      post_admin_account_credit(use_admin_user('csm').access_token, event['amount'], 'GBP', event['reason'],
                                 user_id_of(last_public_user), new_request_id)
     elsif event_type == 'debit'
       post_admin_account_debit(use_csm_user.access_token, event['amount'], user_id_of(last_public_user),
@@ -22,7 +22,7 @@ Given(/^a customer with (no )?credit history$/) do |no_history|
     new_public_user
   else
     # creating new user with default credit history
-    post_admin_account_credit(use_admin_user('csm').access_token, '9.99', 'GoodwillServiceIssue',
+    post_admin_account_credit(use_admin_user('csm').access_token, '9.99', 'GBP', 'GoodwillServiceIssue',
                               user_id_of(new_public_user), new_request_id)
   end
 end

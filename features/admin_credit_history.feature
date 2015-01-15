@@ -62,7 +62,7 @@ Feature: Admin Credit History
     And I am logged in as a <role> user
     When I request the user's credit history
     Then the request is successful
-    And the customer has overall credit balance of 0.00 in GBP
+    And the customer has an overall credit balance of 0.00 in GBP
 
   Examples:
     | role |
