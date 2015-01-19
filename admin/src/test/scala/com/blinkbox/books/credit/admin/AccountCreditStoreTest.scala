@@ -90,11 +90,8 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
     }
 
     db.withSession { implicit session =>
-      val history = dao.getCreditHistoryForUser(customerId).map(buildFromCreditBalances)
-      history.map{ h =>
-        assert(h.netBalance.value == BigDecimal(1))
-        assert(h.history.size == 2)
-      }
+      dao.getCreditHistoryForUser(customerId).map(buildFromCreditBalances)
+        .map(assertCreditHistory(_, expectedValue = BigDecimal(21), expectedSize = 0))
     }
   }
 
