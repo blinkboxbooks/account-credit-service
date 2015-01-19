@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.15.12 ([#57](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/57) 2015-01-19 14:34:24)
+
+PT-262: 503 on UnknownDatabaseException, refactor DAO
+
+patch 
+
+- PT-262: 503 on `UnknownDatabaseExecption`
+- refactor DAO code to return Futures, and use common-slick exception filtering behaviour. 
+
 ## 0.15.11 ([#56](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/56) 2015-01-15 11:33:39)
 
 PT-262: Add correct currency & multi-users scenarios
