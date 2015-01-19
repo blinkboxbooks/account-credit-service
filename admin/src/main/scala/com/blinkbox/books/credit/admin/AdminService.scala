@@ -30,7 +30,7 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) 
     accountCreditStore.getCreditBalanceByRequestId(requestId).map(_.nonEmpty)
 
   override def addCredit(req: NewCredit, customerId: Int)(implicit adminUser: User): Future[Unit] =
-    accountCreditStore.addCredit(copyAddCreditReqToCreditBalance(req, customerId, adminUser)).transform(_ => (), identity)
+    accountCreditStore.addCredit(copyAddCreditReqToCreditBalance(req, customerId, adminUser)).map(_ => ())
 
   private def copyAddCreditReqToCreditBalance(req: NewCredit, customerId: Int, adminUser: User): CreditBalance = {
     validateAmount(req.amount)

@@ -4,12 +4,12 @@ import com.blinkbox.books.slick.{DatabaseComponent, H2DatabaseSupport, TablesCon
 import com.blinkbox.books.time.SystemClock
 import com.google.common.util.concurrent.MoreExecutors
 import org.junit.runner.RunWith
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.exceptions.TestFailedException
+import org.scalatest.concurrent.{AsyncAssertions, ScalaFutures}
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
+import org.slf4j.LoggerFactory
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.math.BigDecimal.double2bigDecimal
 import scala.slick.driver.H2Driver
 import scala.slick.jdbc.JdbcBackend.Database
@@ -31,14 +31,14 @@ trait TestDatabase extends DatabaseComponent {
 }
 
 @RunWith(classOf[JUnitRunner])
-class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestDatabase with ScalaFutures {
+class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestDatabase with ScalaFutures with AsyncAssertions {
   import tables.driver.simple._
   import tables._
 
   implicit val directExecutor = ExecutionContext.fromExecutor(MoreExecutors.directExecutor())
   val dao = new DbAccountCreditStore[H2DatabaseSupport](db, tables, exceptionFilter, directExecutor)
   def nowTime = SystemClock.now()
-
+  val log = LoggerFactory.getLogger(getClass)
   val customerId = 2387
   val adminId = 889
 
@@ -90,8 +90,8 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
     }
 
     db.withSession { implicit session =>
-      dao.getCreditHistoryForUser(customerId).map(buildFromCreditBalances)
-        .map(assertCreditHistory(_, expectedValue = BigDecimal(21), expectedSize = 0))
+      val actual = dao.getCreditHistoryForUser(customerId).map(buildFromCreditBalances)
+      assertCreditHistory(actual, expectedValue = BigDecimal(1), expectedSize = 2)
     }
   }
 
@@ -102,25 +102,23 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
     }
 
     db.withSession { implicit session =>
-      whenReady(dao.getCreditHistoryForUser(customerId).map(buildFromCreditBalances)) { history =>
-        assertCreditHistory(history, expectedValue = credit, expectedSize = 1)
-      }
+      val actual = dao.getCreditHistoryForUser(customerId).map(buildFromCreditBalances)
+      assertCreditHistory(actual, expectedValue = credit, expectedSize = 1)
     }
 
     val balance = credit
 
     db.withSession { implicit session =>
       val fut = dao.addDebitIfUserHasSufficientCredit(customerId, "foo", Amount(BigDecimal(balance + 1)))
-      fut.transform(_ => (), {
-        case ex: InsufficientFundsException => ex
-        case ex: Exception => throw new TestFailedException(s"Encountered unexpected exception: $ex, expected InsufficientFundsException", ex, 0)
-      })
+      assert(fut.eitherValue.fold(false){
+        case Right(_) => false
+        case Left(e) => e.isInstanceOf[InsufficientFundsException]
+      }, "Expected InsufficientFundsException to be thrown")
     }
 
     db.withSession { implicit session =>
-      whenReady(dao.getCreditHistoryForUser(customerId).map(buildFromCreditBalances)) { history =>
-        assertCreditHistory(history, expectedValue = credit, expectedSize = 1)
-      }
+      val history = dao.getCreditHistoryForUser(customerId).map(buildFromCreditBalances)
+      assertCreditHistory(history, expectedValue = credit, expectedSize = 1)
     }
   }
 
@@ -128,12 +126,10 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
     val credits = for (i <- 1 to 100) yield CreditBalance(None, s"request-$i", BigDecimal(1), TransactionType.Credit,
         Some(Reason.GoodwillBookIssue), nowTime.plusDays(i), None, customerId, Some(adminId))
     Random.shuffle(credits).foreach(dao.addCredit)
-    dao.getCreditHistoryForUser(customerId) map {
-      case list: Seq[CreditBalance] =>
-        list.zip(list.drop(1)).foreach {
-          case (first, second) => assert(first.createdAt.isAfter(second.createdAt))
-        }
-      case _ => fail("expected a List[CreditBalance]")
+    whenReady(dao.getCreditHistoryForUser(customerId)) { balances =>
+      balances.zip(balances.drop(1)).foreach {
+        case (first, second) => assert(first.createdAt.isAfter(second.createdAt))
+      }
     }
   }
 
@@ -148,9 +144,11 @@ class AccountCreditStoreTest extends FunSuite with BeforeAndAfterEach with TestD
     customerId,
     Some(adminId))
 
-  private def assertCreditHistory(history: CreditHistory, expectedValue: BigDecimal, expectedSize: Int) = {
-    assert(history.netBalance.value == expectedValue)
-    assert(history.history.size == expectedSize)
+  private def assertCreditHistory(history: Future[CreditHistory], expectedValue: BigDecimal, expectedSize: Int) = {
+    whenReady(history) { h =>
+      assert(h.netBalance.value == expectedValue)
+      assert(h.history.size == expectedSize)
+    }
   }
 }    
   

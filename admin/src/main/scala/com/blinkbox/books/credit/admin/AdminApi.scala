@@ -5,7 +5,7 @@ import com.blinkbox.books.slick.UnknownDatabaseException
 import com.blinkbox.books.spray.v2
 import com.typesafe.scalalogging.StrictLogging
 import org.json4s.ShortTypeHints
-import spray.http.StatusCodes
+import spray.http.{RequestProcessingException, StatusCodes}
 import spray.routing._
 import Directives._
 import com.blinkbox.books.auth.UserRole
@@ -31,7 +31,7 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
   val exceptionHandler: ExceptionHandler = ExceptionHandler {
     case e: InvalidRequestException => complete(StatusCodes.BadRequest, v2.Error(e.message, None))
     case e: InsufficientFundsException => complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))
-    case e: UnknownDatabaseException => complete(StatusCodes.ServiceUnavailable, v2.Error("ServiceUnavailable", None))
+    case e: UnknownDatabaseException => failWith(new RequestProcessingException(StatusCodes.ServiceUnavailable))
   }
 
   val route = monitor(logger, throwableMarshaller) {
