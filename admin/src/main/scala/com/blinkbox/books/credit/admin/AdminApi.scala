@@ -1,6 +1,7 @@
 package com.blinkbox.books.credit.admin
 
 import com.blinkbox.books.json.ExplicitTypeHints
+import com.blinkbox.books.slick.UnknownDatabaseException
 import com.blinkbox.books.spray.v2
 import com.typesafe.scalalogging.StrictLogging
 import org.json4s.ShortTypeHints
@@ -17,7 +18,6 @@ import com.blinkbox.books.spray.MonitoringDirectives.monitor
 import com.blinkbox.books.spray.BearerTokenAuthenticator
 import com.blinkbox.books.spray.v2.Implicits.throwableMarshaller
 import com.blinkbox.books.auth.Elevation.Critical
-import scala.util.control.NonFatal
 
 class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticator) extends v2.JsonSupport with StrictLogging {
 
@@ -31,9 +31,7 @@ class AdminApi(adminService: AdminService, authenticator: BearerTokenAuthenticat
   val exceptionHandler: ExceptionHandler = ExceptionHandler {
     case e: InvalidRequestException => complete(StatusCodes.BadRequest, v2.Error(e.message, None))
     case e: InsufficientFundsException => complete(StatusCodes.BadRequest, v2.Error("InsufficientFunds", None))
-    case NonFatal(e) =>
-      logger.warn("an unknown exception occurred", e)
-      complete(StatusCodes.ServerError, v2.Error("server_error", None))
+    case e: UnknownDatabaseException => complete(StatusCodes.ServiceUnavailable, v2.Error("ServiceUnavailable", None))
   }
 
   val route = monitor(logger, throwableMarshaller) {

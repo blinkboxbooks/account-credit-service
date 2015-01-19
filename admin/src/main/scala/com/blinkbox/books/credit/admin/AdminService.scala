@@ -4,6 +4,7 @@ import com.blinkbox.books.auth.User
 import scala.concurrent.Future
 import com.blinkbox.books.time.Clock
 import scala.concurrent.ExecutionContext.Implicits.global
+import CreditHistory.buildFromCreditBalances
 
 trait AdminService {
   def getCreditReasons(): List[String]
@@ -17,22 +18,19 @@ class DefaultAdminService(accountCreditStore: AccountCreditStore, clock: Clock) 
 
   override def getCreditReasons(): List[String] = Reason.values.toList.map(_.toString)
 
-  override def addDebit(userId: Int, amount: Amount, requestId: String): Future[Unit] = Future {
+  override def addDebit(userId: Int, amount: Amount, requestId: String): Future[Unit] = {
     validateAmount(amount)
     accountCreditStore.addDebitIfUserHasSufficientCredit(userId, requestId, amount)
   }
 
-  override def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory] = Future {
-    CreditHistory.buildFromCreditBalances(accountCreditStore.getCreditHistoryForUser(userId))
-  }
+  override def lookupCreditHistoryForUser(userId: Int): Future[CreditHistory] =
+    accountCreditStore.getCreditHistoryForUser(userId).map(buildFromCreditBalances)
 
-  override def hasRequestAlreadyBeenProcessed(requestId: String): Future[Boolean] = Future {
-    accountCreditStore.getCreditBalanceByRequestId(requestId).nonEmpty
-  }
+  override def hasRequestAlreadyBeenProcessed(requestId: String): Future[Boolean] =
+    accountCreditStore.getCreditBalanceByRequestId(requestId).map(_.nonEmpty)
 
-  override def addCredit(req: NewCredit, customerId: Int)(implicit adminUser: User): Future[Unit] = Future {
-    accountCreditStore.addCredit(copyAddCreditReqToCreditBalance(req, customerId, adminUser))
-  }
+  override def addCredit(req: NewCredit, customerId: Int)(implicit adminUser: User): Future[Unit] =
+    accountCreditStore.addCredit(copyAddCreditReqToCreditBalance(req, customerId, adminUser)).transform(_ => (), identity)
 
   private def copyAddCreditReqToCreditBalance(req: NewCredit, customerId: Int, adminUser: User): CreditBalance = {
     validateAmount(req.amount)
