@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.15.13 ([#58](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/58) 2015-01-20 16:12:49)
+
+PT-244: Update cucumber tests
+
+patch 
+
+- PT-244: Added scenarios for malformed user ids
+
 ## 0.15.12 ([#57](https://git.mobcastdev.com/Agora/account-credit-service-v2/pull/57) 2015-01-19 14:34:24)
 
 PT-262: 503 on UnknownDatabaseException, refactor DAO
