@@ -1,5 +1,7 @@
 package com.blinkbox.books.credit.admin
 
+import java.sql.SQLSyntaxErrorException
+
 import com.blinkbox.books.auth.{ UserRole, User, Elevation }
 import com.blinkbox.books.spray.v2
 import com.blinkbox.books.test.MockitoSyrup
@@ -18,6 +20,7 @@ import org.mockito.Matchers._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import com.blinkbox.books.time.StoppedClock
+import com.blinkbox.books.slick.UnknownDatabaseException
 import scala.concurrent.duration._
 
 @RunWith(classOf[JUnitRunner])
@@ -276,6 +279,15 @@ class AdminApiTest extends FlatSpec with ScalatestRouteTest with HttpService wit
     Get("/admin/accountcredit/reasons") ~> route ~> check {
       assert(status == StatusCodes.OK)
       assert(DummyData.expectedForCreditReasons == responseAs[JValue])
+    }
+  }
+
+  it should "503 on UnknownDatabaseException" in new TestFixture {
+    when(authenticator.apply(any[RequestContext])).thenReturn(Future.successful(Right(authenticatedUserCSM)))
+    when(adminService.lookupCreditHistoryForUser(123))
+      .thenReturn(Future.failed(UnknownDatabaseException(new SQLSyntaxErrorException("test"))))
+    Get("/admin/users/123/accountcredit") ~> route ~> check {
+      assert(status == StatusCodes.ServiceUnavailable)
     }
   }
   
