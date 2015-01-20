@@ -36,7 +36,7 @@ Feature: Admin Account Debit
     |-1    |
 
   Scenario Outline: Debit malformed user id
-    Given a malformed customer id <malformed_id>
+    Given a malformed customer id of <malformed_id>
     And I am logged in as a CSM user
     When I debit the customer 1.01 in GBP
     Then the request fails because the user was not found

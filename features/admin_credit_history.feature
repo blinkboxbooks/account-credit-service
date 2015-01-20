@@ -57,7 +57,7 @@ Feature: Admin Credit History
     Then the request fails because my role is forbidden
 
   Scenario Outline: Requesting credit history with malformed user id
-    Given a malformed customer id <malformed_id>
+    Given a malformed customer id of <malformed_id>
     And I am logged in as a CSM user
     When I request the user's credit history
     Then the request fails because the user was not found

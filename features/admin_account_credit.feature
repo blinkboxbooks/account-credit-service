@@ -17,7 +17,7 @@ Feature: Admin account credit service
 
   @manual @data-dependent
   Scenario Outline: Credit Malformed user id
-    Given a malformed customer id <malformed_id>
+    Given a malformed customer id of <malformed_id>
     And I am logged in as a CSM user
     When I credit the customer 1.01 in GBP with the reason: Goodwill (Technical Issue)
     Then the request is unsuccessful because the user was not found

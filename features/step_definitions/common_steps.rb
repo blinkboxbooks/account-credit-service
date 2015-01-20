@@ -10,7 +10,6 @@ Given(/^I am a logged out user$/) do
   use_logged_out_admin_user
 end
 
-
-Given(/^a malformed customer id (.*)$/) do |malformed_id|
+Given(/^a malformed customer id of (.*)$/) do |malformed_id|
   use_malformed_user_id(malformed_id)
 end
