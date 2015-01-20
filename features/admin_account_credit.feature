@@ -16,17 +16,17 @@ Feature: Admin account credit service
     | CSR  |
 
   @manual @data-dependent
-  Scenario Outline: Credit unknown user
-    Given an unknown customer
-    And I am logged in as a <role> user
+  Scenario Outline: Credit Malformed user id
+    Given a malformed customer id <malformed_id>
+    And I am logged in as a CSM user
     When I credit the customer 1.01 in GBP with the reason: Goodwill (Technical Issue)
-    Then the request is successful
-    And the customer has an overall credit balance of 1.01 in GBP
+    Then the request is unsuccessful because the user was not found
 
   Examples:
-    | role |
-    | CSM  |
-    | CSR  |
+    | malformed_id |
+    | 9999999999   |
+    | -1           |
+    | abc          |
 
   Scenario Outline: Credit user with invalid amount
     Given a customer with 0.00 in GBP of credit

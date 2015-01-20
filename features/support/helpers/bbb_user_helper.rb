@@ -18,11 +18,11 @@ module KnowsAboutBbbUsers
     @last_public_user = public_user
   end
 
-  def use_unknown_customer
+  def use_malformed_user_id(id)
     @last_public_user = Blinkbox::User.new(:username => 'unknown-user@bbb.com', :password => 'abc123', :server_uri => test_env.servers['auth'])
     @last_public_user.instance_eval %Q"
       def user_id
-        '99999999999'
+        '#{id}'
       end
     "
   end
@@ -43,7 +43,7 @@ module KnowsAboutBbbUsers
   end
 
   def user_id_of(user)
-    /\d+/.match(user.user_id).to_s
+    user.user_id.split(':').pop
   end
 
   def authenticate_user(username, password)
