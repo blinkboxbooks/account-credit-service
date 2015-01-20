@@ -35,13 +35,17 @@ Feature: Admin Account Debit
     |0     |
     |-1    |
 
-  # CRED-74
-  Scenario: Debit unknown user
-    Given an unknown customer
+  Scenario Outline: Debit malformed user id
+    Given a malformed customer id of <malformed_id>
     And I am logged in as a CSM user
     When I debit the customer 1.01 in GBP
-    Then the request fails because it was invalid
-    And the customer has an overall credit balance of 0.00 in GBP
+    Then the request fails because the user was not found
+
+  Examples:
+    | malformed_id |
+    | 9999999999   |
+    | -1           |
+    | abc          |
 
   Scenario: Debit user using a logged out user
     Given a customer with 10.00 in GBP of credit

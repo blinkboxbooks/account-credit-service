@@ -56,18 +56,17 @@ Feature: Admin Credit History
     When I request the user's credit history
     Then the request fails because my role is forbidden
 
-  # CRED-74
-  Scenario Outline: Requesting credit history of unknown user
-    Given an unknown customer
-    And I am logged in as a <role> user
+  Scenario Outline: Requesting credit history with malformed user id
+    Given a malformed customer id of <malformed_id>
+    And I am logged in as a CSM user
     When I request the user's credit history
-    Then the request is successful
-    And the customer has an overall credit balance of 0.00 in GBP
+    Then the request fails because the user was not found
 
   Examples:
-    | role |
-    | CSM  |
-    | CSR  |
+    | malformed_id |
+    | 9999999999   |
+    | -1           |
+    | abc          |
 
   Scenario Outline: Requesting credit history for a user without history
     Given a customer with no credit history
