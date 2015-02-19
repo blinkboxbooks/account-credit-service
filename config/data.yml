@@ -1,0 +1,7 @@
+user:
+  has the csm role:
+    username: "tm-books-itops@blinkbox.com"
+    password: "snip"
+  has the csr role:
+    username: "tm-books-test-csr@blinkbox.com"
+    password: "snip"
